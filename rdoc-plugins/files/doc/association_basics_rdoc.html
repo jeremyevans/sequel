@@ -1013,7 +1013,7 @@ doc/association_basics.rdoc
 <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:japanese_verses</span>, <span class="ruby-value">clone:</span> <span class="ruby-value">:english_verses</span>, <span class="ruby-value">conditions:</span> {<span class="ruby-value">languageid:</span> <span class="ruby-value">3</span>}
 </pre>
 
-<p>Note that for the final two asociations, you didn’t have to specify the :class, :key, or :order options, as they were copied by the :clone option.  By specifying the :conditions option for the final two associations, it overrides the :conditions option of the first association, it doesn’t attempt to merge them.</p>
+<p>Note that for the final two associations, you didn’t have to specify the :class, :key, or :order options, as they were copied by the :clone option.  By specifying the :conditions option for the final two associations, it overrides the :conditions option of the first association, it doesn’t attempt to merge them.</p>
 
 <p>In addition to the options hash, the :clone option will copy a block argument from the existing situation.  If you want a cloned association to not have the same block as the association you are cloning from, specify the block: nil option in addition to the :clone option.</p>
 

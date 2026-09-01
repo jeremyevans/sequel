@@ -50,7 +50,7 @@ doc/release_notes/3.46.0.txt
 
 <pre class="ruby"><span class="ruby-identifier">create_table</span>(<span class="ruby-value">:tab</span>) <span class="ruby-keyword">do</span>
   <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>, <span class="ruby-value">:primary_key_constraint_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:pk_name</span>
-  <span class="ruby-identifier">foriegn_key</span> <span class="ruby-value">:t_id</span>, <span class="ruby-value">:t</span>, <span class="ruby-value">:foreign_key_constraint_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:fk_name</span>,
+  <span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:t_id</span>, <span class="ruby-value">:t</span>, <span class="ruby-value">:foreign_key_constraint_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:fk_name</span>,
     <span class="ruby-value">:unique</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:unique_constraint_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:uk_name</span>
 <span class="ruby-keyword">end</span>
 </pre>

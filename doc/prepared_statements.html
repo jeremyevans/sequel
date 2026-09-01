@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Prepared Statements and Bound Variables - Sequel: The Database Toolkit for Ruby</title>
+  <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="ruby, sequel, sql, toolkit, orm, plugins, documentation" />
+  <meta name="description" content="Ruby Sequel is a lightweight database toolkit for Ruby." />
+
+  <link rel="icon" type="image/icon" sizes="32x32" href="../images/favicon.ico">
+  <link href="../css/application.css" media="screen" rel="stylesheet" type="text/css" />
+  <link href="../css/guide.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="body">
+  <header class="header">
+    <nav class="nav nav--header">
+      <a href="../index.html">
+        <img src="../images/ruby-sequel.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--header" />
+      </a>
+      <ul class="nav__ul nav__ul--header">
+        <li class="nav__li">
+          <a href="../documentation.html" class="nav__a">Documentation</a>
+        </li>
+        <li class="nav__li">
+          <a href="../plugins.html" class="nav__a">Plugins</a>
+        </li>
+        <li class="nav__li">
+          <a href="../development.html" class="nav__a">Development</a>
+        </li>
+        <li class="nav__li">
+          <a href="../links.html" class="nav__a">Links</a>
+        </li>
+      </ul>
+      <form class="nav__form nav__form--header" action="https://www.google.com/search" autocomplete="off">
+        <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
+      </form>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="main__container">
+      <div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Prepared+Statements+and+Bound+Variables"><a href="#label-Prepared+Statements+and+Bound+Variables">Prepared Statements and Bound Variables</a></h1>
+
+<p><a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a> has support for prepared statements and bound variables.  No matter which database you are using, the <a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a> prepared statement/bound variable API remains the same.  There is native support for prepared statements/bound variables on the following adapters:</p>
+<ul><li>
+<p>ibmdb (prepared statements only)</p>
+</li><li>
+<p>jdbc</p>
+</li><li>
+<p>mysql (server prepared statements using literalized connection variables)</p>
+</li><li>
+<p>mysql2 (full support on 0.4+, otherwise server prepared statements using literalized connection variables)</p>
+</li><li>
+<p>oracle (requires type specifiers for nil/NULL values)</p>
+</li><li>
+<p>postgres (when using the pg driver)</p>
+</li><li>
+<p>sqlite</p>
+</li><li>
+<p>tinytds</p>
+</li></ul>
+
+<p>Support on other adapters is emulated.</p>
+
+<p>You can use the <a href="..//doc/prepared_statements.html">prepared_statements</a> model plugin to automatically use prepared statements for some common model actions such as saving or deleting a model instance, or looking up a model based on a primary key.</p>
+
+<h2 id="label-Placeholders"><a href="#label-Placeholders">Placeholders</a></h2>
+
+<p>Generally, when using prepared statements (and certainly when using bound variables), you need to put placeholders in your SQL to indicate where you want your bound arguments to appear.  Database support and syntax vary significantly for placeholders (e.g. :name, $1, ?).  <a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a> abstracts all of that and allows you to specify placeholders by using the :$name format for placeholders, e.g.:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)
+</pre>
+
+<p>You can use these placeholders in most places where you can use the value directly.  For example, if you want to use placeholders while also using raw SQL, you can do:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM items WHERE name = ?&quot;</span>, <span class="ruby-value">:$n</span>]
+</pre>
+
+<h2 id="label-Bound+Variables"><a href="#label-Bound+Variables">Bound Variables</a></h2>
+
+<p>Using bound variables for this query is simple:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>)
+</pre>
+
+<p>This will do the equivalent of selecting records that have the name ‘Jim’. It returns all records, and can take a block that is passed to <code>Dataset#all</code>.</p>
+
+<p>Deleting or returning the first record works similarly:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:first</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># First record with name &#39;Jim&#39;</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:delete</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># Delete records with name &#39;Jim&#39;</span>
+</pre>
+
+<p>For inserting/updating records, you should also specify a value hash, which may itself contain placeholders:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Insert record with &#39;Jim&#39;, note that the previous filter is ignored</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:insert</span>, {<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, <span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)
+<span class="ruby-comment"># Change name to &#39;Bob&#39; for all records with name of &#39;Jim&#39;</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:update</span>, {<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>, <span class="ruby-value">new_n:</span> <span class="ruby-string">&#39;Bob&#39;</span>}, <span class="ruby-value">name:</span> <span class="ruby-value">:$new_n</span>)
+</pre>
+
+<h2 id="label-Prepared+Statements"><a href="#label-Prepared+Statements">Prepared Statements</a></h2>
+
+<p>Prepared statement support is similar to bound variable support, but you use <code>Dataset#prepare</code> with a name, and <code>Dataset#call</code> or <code>Database#call</code> later with the values:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)
+<span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:select_by_name</span>)
+
+<span class="ruby-identifier">ps</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>)
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:select_by_name</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># same</span>
+</pre>
+
+<p>The <code>Dataset#prepare</code> method returns a prepared statement, and also stores a copy of the prepared statement in the database for later use.  For insert and update queries, the hash to insert/update is passed to <code>prepare</code>:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ps1</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:insert</span>, <span class="ruby-value">:insert_with_name</span>, <span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)
+
+<span class="ruby-identifier">ps1</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>)
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:insert_with_name</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># same</span>
+
+<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)
+<span class="ruby-identifier">ps2</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:update</span>, <span class="ruby-value">:update_name</span>, <span class="ruby-value">name:</span> <span class="ruby-value">:$new_n</span>)
+
+<span class="ruby-identifier">ps2</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>, <span class="ruby-value">new_n:</span> <span class="ruby-string">&#39;Bob&#39;</span>)
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:update_name</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>, <span class="ruby-value">new_n:</span> <span class="ruby-string">&#39;Bob&#39;</span>) <span class="ruby-comment"># same</span>
+</pre>
+
+<h2 id="label-Implementation+Issues"><a href="#label-Implementation+Issues">Implementation Issues</a></h2>
+
+<p>Currently, creating a prepared statement uses Object#extend, which can hurt performance.  For high performance applications, it’s recommended to create all of your prepared statements upon application initialization, and not to create prepared statements dynamically at runtime.</p>
+
+<h2 id="label-Database+support"><a href="#label-Database+support">Database support</a></h2>
+
+<h3 id="label-PostgreSQL"><a href="#label-PostgreSQL">PostgreSQL</a></h3>
+
+<p>If you are using the postgres-pr driver, PostgreSQL uses the default emulated support.  If you are using ruby-pg, there is native support for both prepared statements and bound variables.  Prepared statements are always server side.</p>
+
+<h3 id="label-SQLite"><a href="#label-SQLite">SQLite</a></h3>
+
+<p>SQLite supports both prepared statements and bound variables.</p>
+
+<h3 id="label-MySQL-2FMysql2"><a href="#label-MySQL-2FMysql2">MySQL/Mysql2</a></h3>
+
+<p>The MySQL and Mysql2 &lt;0.4 ruby drivers do not support bound variables, so the bound variable methods are emulated.  It uses server side prepared statements.</p>
+
+<p>Mysql2 0.4+ supports both prepared statements and bound variables.</p>
+
+<h3 id="label-JDBC"><a href="#label-JDBC">JDBC</a></h3>
+
+<p>JDBC supports both prepared statements and bound variables.  Whether these are server side or client side depends on the JDBC driver.  For PostgreSQL over JDBC, you can add the prepareThreshold=N parameter to the connection string, which will use a server side prepared statement after N calls to the prepared statement.</p>
+
+<h3 id="label-TinyTDS"><a href="#label-TinyTDS">TinyTDS</a></h3>
+
+<p>Uses the sp_executesql stored procedure with bound variables, since Microsoft SQL Server doesn’t support true prepared statements.</p>
+
+<h3 id="label-IBM_DB"><a href="#label-IBM_DB">IBM_DB</a></h3>
+
+<p>DB2 supports both prepared statements and bound variables.</p>
+
+<h3 id="label-Oracle"><a href="#label-Oracle">Oracle</a></h3>
+
+<p>Oracle supports both prepared statements and bound variables.  Prepared statements (OCI8::Cursor objects) are cached per connection.  If you ever plan to use a nil/NULL value as a bound variable/prepared statement value, you must specify the type in the placeholder using a __* suffix. You can use any of the schema types that <a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a> supports, such as :$name__string or :$num__integer.  Using blobs as bound variables is not currently supported.</p>
+
+<h3 id="label-All+Others"><a href="#label-All+Others">All Others</a></h3>
+
+<p>Support is emulated.</p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <nav class="nav">
+      <a href="../index.html">
+        <img src="../images/ruby-sequel-monocrome.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--footer" />
+      </a>
+      <ul class="nav__ul">
+        <li class="nav__li">
+          <a href="../documentation.html" class="nav__a">Documentation</a>
+          <a href="../documentation.html#general-overview" class="a">General Overview</a>
+          <a href="../documentation.html#databases" class="a">Databases</a>
+          <a href="../documentation.html#datasets" class="a">Datasets</a>
+          <a href="../documentation.html#models" class="a">Models</a>
+          <a href="../documentation.html#misc" class="a">Misc</a>
+          <a href="../documentation.html#rdoc" class="a">RDoc</a>
+          <a href="../documentation.html#release-notes" class="a">Release Notes</a>
+        </li>
+        <li class="nav__li">
+          <a href="../plugins.html" class="nav__a">Plugins</a>
+          <a href="../plugins.html#model-plugins" class="a">Model Plugins</a>
+          <a href="../plugins.html#sequel-extensions" class="a">Sequel Extensions</a>
+        </li>
+        <li class="nav__li">
+          <a href="../development.html" class="nav__a">Development</a>
+          <a href="../development.html#bugs" class="a">Reporting Bugs</a>
+          <a href="../development.html#contribute" class="a">Contribute</a>
+          <a href="../development.html#code" class="a">Source Code</a>
+          <a href="../development.html#license" class="a">License</a>
+        </li>
+        <li class="nav__li">
+          <a href="../links.html" class="nav__a">Links</a>
+          <a href="../links.html#articles" class="a">Articles</a>
+          <a href="../links.html#presentations" class="a">Presentations</a>
+          <a href="../links.html#logos" class="a">Logos &amp; Badges</a>
+          <a href="../links.html#using-sequel" class="a">Using Sequel</a>
+          <a href="https://rubygems.org/gems/sequel/" class="a">RubyGems</a>
+          <a href="https://github.com/jeremyevans/sequel/" class="a">GitHub</a>
+        </li>
+      </ul>
+      <form action="https://www.google.com/search" autocomplete="off">
+        <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
+      </form>
+    </nav>
+  </footer>
+</body>
+</html>

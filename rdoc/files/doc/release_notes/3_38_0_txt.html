@@ -53,7 +53,7 @@ doc/release_notes/3.38.0.txt
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:people</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Me&#39;</span>, <span class="ruby-value">:address</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">ad</span>)
 </pre>
 
-<p>If you are using the native postgres adapter, when retreiving row type values, they will be returned as instances of the row type, which are hash-like objects:</p>
+<p>If you are using the native postgres adapter, when retrieving row type values, they will be returned as instances of the row type, which are hash-like objects:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ad</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:people</span>].<span class="ruby-identifier">get</span>(<span class="ruby-value">:address</span>)
 <span class="ruby-identifier">ad</span>[<span class="ruby-value">:street</span>] <span class="ruby-comment"># =&gt; &#39;555 Foo St.&#39;</span>
@@ -181,7 +181,7 @@ doc/release_notes/3.38.0.txt
 </li><li>
 <p>The swift adapter now requires swift-db-{postgres,mysql,sqlite3} gems instead of the swift gem.  swift/postgres requires swift-db-postgres 0.2.0+, swift/sqlite requires swift-db-sqlite 0.1.2+, and swift/mysql requires swift-db-mysql.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> will no longer typecast a string to a PostgreSQL array or hstore column in a model column setter.  This is because the parsers that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses were designed to support only PostgreSQL’s output format.  It’s unlikely that a user would provide that format for typecasting, and while there aren’t known security issues with the parsers, they were not designed to handle arbtirary user input, so typecasting from string is no longer allowed and will now raise an error.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> will no longer typecast a string to a PostgreSQL array or hstore column in a model column setter.  This is because the parsers that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses were designed to support only PostgreSQL’s output format.  It’s unlikely that a user would provide that format for typecasting, and while there aren’t known security issues with the parsers, they were not designed to handle arbitrary user input, so typecasting from string is no longer allowed and will now raise an error.</p>
 
 <p>The only reason such typecasting was allowed in the first place was to work around issues in the jdbc/postgres, do/postgres, and swift/postgres adapters, using the the typecast_on_load plugin. If you were previously using the typecast_on_load plugin for hstore or array columns, you need to switch to using the new pg_typecast_on_load plugin.</p>
 </li><li>

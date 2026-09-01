@@ -99,9 +99,9 @@ Sequel::Plugins::Subclasses
 </a>
 <pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb</span>
 <span class="line-num">42</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">43</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">43</span>   <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">44</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@subclasses</span>, [])  <span class="ruby-keyword">if</span> <span class="ruby-constant">NEED_SUBCLASSES</span>
-<span class="line-num">45</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">45</span>   <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">46</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@on_subclass</span>, <span class="ruby-identifier">block</span>)
 <span class="line-num">47</span> <span class="ruby-keyword">end</span></pre>
 </div>

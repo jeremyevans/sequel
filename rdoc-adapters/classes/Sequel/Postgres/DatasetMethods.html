@@ -304,12 +304,12 @@ Sequel::Postgres::DatasetMethods
 <span class="line-num">3054</span>     <span class="ruby-identifier">rows</span>[<span class="ruby-value">0</span>]
 <span class="line-num">3055</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">all?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> <span class="ruby-constant">String</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">row</span>}
 <span class="line-num">3056</span>     <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\r\n&quot;</span>) 
-<span class="line-num">3057</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">3057</span>   <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">3058</span>   <span class="ruby-keyword">else</span>
 <span class="line-num">3059</span>     <span class="ruby-comment"># This branch is unreachable in tests, but it seems better to just return</span>
 <span class="line-num">3060</span>     <span class="ruby-comment"># all rows than throw in error if this case actually happens.</span>
 <span class="line-num">3061</span>     <span class="ruby-identifier">rows</span>
-<span class="line-num">3062</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">3062</span>   <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">3063</span>   <span class="ruby-keyword">end</span>
 <span class="line-num">3064</span> <span class="ruby-keyword">end</span></pre>
 </div>
@@ -528,9 +528,13 @@ Sequel::Postgres::DatasetMethods
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:conflict_where </td><td>
 <p>The index filter, when using a partial index to determine uniqueness.</p>
 </td></tr><tr><td class='label'>:constraint </td><td>
-<p>An explicit constraint name, has precendence over :target.</p>
+<p>An explicit constraint name, has precedence over :target.</p>
 </td></tr><tr><td class='label'>:target </td><td>
 <p>The column name or expression to handle uniqueness violations on.</p>
+</td></tr><tr><td class='label'>:select </td><td>
+<p>Use ON CONFLICT DO SELECT. This will use the dataset’s lock style. You must use returning on this dataset when using this option.</p>
+</td></tr><tr><td class='label'>:select_where </td><td>
+<p>A WHERE condition to use for the select.</p>
 </td></tr><tr><td class='label'>:update </td><td>
 <p>A hash of columns and values to set.  Uses ON CONFLICT DO UPDATE.</p>
 </td></tr><tr><td class='label'>:update_where </td><td>
@@ -564,6 +568,16 @@ Sequel::Postgres::DatasetMethods
 <span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>
 <span class="ruby-comment"># ON CONFLICT ON CONSTRAINT table_a_uidx</span>
 <span class="ruby-comment"># DO UPDATE SET b = excluded.b WHERE (table.status_id = 1)</span>
+
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">returning</span>(<span class="ruby-value">:a</span>).<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">target:</span> <span class="ruby-value">:a</span>, <span class="ruby-value">select:</span> <span class="ruby-keyword">true</span>).<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)
+<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>
+<span class="ruby-comment"># ON CONFLICT (a) DO SELECT RETURNING a</span>
+
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">returning</span>(<span class="ruby-value">:a</span>).<span class="ruby-identifier">for_update</span>.
+  <span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">target:</span> <span class="ruby-value">:a</span>, <span class="ruby-value">select:</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">select_where:</span> {<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:excluded</span>][<span class="ruby-value">:b</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-value">3</span>}).
+  <span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)
+<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>
+<span class="ruby-comment"># ON CONFLICT (a) DO SELECT FOR UPDATE WHERE (excluded.b = 3) RETURNING a</span>
 </pre>
 
 </div>
@@ -572,9 +586,13 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-insert_conflict-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3216</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_conflict</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">3217</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:insert_conflict</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>)
-<span class="line-num">3218</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3229</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_conflict</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">3230</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:select</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update</span>]
+<span class="line-num">3231</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide both :select and :update options to insert_conflict&quot;</span>
+<span class="line-num">3232</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">3233</span> 
+<span class="line-num">3234</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:insert_conflict</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>)
+<span class="line-num">3235</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert_ignore'>
@@ -598,9 +616,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-insert_ignore-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3226</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_ignore</span>
-<span class="line-num">3227</span>   <span class="ruby-identifier">insert_conflict</span>
-<span class="line-num">3228</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3243</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_ignore</span>
+<span class="line-num">3244</span>   <span class="ruby-identifier">insert_conflict</span>
+<span class="line-num">3245</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert_select'>
@@ -619,11 +637,11 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-insert_select-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3233</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
-<span class="line-num">3234</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_insert_select?</span>
-<span class="line-num">3235</span>   <span class="ruby-comment"># Handle case where query does not return a row</span>
-<span class="line-num">3236</span>   <span class="ruby-identifier">server?</span>(<span class="ruby-value">:default</span>).<span class="ruby-identifier">with_sql_first</span>(<span class="ruby-identifier">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span>
-<span class="line-num">3237</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3250</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">3251</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_insert_select?</span>
+<span class="line-num">3252</span>   <span class="ruby-comment"># Handle case where query does not return a row</span>
+<span class="line-num">3253</span>   <span class="ruby-identifier">server?</span>(<span class="ruby-value">:default</span>).<span class="ruby-identifier">with_sql_first</span>(<span class="ruby-identifier">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span>
+<span class="line-num">3254</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert_select_sql'>
@@ -642,10 +660,10 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-insert_select_sql-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3241</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
-<span class="line-num">3242</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:returning</span>] <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">returning</span>
-<span class="line-num">3243</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
-<span class="line-num">3244</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3258</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">3259</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:returning</span>] <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">returning</span>
+<span class="line-num">3260</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">3261</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-join_table'>
@@ -664,12 +682,12 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-join_table-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3248</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">join_table</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">table</span>, <span class="ruby-identifier">expr</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3249</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">AliasedExpression</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">expr</span>.<span class="ruby-identifier">expression</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">expr</span>.<span class="ruby-identifier">expression</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">expr</span>.<span class="ruby-identifier">expression</span>.<span class="ruby-identifier">all?</span>
-<span class="line-num">3250</span>     <span class="ruby-identifier">options</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:join_using</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
-<span class="line-num">3251</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">3252</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">3253</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3265</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">join_table</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">table</span>, <span class="ruby-identifier">expr</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3266</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">AliasedExpression</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">expr</span>.<span class="ruby-identifier">expression</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">expr</span>.<span class="ruby-identifier">expression</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">expr</span>.<span class="ruby-identifier">expression</span>.<span class="ruby-identifier">all?</span>
+<span class="line-num">3267</span>     <span class="ruby-identifier">options</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:join_using</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">3268</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">3269</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">3270</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-lock'>
@@ -688,21 +706,21 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-lock-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3260</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lock</span>(<span class="ruby-identifier">mode</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">3261</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>) <span class="ruby-comment"># perform locking inside a transaction and yield to block</span>
-<span class="line-num">3262</span>     <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">lock</span>(<span class="ruby-identifier">mode</span>, <span class="ruby-identifier">opts</span>); <span class="ruby-keyword">yield</span>}
-<span class="line-num">3263</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">3264</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-string">&#39;LOCK TABLE &#39;</span>.<span class="ruby-identifier">dup</span>
-<span class="line-num">3265</span>     <span class="ruby-identifier">source_list_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:from</span>])
-<span class="line-num">3266</span>     <span class="ruby-identifier">mode</span> = <span class="ruby-identifier">mode</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">upcase</span>.<span class="ruby-identifier">strip</span>
-<span class="line-num">3267</span>     <span class="ruby-keyword">unless</span> <span class="ruby-constant">LOCK_MODES</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">mode</span>)
-<span class="line-num">3268</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Unsupported lock mode: #{mode}&quot;</span>
-<span class="line-num">3269</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">3270</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot; IN #{mode} MODE&quot;</span>
-<span class="line-num">3271</span>     <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">3272</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">3273</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">3274</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3277</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lock</span>(<span class="ruby-identifier">mode</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">3278</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>) <span class="ruby-comment"># perform locking inside a transaction and yield to block</span>
+<span class="line-num">3279</span>     <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">lock</span>(<span class="ruby-identifier">mode</span>, <span class="ruby-identifier">opts</span>); <span class="ruby-keyword">yield</span>}
+<span class="line-num">3280</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">3281</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-string">&#39;LOCK TABLE &#39;</span>.<span class="ruby-identifier">dup</span>
+<span class="line-num">3282</span>     <span class="ruby-identifier">source_list_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:from</span>])
+<span class="line-num">3283</span>     <span class="ruby-identifier">mode</span> = <span class="ruby-identifier">mode</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">upcase</span>.<span class="ruby-identifier">strip</span>
+<span class="line-num">3284</span>     <span class="ruby-keyword">unless</span> <span class="ruby-constant">LOCK_MODES</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">mode</span>)
+<span class="line-num">3285</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Unsupported lock mode: #{mode}&quot;</span>
+<span class="line-num">3286</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">3287</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot; IN #{mode} MODE&quot;</span>
+<span class="line-num">3288</span>     <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">3289</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">3290</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">3291</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-merge'>
@@ -721,14 +739,14 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-merge-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3277</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3278</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">merge_sql</span>
-<span class="line-num">3279</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">uses_returning?</span>(<span class="ruby-value">:merge</span>)
-<span class="line-num">3280</span>     <span class="ruby-identifier">returning_fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3281</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">3282</span>     <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">sql</span>)
-<span class="line-num">3283</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">3284</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3294</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3295</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">merge_sql</span>
+<span class="line-num">3296</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">uses_returning?</span>(<span class="ruby-value">:merge</span>)
+<span class="line-num">3297</span>     <span class="ruby-identifier">returning_fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3298</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">3299</span>     <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">3300</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">3301</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-merge_delete_when_not_matched_by_source'>
@@ -754,9 +772,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-merge_delete_when_not_matched_by_source-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3295</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge_delete_when_not_matched_by_source</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3296</span>   <span class="ruby-identifier">_merge_when</span>(<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:delete_not_matched_by_source</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3297</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3312</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge_delete_when_not_matched_by_source</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3313</span>   <span class="ruby-identifier">_merge_when</span>(<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:delete_not_matched_by_source</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3314</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-merge_do_nothing_when_matched'>
@@ -782,9 +800,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-merge_do_nothing_when_matched-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3308</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge_do_nothing_when_matched</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3309</span>   <span class="ruby-identifier">_merge_when</span>(<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:matched</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3310</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3325</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge_do_nothing_when_matched</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3326</span>   <span class="ruby-identifier">_merge_when</span>(<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:matched</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3327</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-merge_do_nothing_when_not_matched'>
@@ -810,9 +828,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-merge_do_nothing_when_not_matched-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3321</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge_do_nothing_when_not_matched</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3322</span>   <span class="ruby-identifier">_merge_when</span>(<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:not_matched</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3323</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3338</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge_do_nothing_when_not_matched</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3339</span>   <span class="ruby-identifier">_merge_when</span>(<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:not_matched</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3340</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-merge_do_nothing_when_not_matched_by_source'>
@@ -838,9 +856,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-merge_do_nothing_when_not_matched_by_source-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3334</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge_do_nothing_when_not_matched_by_source</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3335</span>   <span class="ruby-identifier">_merge_when</span>(<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:not_matched_by_source</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3336</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3351</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge_do_nothing_when_not_matched_by_source</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3352</span>   <span class="ruby-identifier">_merge_when</span>(<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:not_matched_by_source</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3353</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-merge_insert'>
@@ -859,13 +877,13 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-merge_insert-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3339</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge_insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3340</span>   <span class="ruby-identifier">h</span> = {<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:insert</span>, <span class="ruby-value">:values</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">values</span>}
-<span class="line-num">3341</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:override</span>]
-<span class="line-num">3342</span>     <span class="ruby-identifier">h</span>[<span class="ruby-value">:override</span>] = <span class="ruby-identifier">insert_override_sql</span>(<span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>)
-<span class="line-num">3343</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">3344</span>   <span class="ruby-identifier">_merge_when</span>(<span class="ruby-identifier">h</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3345</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3356</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge_insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3357</span>   <span class="ruby-identifier">h</span> = {<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:insert</span>, <span class="ruby-value">:values</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">values</span>}
+<span class="line-num">3358</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:override</span>]
+<span class="line-num">3359</span>     <span class="ruby-identifier">h</span>[<span class="ruby-value">:override</span>] = <span class="ruby-identifier">insert_override_sql</span>(<span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>)
+<span class="line-num">3360</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">3361</span>   <span class="ruby-identifier">_merge_when</span>(<span class="ruby-identifier">h</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3362</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-merge_update_when_not_matched_by_source'>
@@ -891,9 +909,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-merge_update_when_not_matched_by_source-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3356</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge_update_when_not_matched_by_source</span>(<span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3357</span>   <span class="ruby-identifier">_merge_when</span>(<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:update_not_matched_by_source</span>, <span class="ruby-value">:values</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">3358</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3373</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge_update_when_not_matched_by_source</span>(<span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3374</span>   <span class="ruby-identifier">_merge_when</span>(<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:update_not_matched_by_source</span>, <span class="ruby-value">:values</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">3375</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-overriding_system_value'>
@@ -912,9 +930,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-overriding_system_value-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3363</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">overriding_system_value</span>
-<span class="line-num">3364</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:override</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:system</span>)
-<span class="line-num">3365</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3380</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">overriding_system_value</span>
+<span class="line-num">3381</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:override</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:system</span>)
+<span class="line-num">3382</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-overriding_user_value'>
@@ -933,9 +951,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-overriding_user_value-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3369</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">overriding_user_value</span>
-<span class="line-num">3370</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:override</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:user</span>)
-<span class="line-num">3371</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3386</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">overriding_user_value</span>
+<span class="line-num">3387</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:override</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:user</span>)
+<span class="line-num">3388</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_cte-3F'>
@@ -952,13 +970,13 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_cte-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3373</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)
-<span class="line-num">3374</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:select</span>
-<span class="line-num">3375</span>     <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">80400</span>
-<span class="line-num">3376</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">3377</span>     <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90100</span>
-<span class="line-num">3378</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">3379</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3390</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)
+<span class="line-num">3391</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:select</span>
+<span class="line-num">3392</span>     <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">80400</span>
+<span class="line-num">3393</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">3394</span>     <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90100</span>
+<span class="line-num">3395</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">3396</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_cte_in_subqueries-3F'>
@@ -977,9 +995,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_cte_in_subqueries-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3383</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte_in_subqueries?</span>
-<span class="line-num">3384</span>   <span class="ruby-identifier">supports_cte?</span>
-<span class="line-num">3385</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3400</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte_in_subqueries?</span>
+<span class="line-num">3401</span>   <span class="ruby-identifier">supports_cte?</span>
+<span class="line-num">3402</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_distinct_on-3F'>
@@ -998,9 +1016,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_distinct_on-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3388</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_distinct_on?</span>
-<span class="line-num">3389</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">3390</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3405</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_distinct_on?</span>
+<span class="line-num">3406</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">3407</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_group_cube-3F'>
@@ -1019,9 +1037,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_group_cube-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3393</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_cube?</span>
-<span class="line-num">3394</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>
-<span class="line-num">3395</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3410</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_cube?</span>
+<span class="line-num">3411</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>
+<span class="line-num">3412</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_group_rollup-3F'>
@@ -1040,9 +1058,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_group_rollup-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3398</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_rollup?</span>
-<span class="line-num">3399</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>
-<span class="line-num">3400</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3415</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_rollup?</span>
+<span class="line-num">3416</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>
+<span class="line-num">3417</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_grouping_sets-3F'>
@@ -1061,9 +1079,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_grouping_sets-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3403</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_grouping_sets?</span>
-<span class="line-num">3404</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>
-<span class="line-num">3405</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3420</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_grouping_sets?</span>
+<span class="line-num">3421</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>
+<span class="line-num">3422</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_insert_conflict-3F'>
@@ -1082,9 +1100,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_insert_conflict-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3413</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_insert_conflict?</span>
-<span class="line-num">3414</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>
-<span class="line-num">3415</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3430</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_insert_conflict?</span>
+<span class="line-num">3431</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>
+<span class="line-num">3432</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_insert_select-3F'>
@@ -1103,9 +1121,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_insert_select-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3408</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_insert_select?</span>
-<span class="line-num">3409</span>   <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:disable_insert_returning</span>]
-<span class="line-num">3410</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3425</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_insert_select?</span>
+<span class="line-num">3426</span>   <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:disable_insert_returning</span>]
+<span class="line-num">3427</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_lateral_subqueries-3F'>
@@ -1124,9 +1142,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_lateral_subqueries-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3418</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_lateral_subqueries?</span>
-<span class="line-num">3419</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90300</span>
-<span class="line-num">3420</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3435</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_lateral_subqueries?</span>
+<span class="line-num">3436</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90300</span>
+<span class="line-num">3437</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_merge-3F'>
@@ -1145,9 +1163,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_merge-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3428</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_merge?</span>
-<span class="line-num">3429</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">150000</span>
-<span class="line-num">3430</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3445</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_merge?</span>
+<span class="line-num">3446</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">150000</span>
+<span class="line-num">3447</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_modifying_joins-3F'>
@@ -1166,9 +1184,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_modifying_joins-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3423</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_modifying_joins?</span>
-<span class="line-num">3424</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">3425</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3440</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_modifying_joins?</span>
+<span class="line-num">3441</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">3442</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_nowait-3F'>
@@ -1187,9 +1205,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_nowait-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3433</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_nowait?</span>
-<span class="line-num">3434</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">3435</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3450</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_nowait?</span>
+<span class="line-num">3451</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">3452</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_regexp-3F'>
@@ -1208,9 +1226,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_regexp-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3448</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_regexp?</span>
-<span class="line-num">3449</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">3450</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3465</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_regexp?</span>
+<span class="line-num">3466</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">3467</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_returning-3F'>
@@ -1229,13 +1247,13 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_returning-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3439</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_returning?</span>(<span class="ruby-identifier">type</span>)
-<span class="line-num">3440</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:merge</span>
-<span class="line-num">3441</span>     <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">170000</span>
-<span class="line-num">3442</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">3443</span>     <span class="ruby-keyword">true</span>
-<span class="line-num">3444</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">3445</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3456</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_returning?</span>(<span class="ruby-identifier">type</span>)
+<span class="line-num">3457</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:merge</span>
+<span class="line-num">3458</span>     <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">170000</span>
+<span class="line-num">3459</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">3460</span>     <span class="ruby-keyword">true</span>
+<span class="line-num">3461</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">3462</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_skip_locked-3F'>
@@ -1254,9 +1272,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_skip_locked-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3453</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_skip_locked?</span>
-<span class="line-num">3454</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>
-<span class="line-num">3455</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3470</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_skip_locked?</span>
+<span class="line-num">3471</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>
+<span class="line-num">3472</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_timestamp_timezones-3F'>
@@ -1275,10 +1293,10 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_timestamp_timezones-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3460</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_timezones?</span>
-<span class="line-num">3461</span>   <span class="ruby-comment"># SEQUEL6: Remove</span>
-<span class="line-num">3462</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">3463</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3477</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_timezones?</span>
+<span class="line-num">3478</span>   <span class="ruby-comment"># SEQUEL6: Remove</span>
+<span class="line-num">3479</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">3480</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_window_clause-3F'>
@@ -1297,9 +1315,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_window_clause-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3467</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_clause?</span>
-<span class="line-num">3468</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">80400</span>
-<span class="line-num">3469</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3484</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_clause?</span>
+<span class="line-num">3485</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">80400</span>
+<span class="line-num">3486</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_window_function_frame_option-3F'>
@@ -1318,18 +1336,18 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_window_function_frame_option-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3478</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_function_frame_option?</span>(<span class="ruby-identifier">option</span>)
-<span class="line-num">3479</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">option</span>
-<span class="line-num">3480</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:rows</span>, <span class="ruby-value">:range</span>
-<span class="line-num">3481</span>     <span class="ruby-keyword">true</span>
-<span class="line-num">3482</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:offset</span>
-<span class="line-num">3483</span>     <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90000</span>
-<span class="line-num">3484</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:groups</span>, <span class="ruby-value">:exclude</span>
-<span class="line-num">3485</span>     <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">110000</span>
-<span class="line-num">3486</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">3487</span>     <span class="ruby-keyword">false</span>
-<span class="line-num">3488</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">3489</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3495</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_function_frame_option?</span>(<span class="ruby-identifier">option</span>)
+<span class="line-num">3496</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">option</span>
+<span class="line-num">3497</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:rows</span>, <span class="ruby-value">:range</span>
+<span class="line-num">3498</span>     <span class="ruby-keyword">true</span>
+<span class="line-num">3499</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:offset</span>
+<span class="line-num">3500</span>     <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90000</span>
+<span class="line-num">3501</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:groups</span>, <span class="ruby-value">:exclude</span>
+<span class="line-num">3502</span>     <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">110000</span>
+<span class="line-num">3503</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">3504</span>     <span class="ruby-keyword">false</span>
+<span class="line-num">3505</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">3506</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_window_functions-3F'>
@@ -1348,9 +1366,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_window_functions-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3472</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_functions?</span>
-<span class="line-num">3473</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">80400</span>
-<span class="line-num">3474</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3489</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_functions?</span>
+<span class="line-num">3490</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">80400</span>
+<span class="line-num">3491</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-truncate'>
@@ -1389,13 +1407,13 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-truncate-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3507</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">truncate</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">3508</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">3509</span>     <span class="ruby-keyword">super</span>()
-<span class="line-num">3510</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">3511</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:truncate_opts</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>).<span class="ruby-identifier">truncate</span>
-<span class="line-num">3512</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">3513</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3524</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">truncate</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">3525</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">3526</span>     <span class="ruby-keyword">super</span>()
+<span class="line-num">3527</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">3528</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:truncate_opts</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>).<span class="ruby-identifier">truncate</span>
+<span class="line-num">3529</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">3530</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_ties'>
@@ -1414,9 +1432,9 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-with_ties-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3518</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_ties</span>
-<span class="line-num">3519</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:limit_with_ties</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
-<span class="line-num">3520</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3535</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_ties</span>
+<span class="line-num">3536</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:limit_with_ties</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">3537</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Protected Instance methods</h2>
@@ -1436,18 +1454,18 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-_import-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3528</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">3529</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:returning</span>]
-<span class="line-num">3530</span>     <span class="ruby-comment"># no transaction: our multi_insert_sql_strategy should guarantee</span>
-<span class="line-num">3531</span>     <span class="ruby-comment"># that there&#39;s only ever a single statement.</span>
-<span class="line-num">3532</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">multi_insert_sql</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>)[<span class="ruby-value">0</span>]
-<span class="line-num">3533</span>     <span class="ruby-identifier">returning_fetch_rows</span>(<span class="ruby-identifier">sql</span>).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>}
-<span class="line-num">3534</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:return</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:primary_key</span>
-<span class="line-num">3535</span>     <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">insert_pk</span>).<span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">3536</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">3537</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">3538</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">3539</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3545</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">3546</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:returning</span>]
+<span class="line-num">3547</span>     <span class="ruby-comment"># no transaction: our multi_insert_sql_strategy should guarantee</span>
+<span class="line-num">3548</span>     <span class="ruby-comment"># that there&#39;s only ever a single statement.</span>
+<span class="line-num">3549</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">multi_insert_sql</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>)[<span class="ruby-value">0</span>]
+<span class="line-num">3550</span>     <span class="ruby-identifier">returning_fetch_rows</span>(<span class="ruby-identifier">sql</span>).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>}
+<span class="line-num">3551</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:return</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:primary_key</span>
+<span class="line-num">3552</span>     <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">insert_pk</span>).<span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">3553</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">3554</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">3555</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">3556</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method protected-instance' id='method-method-i-to_prepared_statement'>
@@ -1464,13 +1482,13 @@ Sequel::Postgres::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-to_prepared_statement-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">3541</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
-<span class="line-num">3542</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:insert</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:returning</span>)
-<span class="line-num">3543</span>     <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">insert_pk</span>).<span class="ruby-identifier">send</span>(<span class="ruby-value">:to_prepared_statement</span>, <span class="ruby-value">:insert_pk</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
-<span class="line-num">3544</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">3545</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">3546</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">3547</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">3558</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">3559</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:insert</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:returning</span>)
+<span class="line-num">3560</span>     <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">insert_pk</span>).<span class="ruby-identifier">send</span>(<span class="ruby-value">:to_prepared_statement</span>, <span class="ruby-value">:insert_pk</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">3561</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">3562</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">3563</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">3564</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

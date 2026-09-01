@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Sequel Extensions - Sequel: The Database Toolkit for Ruby</title>
+  <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="ruby, sequel, sql, toolkit, orm, plugins, documentation" />
+  <meta name="description" content="Ruby Sequel is a lightweight database toolkit for Ruby." />
+
+  <link rel="icon" type="image/icon" sizes="32x32" href="../images/favicon.ico">
+  <link href="../css/application.css" media="screen" rel="stylesheet" type="text/css" />
+  <link href="../css/guide.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="body">
+  <header class="header">
+    <nav class="nav nav--header">
+      <a href="../index.html">
+        <img src="../images/ruby-sequel.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--header" />
+      </a>
+      <ul class="nav__ul nav__ul--header">
+        <li class="nav__li">
+          <a href="../documentation.html" class="nav__a">Documentation</a>
+        </li>
+        <li class="nav__li">
+          <a href="../plugins.html" class="nav__a">Plugins</a>
+        </li>
+        <li class="nav__li">
+          <a href="../development.html" class="nav__a">Development</a>
+        </li>
+        <li class="nav__li">
+          <a href="../links.html" class="nav__a">Links</a>
+        </li>
+      </ul>
+      <form class="nav__form nav__form--header" action="https://www.google.com/search" autocomplete="off">
+        <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
+      </form>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="main__container">
+      <div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Sequel+Extensions"><a href="#label-Sequel+Extensions"><a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a> Extensions</a></h1>
+
+<p><a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a> has an official extension system, for adding global, Database, and Dataset extensions.</p>
+
+<h2 id="label-Global+Extensions"><a href="#label-Global+Extensions">Global Extensions</a></h2>
+
+<p>Global extensions can add or modify the behavior of any part of <a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a>.  Technically, they are not limited to affecting <a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a>, as they can also modify code outside of <a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a> (e.g. the blank extension).  However, extensions that modify things outside of <a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a> generally do so only for backwards compatibility.</p>
+
+<p>Global extensions are loaded via <code>Sequel.extension</code>:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:named_timezones</span>
+</pre>
+
+<p>All this does is require the relevant extension from <code>sequel/extensions/named_timezones</code> somewhere in the ruby path.  Global extensions are just a simpler, consistent way to require code that modifies <a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a>.</p>
+
+<h2 id="label-Database+Extensions"><a href="#label-Database+Extensions">Database Extensions</a></h2>
+
+<p>Database extensions should add or modify the behavior of a single <a href="..//rdoc/classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance.  They are loaded via <a href="..//rdoc/classes/Sequel/Database.html#method-i-extension"><code>Sequel::Database#extension</code></a>:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_block</span>
+</pre>
+
+<p>The first thing that this does is load the relevant extension globally.  However, Database extensions should be structured in a way that loading the relevant extension globally just adds a module with the related behavior, it doesn’t modify any other state.  After loading the extension globally, it modifies the related <a href="..//rdoc/classes/Sequel/Database.html"><code>Sequel::Database</code></a> object to modify it’s behavior, usually by extending it with a module.</p>
+
+<p>If you want a Database extension loaded into all future Database instances, you can use <a href="..//rdoc/classes/Sequel/Database.html#method-c-extension"><code>Sequel::Database.extension</code></a>:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_block</span>
+</pre>
+
+<p>All future <a href="..//rdoc/classes/Sequel/Database.html"><code>Sequel::Database</code></a> instances created afterward will then automatically have the server_block extension loaded.</p>
+
+<h2 id="label-Dataset+Extensions"><a href="#label-Dataset+Extensions">Dataset Extensions</a></h2>
+
+<p>Dataset extensions should add or modify the behavior of a single <a href="..//rdoc/classes/Sequel/Dataset.html"><code>Sequel::Dataset</code></a> instance.  They are loaded via <a href="..//rdoc/classes/Sequel/Dataset.html#method-i-extension"><code>Sequel::Dataset#extension</code></a>.  <a href="..//rdoc/classes/Sequel/Dataset.html#method-i-extension"><code>Sequel::Dataset#extension</code></a> returns a modifies copy of the dataset that includes the extension (similar to how most dataset query methods work):</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">extension</span>(<span class="ruby-value">:columns_introspection</span>)
+</pre>
+
+<p>The first thing loading a Dataset extension does is load the relevant extension globally.  Similar to Database extensions, loading a Dataset extension globally should not affect state other than maybe adding a module.  After loading the extension globally, it returned a modified copy of the <a href="..//rdoc/classes/Sequel/Dataset.html"><code>Sequel::Dataset</code></a> with the extension loaded into it.</p>
+
+<p>If you want to load an extension into all future datasets for a given <a href="..//rdoc/classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance, you can also load it as a Database extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:columns_introspection</span>
+</pre>
+
+<p>Likewise, if you want to load an extension into all future datasets for all future databases, you can load it via <a href="..//rdoc/classes/Sequel/Database.html#method-c-extension"><code>Sequel::Database.extension</code></a>:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:columns_introspection</span>
+</pre>
+
+<h2 id="label-Creating+Global+Extensions"><a href="#label-Creating+Global+Extensions">Creating Global Extensions</a></h2>
+
+<p>If you want to create a global extension, you just need to store your code so that you can require it via <code>sequel/extensions/extension_name</code>.  Then users can load it via:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:extension_name</span>
+</pre>
+
+<p>It is recommended you only create a global extension if what you want to do would not work as a Database or Dataset extension.</p>
+
+<h2 id="label-Creating+Database+Extensions"><a href="#label-Creating+Database+Extensions">Creating Database Extensions</a></h2>
+
+<p>Creating Database extensions is similar to global extensions in terms of creating the file.  However, somewhere in the file, you need to call <a href="..//rdoc/classes/Sequel/Database.html#method-c-register_extension"><code>Sequel::Database.register_extension</code></a>.  Usually you would call this with the module that will be added to the related <a href="..//rdoc/classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance when the extension is loaded.  For example, the server_block extension uses something like:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">register_extension</span>(<span class="ruby-value">:server_block</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ServerBlock</span>)
+</pre>
+
+<p>The first argument is the name of the extension as a symbol, and the second is the module.</p>
+
+<p>In some cases, just extending the <a href="..//rdoc/classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance with a module is not sufficient.  So <a href="..//rdoc/classes/Sequel/Database.html#method-c-register_extension"><code>Sequel::Database.register_extension</code></a> also accepts a proc instead of a second argument.  This proc is called with the <a href="..//rdoc/classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance, and can then run any related code:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">register_extension</span>(<span class="ruby-value">:arbitrary_servers</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ArbitraryServers</span>)}
+</pre>
+
+<h2 id="label-Creating+Dataset+Extensions"><a href="#label-Creating+Dataset+Extensions">Creating Dataset Extensions</a></h2>
+
+<p>Creating Dataset extensions is very similar to creating Database extensions, but instead of calling <a href="..//rdoc/classes/Sequel/Database.html#method-c-register_extension"><code>Sequel::Database.register_extension</code></a>, you call <a href="..//rdoc/classes/Sequel/Dataset.html#method-c-register_extension"><code>Sequel::Dataset.register_extension</code></a>.  In general, you would call this with the module that will be added to the related <a href="..//rdoc/classes/Sequel/Dataset.html"><code>Sequel::Dataset</code></a> instance when the extension is loaded.  For example, the columns_introspection extension uses something like:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>.<span class="ruby-identifier">register_extension</span>(<span class="ruby-value">:columns_introspection</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnsIntrospection</span>)
+</pre>
+
+<p>The first argument is the name of the extension as a symbol, and the second is the module.  When you call the <a href="..//rdoc/classes/Sequel/Dataset.html#method-c-register_extension"><code>Sequel::Dataset.register_extension</code></a> method with a module, it in turn calls <a href="..//rdoc/classes/Sequel/Database.html#method-c-register_extension"><code>Sequel::Database.register_extension</code></a> and adds a Database extension that loads this Dataset extension into all future Datasets created from the Database.</p>
+
+<p>You can also call <a href="..//rdoc/classes/Sequel/Dataset.html#method-c-register_extension"><code>Sequel::Dataset.register_extension</code></a> with a proc:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>.<span class="ruby-identifier">register_extension</span>(<span class="ruby-value">:extension_name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> }
+</pre>
+
+<p>Note that if you use a proc, a corresponding Database extension will not be created automatically (you can still call <a href="..//rdoc/classes/Sequel/Database.html#method-c-register_extension"><code>Sequel::Database.register_extension</code></a> manually in this case).</p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <nav class="nav">
+      <a href="../index.html">
+        <img src="../images/ruby-sequel-monocrome.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--footer" />
+      </a>
+      <ul class="nav__ul">
+        <li class="nav__li">
+          <a href="../documentation.html" class="nav__a">Documentation</a>
+          <a href="../documentation.html#general-overview" class="a">General Overview</a>
+          <a href="../documentation.html#databases" class="a">Databases</a>
+          <a href="../documentation.html#datasets" class="a">Datasets</a>
+          <a href="../documentation.html#models" class="a">Models</a>
+          <a href="../documentation.html#misc" class="a">Misc</a>
+          <a href="../documentation.html#rdoc" class="a">RDoc</a>
+          <a href="../documentation.html#release-notes" class="a">Release Notes</a>
+        </li>
+        <li class="nav__li">
+          <a href="../plugins.html" class="nav__a">Plugins</a>
+          <a href="../plugins.html#model-plugins" class="a">Model Plugins</a>
+          <a href="../plugins.html#sequel-extensions" class="a">Sequel Extensions</a>
+        </li>
+        <li class="nav__li">
+          <a href="../development.html" class="nav__a">Development</a>
+          <a href="../development.html#bugs" class="a">Reporting Bugs</a>
+          <a href="../development.html#contribute" class="a">Contribute</a>
+          <a href="../development.html#code" class="a">Source Code</a>
+          <a href="../development.html#license" class="a">License</a>
+        </li>
+        <li class="nav__li">
+          <a href="../links.html" class="nav__a">Links</a>
+          <a href="../links.html#articles" class="a">Articles</a>
+          <a href="../links.html#presentations" class="a">Presentations</a>
+          <a href="../links.html#logos" class="a">Logos &amp; Badges</a>
+          <a href="../links.html#using-sequel" class="a">Using Sequel</a>
+          <a href="https://rubygems.org/gems/sequel/" class="a">RubyGems</a>
+          <a href="https://github.com/jeremyevans/sequel/" class="a">GitHub</a>
+        </li>
+      </ul>
+      <form action="https://www.google.com/search" autocomplete="off">
+        <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
+      </form>
+    </nav>
+  </footer>
+</body>
+</html>

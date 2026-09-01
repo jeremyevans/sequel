@@ -42,7 +42,7 @@ doc/release_notes/4.22.0.txt
 
 <h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
-<p>On Ruby 1.9+, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses condition variables instead of busy waiting for connections in the threaded conection pools.  This can significantly decrease overhead when waiting for connections, which can improve performance on machines that are compute bottlenecked.  This also makes the connection pool checkouts more fair, reducing the chance that a request for a connection will fail with a PoolTimeout when under heavy resource contention.</p>
+<p>On Ruby 1.9+, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses condition variables instead of busy waiting for connections in the threaded connection pools.  This can significantly decrease overhead when waiting for connections, which can improve performance on machines that are compute bottlenecked.  This also makes the connection pool checkouts more fair, reducing the chance that a request for a connection will fail with a PoolTimeout when under heavy resource contention.</p>
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now attempts to avoid hash allocations and rehashing in performance sensitive code.  This can speed up Dataset#clone, Model#clone, and Model#dup by about 60%, and speed up method chains such as:</p>
 

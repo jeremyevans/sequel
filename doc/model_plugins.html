@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Model Plugins - Sequel: The Database Toolkit for Ruby</title>
+  <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="ruby, sequel, sql, toolkit, orm, plugins, documentation" />
+  <meta name="description" content="Ruby Sequel is a lightweight database toolkit for Ruby." />
+
+  <link rel="icon" type="image/icon" sizes="32x32" href="../images/favicon.ico">
+  <link href="../css/application.css" media="screen" rel="stylesheet" type="text/css" />
+  <link href="../css/guide.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="body">
+  <header class="header">
+    <nav class="nav nav--header">
+      <a href="../index.html">
+        <img src="../images/ruby-sequel.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--header" />
+      </a>
+      <ul class="nav__ul nav__ul--header">
+        <li class="nav__li">
+          <a href="../documentation.html" class="nav__a">Documentation</a>
+        </li>
+        <li class="nav__li">
+          <a href="../plugins.html" class="nav__a">Plugins</a>
+        </li>
+        <li class="nav__li">
+          <a href="../development.html" class="nav__a">Development</a>
+        </li>
+        <li class="nav__li">
+          <a href="../links.html" class="nav__a">Links</a>
+        </li>
+      </ul>
+      <form class="nav__form nav__form--header" action="https://www.google.com/search" autocomplete="off">
+        <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
+      </form>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="main__container">
+      <div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Model+Plugins"><a href="#label-Model+Plugins">Model Plugins</a></h1>
+
+<p><a href="..//rdoc/classes/Sequel/Model.html"><code>Sequel::Model</code></a> (and <a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a> in general) is designed around the idea of a small core, to which application-specific behavior can easily be added.  <a href="..//rdoc/classes/Sequel/Model.html"><code>Sequel::Model</code></a> implements this design using a plugin system.  Plugins are modules that include submodules for model class methods, model instance methods, and model dataset methods.  All plugins can override the class, instance, and dataset methods added by earlier plugins, and call super to get the behavior before the plugin was added.</p>
+
+<h2 id="label-Default+Plugins"><a href="#label-Default+Plugins">Default Plugins</a></h2>
+
+<p>The <a href="..//rdoc/classes/Sequel/Model.html"><code>Sequel::Model</code></a> class is completely empty by default, in that it has no class methods or instance methods.  <a href="..//rdoc/classes/Sequel/Model.html"><code>Sequel::Model</code></a> is itself a plugin, and it is the first plugin loaded, and it is loaded into itself (meta!).  So methods in <a href="..//rdoc/classes/Sequel/Model/ClassMethods.html"><code>Sequel::Model::ClassMethods</code></a> become <a href="..//rdoc/classes/Sequel/Model.html"><code>Sequel::Model</code></a> class methods, methods in <a href="..//rdoc/classes/Sequel/Model/InstanceMethods.html"><code>Sequel::Model::InstanceMethods</code></a> become <a href="..//rdoc/classes/Sequel/Model.html"><code>Sequel::Model</code></a> instance methods, and methods in <a href="..//rdoc/classes/Sequel/Model/DatasetMethods.html"><code>Sequel::Model::DatasetMethods</code></a> become <a href="..//rdoc/classes/Sequel/Model.html"><code>Sequel::Model</code></a> dataset methods. The <a href="..//rdoc/classes/Sequel/Model.html"><code>Sequel::Model</code></a> plugin is often referred to as the base plugin.</p>
+
+<p>By default, the <a href="..//rdoc/classes/Sequel/Model.html"><code>Sequel::Model</code></a> class also has the <a href="..//rdoc/classes/Sequel/Model/Associations.html"><code>Sequel::Model::Associations</code></a> plugin loaded by default, though it is possible to disable this.</p>
+
+<h2 id="label-Loading+Plugins"><a href="#label-Loading+Plugins">Loading Plugins</a></h2>
+
+<p>Loading a plugin into a model class is generally as simple as calling the Sequel::Model.plugin method with the name of the plugin, for example:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:subclasses</span>
+</pre>
+
+<p>What is does is require the <code>sequel/plugins/subclasses</code> file, and then assumes that that file defines the <code>Sequel::Plugins::Subclasses</code> plugin module.</p>
+
+<p>It’s possible to pass module instances to the plugin method to load plugins that are stored in arbitrary files or namespaces:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-constant">MyApp</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>
+</pre>
+
+<p>In the examples shown above, the plugin is loaded into <a href="..//rdoc/classes/Sequel/Model.html"><code>Sequel::Model</code></a>, which means it is loaded into all subclasses that are created afterward.  With many plugins, you are not going to want to add them to <a href="..//rdoc/classes/Sequel/Model.html"><code>Sequel::Model</code></a>, but to a specific subclass:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Node</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:tree</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>Doing this, only Node and future subclasses of Node will have the tree plugin loaded.</p>
+
+<h2 id="label-Plugin+Arguments-2FOptions"><a href="#label-Plugin+Arguments-2FOptions">Plugin Arguments/Options</a></h2>
+
+<p>Some plugins require arguments and/or support options.  For example, the single_table_inheritance plugin requires an argument containing the column that specifies the class to use, and options:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Employee</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:single_table_inheritance</span>, <span class="ruby-value">:type_id</span>, <span class="ruby-value">model_map:</span> {<span class="ruby-value">1</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Staff</span>, <span class="ruby-value">2</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Manager</span>}
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>You should read the documentation for the plugin to determine if it requires arguments and what if any options are supported.</p>
+
+<h2 id="label-Creating+Plugins"><a href="#label-Creating+Plugins">Creating Plugins</a></h2>
+
+<p>The simplest possible plugin is an empty module in a file stored in <code>sequel/plugins/plugin_name</code> somewhere in ruby’s load path:</p>
+
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span>
+  <span class="ruby-keyword">module</span> <span class="ruby-constant">Plugins</span>
+    <span class="ruby-keyword">module</span> <span class="ruby-constant">PluginName</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>Well, technically, that’s not the simplest possible plugin, but it is the simplest one you can load by name.  The absolute simplest plugin would be an empty module:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span>
+</pre>
+
+<h2 id="label-Example+Formatting"><a href="#label-Example+Formatting">Example Formatting</a></h2>
+
+<p>In general, loading plugins by module instead of by name is not recommended, so this guide will assume that plugins are loaded by name.  For simplicity, we’ll also use the following format for example plugin code (and assume a plugin named Foo stored in <code>sequel/plugins/foo</code>):</p>
+
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>This saves 4 lines per example.  However, it’s recommended that you use the nested example displayed earlier for production code.</p>
+
+<p>The examples also assume that the following model class exists:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Bar</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<h2 id="label-Adding+Class+Methods"><a href="#label-Adding+Class+Methods">Adding Class Methods</a></h2>
+
+<p>If you want your plugin to add class methods to the model class it is loaded into, define a ClassMethods module under the plugin module:</p>
+
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>
+  <span class="ruby-keyword">module</span> <span class="ruby-constant">ClassMethods</span>
+    <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">a</span>
+      <span class="ruby-value">1</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>This allows a plugin user to do:</p>
+
+<pre class="ruby"><span class="ruby-constant">Bar</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:foo</span>
+<span class="ruby-constant">Bar</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; 1</span>
+</pre>
+
+<h2 id="label-Adding+Instance+Methods"><a href="#label-Adding+Instance+Methods">Adding Instance Methods</a></h2>
+
+<p>If you want your plugin to add instance methods to the model class it is loaded into, define an InstanceMethods module under the plugin module:</p>
+
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>
+  <span class="ruby-keyword">module</span> <span class="ruby-constant">InstanceMethods</span>
+    <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">a</span>
+      <span class="ruby-value">1</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>This allows a plugin user to do:</p>
+
+<pre class="ruby"><span class="ruby-constant">Bar</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:foo</span>
+<span class="ruby-constant">Bar</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; 1</span>
+</pre>
+
+<h2 id="label-Adding+Dataset+Methods"><a href="#label-Adding+Dataset+Methods">Adding Dataset Methods</a></h2>
+
+<p>If you want your plugin to add methods to the dataset of the model class it is loaded into, define a DatasetMethods module under the plugin module:</p>
+
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>
+  <span class="ruby-keyword">module</span> <span class="ruby-constant">DatasetMethods</span>
+    <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">a</span>
+      <span class="ruby-value">1</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>This allows a plugin user to do:</p>
+
+<pre class="ruby"><span class="ruby-constant">Bar</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:foo</span>
+<span class="ruby-constant">Bar</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; 1</span>
+</pre>
+
+<h2 id="label-Calling+super+to+get+Previous+Behavior"><a href="#label-Calling+super+to+get+Previous+Behavior">Calling super to get Previous Behavior</a></h2>
+
+<p>No matter if you are dealing with class, instance, or dataset methods, you can call super inside the method to get the previous behavior.  This makes it easy to hook into the method, add your own behavior, but still get the previous behavior:</p>
+
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>
+  <span class="ruby-keyword">module</span> <span class="ruby-constant">InstanceMethods</span>
+    <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">save</span>
+      <span class="ruby-keyword">if</span> <span class="ruby-identifier">allow_saving?</span>
+        <span class="ruby-keyword">super</span>
+      <span class="ruby-keyword">else</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;saving not allowed for this object&#39;</span>
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>
+
+    <span class="ruby-identifier">private</span>
+
+    <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">allow_saving?</span>
+      <span class="ruby-identifier">moon</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/Waxing/</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<h2 id="label-Running+Code+When+the+Plugin+is+Loaded"><a href="#label-Running+Code+When+the+Plugin+is+Loaded">Running Code When the Plugin is Loaded</a></h2>
+
+<p>Some plugins require more than just adding methods.  Any plugin that requires state is going to have to initialize that state and store it somewhere (generally in the model class itself).  If you want to run code when a plugin is loaded (usually to initialize state, but possibly for other reasons), there are two methods you can define to do so.  The first method is apply, and it is called only the first time the plugin is loaded into the class, before it is loaded into the class.  This is generally only used if a plugin depends on another plugin or for initializing state.  You define this method as a singleton method of the plugin module:</p>
+
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)
+    <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>
+      <span class="ruby-identifier">plugin</span> <span class="ruby-value">:plugin_that_foo_depends_on</span>
+      <span class="ruby-ivar">@foo_states</span> = {}
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>The other method is called configure, and it is called every time the plugin is loaded into the class, after it is loaded into the class:</p>
+
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)
+    <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>
+      <span class="ruby-ivar">@foo_states</span>[<span class="ruby-value">:initial</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">:baz</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>Note that in the configure method, you know apply has already been called at least once (so @foo_state will definitely exist).</p>
+
+<p>If you want your plugin to take arguments and/or support options, you handle that by making your apply and configure methods take arguments and/or an options hash.  For example, if you want the user to be able to set the initial state via an option, you can do:</p>
+
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>={})
+    <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>
+      <span class="ruby-identifier">plugin</span> <span class="ruby-value">:plugin_foo_depends_on</span>
+      <span class="ruby-ivar">@foo_states</span> = {}
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>={})
+    <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>
+      <span class="ruby-ivar">@foo_states</span>[<span class="ruby-value">:initial</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:initial_state</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@foo_states</span>[<span class="ruby-value">:initial</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:baz</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>This allows a user of the plugin to do either of the following</p>
+
+<pre class="ruby"><span class="ruby-constant">Bar</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:foo</span>
+<span class="ruby-constant">Bar</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:foo</span>, <span class="ruby-value">initial_state:</span> <span class="ruby-value">:quux</span>
+</pre>
+
+<p>If you want to require the initial state to be provided as an argument:</p>
+
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">initial_state</span>)
+    <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>
+      <span class="ruby-identifier">plugin</span> <span class="ruby-value">:plugin_foo_depends_on</span>
+      <span class="ruby-ivar">@foo_states</span> = {}
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">initial_state</span>)
+    <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>
+      <span class="ruby-ivar">@foo_states</span>[<span class="ruby-value">:initial</span>] = <span class="ruby-identifier">initial_state</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>This requires that the user of the plugin specify the argument:</p>
+
+<pre class="ruby"><span class="ruby-constant">Bar</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:foo</span>, <span class="ruby-value">:quux</span>
+</pre>
+
+<p>In general you should only require plugin arguments if you absolutely must have a value and there is no good default.</p>
+
+<h2 id="label-Handling+Subclasses"><a href="#label-Handling+Subclasses">Handling Subclasses</a></h2>
+
+<p><a href="..//rdoc/classes/Sequel/Model.html"><code>Sequel::Model</code></a> uses a copy-on-subclassing approach to model state.  So instead of having a model subclass ask its superclass for a value if the subclass don’t have the value defined, the value should be copied from the parent class to the subclass when the subclass is created.  While this can be implemented by overriding the <code>inherited</code> class method, there is an available shortcut that handles most cases:</p>
+
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>
+  <span class="ruby-keyword">module</span> <span class="ruby-constant">ClassMethods</span>
+    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span>.<span class="ruby-identifier">inherited_instance_variables</span>(<span class="ruby-keyword">self</span>, <span class="ruby-value">:@foo_states</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:dup</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>Inside the ClassMethods submodule, you call the <a href="..//rdoc/classes/Sequel/Plugins.html#method-c-inherited_instance_variables"><code>Sequel::Plugins.inherited_instance_variables</code></a> method with the first argument being self.  The second argument should be a hash describing how to copy the value from the parent class into the subclass.  The keys of this hash are instance variable names, including the @ symbol (e.g. :@foo_state).  The values of this hash describe how to copy it:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>nil </td><td>
+<p>Use the value directly.</p>
+</td></tr><tr><td class='label'>:dup </td><td>
+<p>Call dup on the value.</p>
+</td></tr><tr><td class='label'>:hash_dup </td><td>
+<p>Create a new hash with the same keys, but a dup of all the values.</p>
+</td></tr><tr><td class='label'>Proc </td><td>
+<p>An arbitrary proc that is called with the parent class value and should return the value to set into the subclass.</p>
+</td></tr></tbody></table>
+
+<h2 id="label-Handling+Changes+to+the+Model-27s+Dataset"><a href="#label-Handling+Changes+to+the+Model-27s+Dataset">Handling Changes to the Model’s Dataset</a></h2>
+
+<p>In many plugins, if the model class changes the dataset, you need to change the state for the plugin.  While you can do this by overriding the set_dataset class method, there is an available shortcut:</p>
+
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>
+  <span class="ruby-keyword">module</span> <span class="ruby-constant">ClassMethods</span>
+    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span>.<span class="ruby-identifier">after_set_dataset</span>(<span class="ruby-keyword">self</span>, <span class="ruby-value">:set_foo_table</span>)
+
+    <span class="ruby-identifier">private</span>
+
+    <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_foo_table</span>
+      <span class="ruby-ivar">@foo_states</span>[<span class="ruby-value">:table</span>] = <span class="ruby-identifier">table_name</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>With this code, any time the model’s dataset changes, the state of the plugin will be updated to set the correct table name.  This is also called when creating a new model class with a dataset.</p>
+
+<h2 id="label-Making+Dataset+Methods+Callable+as+Class+Methods"><a href="#label-Making+Dataset+Methods+Callable+as+Class+Methods">Making Dataset Methods Callable as Class Methods</a></h2>
+
+<p>In some cases, when dataset methods are added, you want to also create a model class method that will call the dataset method, so you can write:</p>
+
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">method</span>
+</pre>
+
+<p>instead of:</p>
+
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">method</span>
+</pre>
+
+<p>There is an available shortcut that automatically creates the class methods:</p>
+
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>
+  <span class="ruby-keyword">module</span> <span class="ruby-constant">ClassMethods</span>
+    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span>.<span class="ruby-identifier">def_dataset_methods</span>(<span class="ruby-keyword">self</span>, <span class="ruby-value">:quux</span>)
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-keyword">module</span> <span class="ruby-constant">DatasetMethods</span>
+    <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quux</span>
+      <span class="ruby-value">2</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <nav class="nav">
+      <a href="../index.html">
+        <img src="../images/ruby-sequel-monocrome.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--footer" />
+      </a>
+      <ul class="nav__ul">
+        <li class="nav__li">
+          <a href="../documentation.html" class="nav__a">Documentation</a>
+          <a href="../documentation.html#general-overview" class="a">General Overview</a>
+          <a href="../documentation.html#databases" class="a">Databases</a>
+          <a href="../documentation.html#datasets" class="a">Datasets</a>
+          <a href="../documentation.html#models" class="a">Models</a>
+          <a href="../documentation.html#misc" class="a">Misc</a>
+          <a href="../documentation.html#rdoc" class="a">RDoc</a>
+          <a href="../documentation.html#release-notes" class="a">Release Notes</a>
+        </li>
+        <li class="nav__li">
+          <a href="../plugins.html" class="nav__a">Plugins</a>
+          <a href="../plugins.html#model-plugins" class="a">Model Plugins</a>
+          <a href="../plugins.html#sequel-extensions" class="a">Sequel Extensions</a>
+        </li>
+        <li class="nav__li">
+          <a href="../development.html" class="nav__a">Development</a>
+          <a href="../development.html#bugs" class="a">Reporting Bugs</a>
+          <a href="../development.html#contribute" class="a">Contribute</a>
+          <a href="../development.html#code" class="a">Source Code</a>
+          <a href="../development.html#license" class="a">License</a>
+        </li>
+        <li class="nav__li">
+          <a href="../links.html" class="nav__a">Links</a>
+          <a href="../links.html#articles" class="a">Articles</a>
+          <a href="../links.html#presentations" class="a">Presentations</a>
+          <a href="../links.html#logos" class="a">Logos &amp; Badges</a>
+          <a href="../links.html#using-sequel" class="a">Using Sequel</a>
+          <a href="https://rubygems.org/gems/sequel/" class="a">RubyGems</a>
+          <a href="https://github.com/jeremyevans/sequel/" class="a">GitHub</a>
+        </li>
+      </ul>
+      <form action="https://www.google.com/search" autocomplete="off">
+        <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
+      </form>
+    </nav>
+  </footer>
+</body>
+</html>

@@ -66,7 +66,7 @@ doc/release_notes/3.12.0.txt
 
 <h1 id="label-New+Plugins"><a href="#label-New+Plugins">New Plugins</a></h1>
 <ul><li>
-<p>A sharding plugin has been added that allows model objects to work well with sharded databases.  When using it, model objects know which shard they were retrieved from, so when you save the object, it is saved back to that shard.  The sharding plugin also works with associations, so associated records are retrieved from the same shard the main object was retreived from.  The sharding plugin also works with both methods of eager loading, and provides methods that you can use to create objects on specific shards.</p>
+<p>A sharding plugin has been added that allows model objects to work well with sharded databases.  When using it, model objects know which shard they were retrieved from, so when you save the object, it is saved back to that shard.  The sharding plugin also works with associations, so associated records are retrieved from the same shard the main object was retrieved from.  The sharding plugin also works with both methods of eager loading, and provides methods that you can use to create objects on specific shards.</p>
 </li><li>
 <p>An update_primary_key plugin has been added that allows <a href="../../../classes/Sequel.html"><code>Sequel</code></a> to work correctly if you modify the primary key of a model object. This should not be necessary if you are using surrogate keys, but if your database uses natural primary keys which can change, this should be helpful.</p>
 </li><li>

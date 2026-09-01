@@ -213,7 +213,7 @@ doc/release_notes/2.12.0.txt
 </li><li>
 <p>When using the JDBC adapter, Java::JavaSQL::Timestamp#usec is deprecated.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> has returned Java::JavaSQL::Timestamp as DateTime or Time for a few versions, so this shouldn’t affect most people.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> will no longer require bigdecimal/util, enumerator, or yaml in 3.0.  If you need them in your code, make sure you require them yourself.  Using features added by requiring these standard libaries will not bring up a deprecation warning, for obvious reasons.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> will no longer require bigdecimal/util, enumerator, or yaml in 3.0.  If you need them in your code, make sure you require them yourself.  Using features added by requiring these standard libraries will not bring up a deprecation warning, for obvious reasons.</p>
 </li><li>
 <p>Sequel::Error::InvalidTransform, Sequel::Error::NoExistingFilter, and Sequel::Error::InvalidStatement exceptions will be removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.0.  You will not get a deprecation message if you reference them in 2.12.</p>
 </li><li>
@@ -318,7 +318,7 @@ end</pre>
 <span class="ruby-keyword">end</span>
 </pre>
 </li><li>
-<p>MySQL adapter datasets now have on_duplicate_key_update and insert_ignore methods which modify the SQL used to support ON DUPLICATE KEY UPDATE and INSERT INGORE syntax in multi_insert and import.</p>
+<p>MySQL adapter datasets now have on_duplicate_key_update and insert_ignore methods which modify the SQL used to support ON DUPLICATE KEY UPDATE and INSERT IGNORE syntax in multi_insert and import.</p>
 </li><li>
 <p>If you use the MySQL native adapter, you can set:</p>
 
@@ -390,7 +390,7 @@ end</pre>
 <p>The Oracle and MySQL adapters now raise an error as soon as you call distinct on a dataset, instead of waiting until the SQL is generated.</p>
 </li></ul>
 
-<p>Backwards Compatibilty</p>
+<p>Backwards Compatibility</p>
 <hr>
 <ul><li>
 <p>Saving a newly inserted record in an after_create or after_save hook is no longer broken.  It broke in 2.10 as a side effect of allowing the hook to check whether or not the record was a new record.  The code has been changed so that a @was_new instance variable will be defined to true if the record was just created.</p>

@@ -62,7 +62,7 @@ Sequel::Plugins::UnusedAssociations
 <span class="ruby-comment"># =&gt; [[&quot;Class1&quot;, &quot;assoc1&quot;], ...]</span>
 </pre>
 
-<p>You can use the output of the <a href="../../../files/lib/sequel/plugins/unused_associations_rb.html">unused_associations</a> method to determine which associations are not used at all in your application, and can be eliminiated.</p>
+<p>You can use the output of the <a href="../../../files/lib/sequel/plugins/unused_associations_rb.html">unused_associations</a> method to determine which associations are not used at all in your application, and can be eliminated.</p>
 
 <p>You can also take that unused association data and pass it to the <code>unused_association_options</code> method, which will return an array of information on associations which are used, but have related methods defined that are not used. The first two entries in each array are the class name and association name as a string, and the third entry is a hash of association options:</p>
 
@@ -99,7 +99,7 @@ Sequel::Plugins::UnusedAssociations
 
 <h1 id="module-Sequel::Plugins::UnusedAssociations-label-Automatic+Usage+of+Unused+Association+Data"><a href="#module-Sequel::Plugins::UnusedAssociations-label-Automatic+Usage+of+Unused+Association+Data">Automatic Usage of Unused Association Data</a></h1>
 
-<p>Since it can be a pain to manually update all of your code to remove unused assocations or add options to prevent the definition of unused associations, the <a href="../../../files/lib/sequel/plugins/unused_associations_rb.html">unused_associations</a> plugin comes with support to take previously saved unused association data, and use it to not create unused associations, and to automatically use the appropriate options so that unused association methods are not created.</p>
+<p>Since it can be a pain to manually update all of your code to remove unused associations or add options to prevent the definition of unused associations, the <a href="../../../files/lib/sequel/plugins/unused_associations_rb.html">unused_associations</a> plugin comes with support to take previously saved unused association data, and use it to not create unused associations, and to automatically use the appropriate options so that unused association methods are not created.</p>
 
 <p>To use this option, you first need to save the unused association data previously prepared.  You can do this by passing an :file option when loading the plugin.</p>
 

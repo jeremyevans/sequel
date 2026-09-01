@@ -67,7 +67,7 @@ UPDATE &quot;table&quot; SET &quot;column&quot;[&#39;key&#39;] = &#39;value&#39;
 
 <h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports calling PostgreSQL procedures without arguments when using Database#call_procedure.  Previously, attempts to call procuredures without arguments would call the procedure with a single NULL argument.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports calling PostgreSQL procedures without arguments when using Database#call_procedure.  Previously, attempts to call procedures without arguments would call the procedure with a single NULL argument.</p>
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses defined?(yield) instead of block_given? internally for better performance on CRuby.  defined?(yield) is faster as it is built into the VM, while block_given? is a regular method and has the overhead of calling a regular method.  Note that defined?(yield) is not implemented correctly on JRuby before 9.0.0.0, so this release of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> drops support for JRuby versions before 9.0.0.0.</p>
 </li></ul>

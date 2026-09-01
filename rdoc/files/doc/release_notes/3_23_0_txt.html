@@ -146,7 +146,7 @@ doc/release_notes/3.23.0.txt
 
 <h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
-<p>The filter by associations support breaks backward compatibilty for users who previously added an sql_literal instance method to <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>.  Usually, that was done to for reasons similar to but inferior than the filter by association support.  The following code can be used as a temporary workaround until you can modify your program to use the new filter by associations support:</p>
+<p>The filter by associations support breaks backward compatibility for users who previously added an sql_literal instance method to <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>.  Usually, that was done to for reasons similar to but inferior than the filter by association support.  The following code can be used as a temporary workaround until you can modify your program to use the new filter by associations support:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">Associations</span><span class="ruby-operator">::</span><span class="ruby-constant">DatasetMethods</span>.
   <span class="ruby-identifier">send</span>(<span class="ruby-value">:remove_method</span>, <span class="ruby-value">:complex_expression_sql</span>)

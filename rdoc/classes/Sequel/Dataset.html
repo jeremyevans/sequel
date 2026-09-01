@@ -6205,7 +6205,7 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 <span class="line-num">165</span>           <span class="ruby-comment"># columns in the subselect, qualified by the subselect alias.</span>
 <span class="line-num">166</span>           <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">qualifier</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-identifier">column</span>))
 <span class="line-num">167</span>         <span class="ruby-keyword">else</span>
-<span class="line-num">168</span>           <span class="ruby-comment"># Initial dataset not wrapped in subslect, just make</span>
+<span class="line-num">168</span>           <span class="ruby-comment"># Initial dataset not wrapped in subselect, just make</span>
 <span class="line-num">169</span>           <span class="ruby-comment"># sure columns are qualified in some way.</span>
 <span class="line-num">170</span>           <span class="ruby-identifier">qualified_expression</span>(<span class="ruby-identifier">sel</span>, <span class="ruby-identifier">qualifier</span>)
 <span class="line-num">171</span>         <span class="ruby-keyword">end</span>
@@ -6941,7 +6941,7 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 </div>
 <div class='description'>
 
-<p>Retreive a value from the dataset’s cache in a thread safe manner.</p>
+<p>Retrieve a value from the dataset’s cache in a thread safe manner.</p>
 
 </div>
 <div class='source'>

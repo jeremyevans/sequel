@@ -104,7 +104,7 @@ unless non_root_nodes.empty?
   id_map = {}
   # Create an map of parent_ids to nodes that have that parent id
   non_root_nodes.each{|n| (id_map[n.parent_id] ||= []) &lt;&lt; n}
-  # Doesn&#39;t cause an infinte loop, because when only the root node
+  # Doesn&#39;t cause an infinite loop, because when only the root node
   # is left, this is not called.
   Node.filter(Node.primary_key=&gt;id_map.keys).eager(:ancestors).all</pre>
 
@@ -218,7 +218,7 @@ nodes = Node.filter(:id &lt; 10).eager(:ancestors, :descendants).all</pre>
 <p>Backwards Incompatible Changes</p>
 <hr>
 <ul><li>
-<p>ParseTree support, deprecated in <a href="2_1_0_txt.html">2.1.0</a>, has been removed in 2.2.0. You should use the expression filter syntax instead, perferably without the block (though it can be used inside a block as well). This usually involves the following types of changes:</p>
+<p>ParseTree support, deprecated in <a href="2_1_0_txt.html">2.1.0</a>, has been removed in 2.2.0. You should use the expression filter syntax instead, preferably without the block (though it can be used inside a block as well). This usually involves the following types of changes:</p>
 
 <pre>filter{:x == :y} =&gt; filter(:x =&gt; :y)
 filter{:x &lt;&lt; :y} =&gt; filter(:x =&gt; :y)

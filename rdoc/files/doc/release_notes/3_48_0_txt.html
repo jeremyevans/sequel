@@ -353,7 +353,7 @@ doc/release_notes/3.48.0.txt
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now sets up the identifier mangling methods on Database initialization instead of on first use.</p>
 </li><li>
-<p>The private Database#adapter_initialize method has been added for per adapter configuration.  All internal adapters have been switched to use this method instead of overridding initialize, and all external adapters should as well.  This makes sure that Database instances are not added to Sequel::DATABASES until they have been completely initialized.</p>
+<p>The private Database#adapter_initialize method has been added for per adapter configuration.  All internal adapters have been switched to use this method instead of overriding initialize, and all external adapters should as well.  This makes sure that Database instances are not added to Sequel::DATABASES until they have been completely initialized.</p>
 </li><li>
 <p>Virtual row blocks no longer convert their return values to an array. Among other things, this means that having a virtual row block return a hash works as expected.</p>
 </li><li>

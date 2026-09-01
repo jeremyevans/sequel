@@ -79,10 +79,10 @@ Sequel::MySQL::MysqlMysql2::DatabaseMethods
 [show source]
 </a>
 <pre id='method-i-call_sproc-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/mysql_mysql2.rb</span>
-<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call_sproc</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">28</span>   <span class="ruby-identifier">args</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:args</span>] <span class="ruby-operator">||</span> [] 
-<span class="line-num">29</span>   <span class="ruby-identifier">execute</span>(<span class="ruby-node">&quot;CALL #{name}#{args.empty? ? &#39;()&#39; : literal(args)}&quot;</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:sproc</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">37</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call_sproc</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">38</span>   <span class="ruby-identifier">args</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:args</span>] <span class="ruby-operator">||</span> [] 
+<span class="line-num">39</span>   <span class="ruby-identifier">execute</span>(<span class="ruby-node">&quot;CALL #{name}#{args.empty? ? &#39;()&#39; : literal(args)}&quot;</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:sproc</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-execute'>
@@ -101,15 +101,15 @@ Sequel::MySQL::MysqlMysql2::DatabaseMethods
 [show source]
 </a>
 <pre id='method-i-execute-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/mysql_mysql2.rb</span>
-<span class="line-num">34</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">35</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:sproc</span>]
-<span class="line-num">36</span>     <span class="ruby-identifier">call_sproc</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">37</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">ArgumentMapper</span>)
-<span class="line-num">38</span>     <span class="ruby-identifier">execute_prepared_statement</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">39</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">40</span>     <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
-<span class="line-num">41</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">42</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">44</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">45</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:sproc</span>]
+<span class="line-num">46</span>     <span class="ruby-identifier">call_sproc</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">47</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">ArgumentMapper</span>)
+<span class="line-num">48</span>     <span class="ruby-identifier">execute_prepared_statement</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">49</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">50</span>     <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
+<span class="line-num">51</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">52</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -95,7 +95,7 @@ lib/sequel/extensions/pg_hstore_ops.rb
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:tab</span>].<span class="ruby-identifier">update</span>(<span class="ruby-value">h:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore_op</span>(<span class="ruby-value">:h</span>).<span class="ruby-identifier">delete</span>(<span class="ruby-string">&#39;k1&#39;</span>))
 </pre>
 
-<p>On PostgreSQL 14+, The hstore <code>[]</code> method will use subscripts instead of being the same as <code>get</code>, if the value being wrapped is an identifer:</p>
+<p>On PostgreSQL 14+, The hstore <code>[]</code> method will use subscripts instead of being the same as <code>get</code>, if the value being wrapped is an identifier:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore_op</span>(<span class="ruby-value">:hstore_column</span>)[<span class="ruby-string">&#39;a&#39;</span>]    <span class="ruby-comment"># hstore_column[&#39;a&#39;]</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore_op</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:h</span>][<span class="ruby-value">:s</span>])[<span class="ruby-string">&#39;a&#39;</span>]      <span class="ruby-comment"># h.s[&#39;a&#39;]</span>

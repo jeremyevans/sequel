@@ -76,7 +76,7 @@ Superclass:
 <td class='context-item-value'>[PGError].freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>:nocov:</p>
+<p>simplecov:enable</p>
 </td>
 </tr>
 </table>
@@ -104,12 +104,12 @@ Superclass:
 <span class="line-num">185</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>
 <span class="line-num">186</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>
 <span class="line-num">187</span>     {<span class="ruby-value">:value</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">arg</span>, <span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">17</span>, <span class="ruby-value">:format</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}
-<span class="line-num">188</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">188</span>   <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">189</span>   <span class="ruby-comment"># Not covered by tests as tests use pg_extended_date_support</span>
 <span class="line-num">190</span>   <span class="ruby-comment"># extension, which has basically the same code.</span>
 <span class="line-num">191</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Time</span>, <span class="ruby-constant">DateTime</span>
 <span class="line-num">192</span>     <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">literal_date_or_time</span>(<span class="ruby-identifier">arg</span>)
-<span class="line-num">193</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">193</span>   <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">194</span>   <span class="ruby-keyword">else</span>
 <span class="line-num">195</span>     <span class="ruby-identifier">arg</span>
 <span class="line-num">196</span>   <span class="ruby-keyword">end</span>
@@ -170,9 +170,9 @@ Superclass:
 <span class="line-num">225</span>       <span class="ruby-value">:sslmode</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:sslmode</span>],
 <span class="line-num">226</span>       <span class="ruby-value">:sslrootcert</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:sslrootcert</span>]
 <span class="line-num">227</span>     }.<span class="ruby-identifier">delete_if</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">key</span>, <span class="ruby-identifier">value</span><span class="ruby-operator">|</span> <span class="ruby-identifier">blank_object?</span>(<span class="ruby-identifier">value</span>) }
-<span class="line-num">228</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">228</span>     <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">229</span>     <span class="ruby-identifier">connection_params</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:driver_options</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:driver_options</span>]
-<span class="line-num">230</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">230</span>     <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">231</span>     <span class="ruby-identifier">conn</span> = <span class="ruby-constant">Adapter</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:conn_str</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">connection_params</span>)
 <span class="line-num">232</span> 
 <span class="line-num">233</span>     <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@prepared_statements</span>, {})
@@ -181,12 +181,12 @@ Superclass:
 <span class="line-num">236</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">set_notice_receiver</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">receiver</span>)
 <span class="line-num">237</span>     <span class="ruby-keyword">end</span>
 <span class="line-num">238</span> 
-<span class="line-num">239</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">239</span>     <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">240</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:type_map_for_queries=</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">PG_QUERY_TYPE_MAP</span>)
-<span class="line-num">241</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">241</span>     <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">242</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">type_map_for_queries</span> = <span class="ruby-constant">PG_QUERY_TYPE_MAP</span>
 <span class="line-num">243</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">244</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">244</span>   <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">245</span>   <span class="ruby-keyword">else</span>
 <span class="line-num">246</span>     <span class="ruby-keyword">unless</span> <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:force_standard_strings</span>, <span class="ruby-keyword">true</span>))
 <span class="line-num">247</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot create connection using postgres-pr unless force_standard_strings is set&quot;</span>
@@ -201,11 +201,11 @@ Superclass:
 <span class="line-num">256</span>       <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>]
 <span class="line-num">257</span>     )
 <span class="line-num">258</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">259</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">259</span>   <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">260</span> 
 <span class="line-num">261</span>   <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@db</span>, <span class="ruby-keyword">self</span>)
 <span class="line-num">262</span> 
-<span class="line-num">263</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">263</span>   <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">264</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">encoding</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:encoding</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:charset</span>]
 <span class="line-num">265</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:set_client_encoding</span>)
 <span class="line-num">266</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">set_client_encoding</span>(<span class="ruby-identifier">encoding</span>)
@@ -213,7 +213,7 @@ Superclass:
 <span class="line-num">268</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">async_exec</span>(<span class="ruby-node">&quot;set client_encoding to &#39;#{encoding}&#39;&quot;</span>)
 <span class="line-num">269</span>     <span class="ruby-keyword">end</span>
 <span class="line-num">270</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">271</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">271</span>   <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">272</span> 
 <span class="line-num">273</span>   <span class="ruby-identifier">connection_configuration_sqls</span>(<span class="ruby-identifier">opts</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">sql</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>)}
 <span class="line-num">274</span>   <span class="ruby-identifier">conn</span>
@@ -338,7 +338,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>:nocov: <a href="Database.html#method-i-copy_table"><code>copy_table</code></a> uses PostgreSQL’s +COPY TO STDOUT+ SQL statement to return formatted results directly to the caller.  This method is only supported if pg is the underlying ruby driver.  This method should only be called if you want results returned to the client.  If you are using +COPY TO+ with a filename, you should just use <code>run</code> instead of this method.</p>
+<p>simplecov:enable <a href="Database.html#method-i-copy_table"><code>copy_table</code></a> uses PostgreSQL’s +COPY TO STDOUT+ SQL statement to return formatted results directly to the caller.  This method is only supported if pg is the underlying ruby driver.  This method should only be called if you want results returned to the client.  If you are using +COPY TO+ with a filename, you should just use <code>run</code> instead of this method.</p>
 
 <p>The table argument supports the following types:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>String </td><td>
@@ -426,7 +426,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>:nocov: Return a hash of information about the related PGError (or Sequel::DatabaseError that wraps a PGError), with the following entries (any of which may be <code>nil</code>):</p>
+<p>simplecov:enable Return a hash of information about the related PGError (or Sequel::DatabaseError that wraps a PGError), with the following entries (any of which may be <code>nil</code>):</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:schema </td><td>
 <p>The schema name related to the error</p>
 </td></tr><tr><td class='label'>:table </td><td>

@@ -216,7 +216,7 @@ Project.association_reflection(:portfolio)
 
 <h3 id="method-i-associate-label-Multiple+Types"><a href="#method-i-associate-label-Multiple+Types">Multiple Types</a></h3>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:adder </td><td>
-<p>Proc used to define the private <em>add</em>* method for doing the database work to associate the given object to the current object (*_to_many assocations). Set to nil to not define a add_* method for the association.</p>
+<p>Proc used to define the private <em>add</em>* method for doing the database work to associate the given object to the current object (*_to_many associations). Set to nil to not define a add_* method for the association.</p>
 </td></tr><tr><td class='label'>:after_add </td><td>
 <p>Symbol, Proc, or array of both/either specifying a callback to call after a new item is added to the association.</p>
 </td></tr><tr><td class='label'>:after_load </td><td>
@@ -244,7 +244,7 @@ Project.association_reflection(:portfolio)
 </td></tr><tr><td class='label'>:class_namespace </td><td>
 <p>If :class is given as a string or symbol, sets the default namespace in which to look for the class.  <code>class: &#39;Foo&#39;, class_namespace: &#39;Bar&#39;</code> looks for <code>::Bar::Foo</code>.)</p>
 </td></tr><tr><td class='label'>:clearer </td><td>
-<p>Proc used to define the private <em>remove_all</em>* method for doing the database work to remove all objects associated to the current object (*_to_many assocations). Set to nil to not define a remove_all_* method for the association.</p>
+<p>Proc used to define the private <em>remove_all</em>* method for doing the database work to remove all objects associated to the current object (*_to_many associations). Set to nil to not define a remove_all_* method for the association.</p>
 </td></tr><tr><td class='label'>:clone </td><td>
 <p>Merge the current options and block into the options and block used in defining the given association.  Can be used to DRY up a bunch of similar associations that all share the same options such as :class and :key, while changing the order and block used.</p>
 </td></tr><tr><td class='label'>:conditions </td><td>
@@ -306,13 +306,13 @@ Project.association_reflection(:portfolio)
 </td></tr><tr><td class='label'>:read_only </td><td>
 <p>Do not add a setter method (for <a href="ClassMethods.html#method-i-many_to_one"><code>many_to_one</code></a> or <a href="ClassMethods.html#method-i-one_to_one"><code>one_to_one</code></a> associations), or add_/remove_/remove_all_ methods (for <a href="ClassMethods.html#method-i-one_to_many"><code>one_to_many</code></a> and <a href="ClassMethods.html#method-i-many_to_many"><code>many_to_many</code></a> associations).</p>
 </td></tr><tr><td class='label'>:reciprocal </td><td>
-<p>the symbol name of the reciprocal association, if it exists.  By default, <a href="../../../Sequel.html"><code>Sequel</code></a> will try to determine it by looking at the associated model’s assocations for a association that matches the current association’s key(s).  Set to nil to not use a reciprocal.</p>
+<p>the symbol name of the reciprocal association, if it exists.  By default, <a href="../../../Sequel.html"><code>Sequel</code></a> will try to determine it by looking at the associated model’s associations for a association that matches the current association’s key(s).  Set to nil to not use a reciprocal.</p>
 </td></tr><tr><td class='label'>:remover </td><td>
-<p>Proc used to define the private <em>remove</em>* method for doing the database work to remove the association between the given object and the current object (*_to_many assocations). Set to nil to not define a remove_* method for the association.</p>
+<p>Proc used to define the private <em>remove</em>* method for doing the database work to remove the association between the given object and the current object (*_to_many associations). Set to nil to not define a remove_* method for the association.</p>
 </td></tr><tr><td class='label'>:select </td><td>
 <p>the columns to select.  Defaults to the associated class’s table_name.* in an association that uses joins, which means it doesn’t include the attributes from the join table.  If you want to include the join table attributes, you can use this option, but beware that the join table attributes can clash with attributes from the model table, so you should alias any attributes that have the same name in both the join table and the associated table.</p>
 </td></tr><tr><td class='label'>:setter </td><td>
-<p>Proc used to define the private _*= method for doing the work to setup the assocation between the given object and the current object (*_to_one associations). Set to nil to not define a setter method for the association.</p>
+<p>Proc used to define the private _*= method for doing the work to setup the association between the given object and the current object (*_to_one associations). Set to nil to not define a setter method for the association.</p>
 </td></tr><tr><td class='label'>:subqueries_per_union </td><td>
 <p>The number of subqueries to use in each UNION query, for eager loading limited associations using the default :union strategy.</p>
 </td></tr><tr><td class='label'>:use_placeholder_loader </td><td>

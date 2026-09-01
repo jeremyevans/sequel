@@ -59,7 +59,7 @@ doc/release_notes/4.33.0.txt
 </li><li>
 <p>On PostgreSQL, Dataset#insert_conflict now accepts an array of columns as the value for the :target option.</p>
 </li><li>
-<p>You can now pass a <a href="../../../classes/Sequel/SQL/Identifier.html"><code>Sequel::SQL::Identifier</code></a> or a Sequel::SQL::QualifiedIdentifer as the table argument when creating a foreign key.  Previously, only symbols were supported, and using other values required specifying the :table option.  So this will now work to reference a table that includes a double underscore:</p>
+<p>You can now pass a <a href="../../../classes/Sequel/SQL/Identifier.html"><code>Sequel::SQL::Identifier</code></a> or a <a href="../../../classes/Sequel/SQL/QualifiedIdentifier.html"><code>Sequel::SQL::QualifiedIdentifier</code></a> as the table argument when creating a foreign key.  Previously, only symbols were supported, and using other values required specifying the :table option.  So this will now work to reference a table that includes a double underscore:</p>
 
 <pre class="ruby"><span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:foo_id</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-value">:fo__oo</span>)
 </pre>

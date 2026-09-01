@@ -52,7 +52,7 @@ doc/postgresql.rdoc
 
 <h2 id="label-Adapter-2FDriver+Specific+Support"><a href="#label-Adapter-2FDriver+Specific+Support">Adapter/Driver Specific Support</a></h2>
 
-<p>Some of this this support depends on the specific adapter or underlying driver in use.</p>
+<p>Some of this support depends on the specific adapter or underlying driver in use.</p>
 
 <p><code>postgres only</code> will denote support specific to the postgres adapter (i.e. not available when connecting to PostgreSQL via the jdbc adapter). <code>postgres/pg only</code> will denote support specific to the postgres adapter when pg is used as the underlying driver (i.e. not available when using the postgres-pr driver).</p>
 
@@ -564,7 +564,7 @@ doc/postgresql.rdoc
 <span class="ruby-comment"># COMMIT;</span>
 </pre>
 
-<h3 id="label-GRAPH_TABLE+support+-28PostgresSQL+19-2B-29"><a href="#label-GRAPH_TABLE+support+-28PostgresSQL+19-2B-29">GRAPH_TABLE support (PostgresSQL 19+)</a></h3>
+<h3 id="label-GRAPH_TABLE+support+-28PostgreSQL+19-2B-29"><a href="#label-GRAPH_TABLE+support+-28PostgreSQL+19-2B-29">GRAPH_TABLE support (PostgreSQL 19+)</a></h3>
 
 <p><code>graph_table</code> is supported on PostgreSQL Database objects. It returns a Sequel::PropertyGraph::Table object that uses a method chaining approach to build the GRAPH_TABLE expression, similarly to how Datasets are created via method chaining:</p>
 

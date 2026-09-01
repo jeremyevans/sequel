@@ -214,11 +214,11 @@ Sequel::Plugins::JsonSerializer
 <span class="line-num">151</span>     <span class="ruby-keyword">else</span>
 <span class="line-num">152</span>       <span class="ruby-keyword">begin</span>
 <span class="line-num">153</span>         <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">parse_json</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">object_to_json</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))
-<span class="line-num">154</span>       <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">154</span>       <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">155</span>       <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">json_parser_error_class</span>
 <span class="line-num">156</span>         <span class="ruby-comment"># Support for old Ruby code that only supports parsing JSON object/array</span>
 <span class="line-num">157</span>         <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">parse_json</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">object_to_json</span>([<span class="ruby-identifier">obj</span>], <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))[<span class="ruby-value">0</span>]
-<span class="line-num">158</span>       <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">158</span>       <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">159</span>       <span class="ruby-keyword">end</span>
 <span class="line-num">160</span>     <span class="ruby-keyword">end</span>
 <span class="line-num">161</span>   <span class="ruby-keyword">end</span>

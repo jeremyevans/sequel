@@ -35,7 +35,7 @@ doc/release_notes/5.59.0.txt
 <div id='description'>
 <h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
-<p>A require_valid_schema plugin has been added, for checking that model classes have schema parsed as expected.  By default, model classes are not required to have valid schema, because it is allowed to have model classes based on arbitrary datasets (such as those using joins or set-returning functions), and it is not possible to determine the schema for arbitary datasets.</p>
+<p>A require_valid_schema plugin has been added, for checking that model classes have schema parsed as expected.  By default, model classes are not required to have valid schema, because it is allowed to have model classes based on arbitrary datasets (such as those using joins or set-returning functions), and it is not possible to determine the schema for arbitrary datasets.</p>
 
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> swallows non-connection errors when trying to parse schema for a model’s dataset, but if schema parsing fails when you would expect it to succeed, it results in a model where typecasting does not work as expected.</p>
 

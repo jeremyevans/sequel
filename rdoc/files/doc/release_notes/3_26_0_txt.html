@@ -42,7 +42,7 @@ doc/release_notes/3.26.0.txt
 
 <h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
-<p>Strings passed to setter methods for integer columns are no longer considered to be in octal format if they include leading zeroes. The previous behavior was never intended, but was a side effect of using Kernel#Integer.  Strings with leading zeroes are now treated as decimal, and you can still use the 0x prefix to treat them as hexidecimal.  If anyone was relying on the old octal behavior, let me know and I’ll add an extension that restores the octal behavior.</p>
+<p>Strings passed to setter methods for integer columns are no longer considered to be in octal format if they include leading zeroes. The previous behavior was never intended, but was a side effect of using Kernel#Integer.  Strings with leading zeroes are now treated as decimal, and you can still use the 0x prefix to treat them as hexadecimal.  If anyone was relying on the old octal behavior, let me know and I’ll add an extension that restores the octal behavior.</p>
 </li><li>
 <p>The identity_map plugin now works with the standard eager loading of many_to_many and many_through_many associations.</p>
 </li><li>
@@ -73,7 +73,7 @@ doc/release_notes/3.26.0.txt
 </li><li>
 <p>An error is now raised if you attempt to eager load via Dataset#eager a many_to_many association that includes an :eager_graph option.  Previously, incorrect SQL would have been generated and an error raised by the database.</p>
 </li><li>
-<p>Datasets are no longer guaranteed to have @row_proc, @indentifier_input_method, and @identifier_output_method defined as instance variables.  You should be be using methods to access them anyway.</p>
+<p>Datasets are no longer guaranteed to have @row_proc, @identifier_input_method, and @identifier_output_method defined as instance variables.  You should be be using methods to access them anyway.</p>
 </li><li>
 <p>Database#table_exists? on PostgreSQL no longer accepts an options hash.  Previously, you could use a :schema option.  You must now provide the schema inside the table argument (e.g. :schema__table).</p>
 </li><li>

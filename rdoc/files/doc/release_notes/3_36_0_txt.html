@@ -39,7 +39,7 @@ doc/release_notes/3.36.0.txt
 </li><li>
 <p>The nested attributes plugin now supports composite primary keys in associated records.  Additionally, it now deals better with natural primary keys in associated records.  There is a new :unmatched_pk option that can be set to :create if you want to create new associated records when the input hash contains primary key information that doesn’t match one of the existing associated objects.</p>
 
-<p>The nested attributes plugin now also supports a :transform option. If given, this option is called with the parent object and the input hash given for each associated record passed into the nested atttributes setter.  The callable should return the hash of attributes to use.</p>
+<p>The nested attributes plugin now also supports a :transform option. If given, this option is called with the parent object and the input hash given for each associated record passed into the nested attributes setter.  The callable should return the hash of attributes to use.</p>
 </li><li>
 <p>Model#from_json in the json_serializer plugin now takes an options hash and recognizes the :fields option.  If the :fields option is given, it should be an array of field names, and set_fields is called with the array instead of using set.  This allows you to easily filter which fields in the hash are set in the model instance.  The entire options hash is also passed to set_fields if :fields is present, so you can additionally use the :missing =&gt; :raise or :missing =&gt; :skip options that set_fields supports.</p>
 </li><li>

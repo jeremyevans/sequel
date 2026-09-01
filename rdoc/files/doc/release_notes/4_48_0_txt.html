@@ -59,7 +59,7 @@ doc/release_notes/4.48.0.txt
 </li><li>
 <p>The Dataset#and, exclude_where, interval, and range methods are now deprecated.  Undeprecated copies are now available in the new sequel_4_dataset_methods extension.</p>
 </li><li>
-<p>Model.<< is now deprecated.  Intuitivately, you would except this to call Model.create and return the Model class, but it calls &lt;&lt; on the model’s dataset and returns the dataset.</p>
+<p>Model.<< is now deprecated.  Intuitively, you would expect this to call Model.create and return the Model class, but it calls &lt;&lt; on the model’s dataset and returns the dataset.</p>
 </li><li>
 <p>The Sequel::Postgres::PG_TYPES constant is now deprecated.  All conversion procs should now be added on a per-Database basis using add_conversion_proc or add_named_conversion_proc.  The following private Database methods related to conversion procs are now deprecated, though some are still called internally and therefore do not have deprecation warnings:</p>
 <ul><li>
@@ -120,7 +120,7 @@ doc/release_notes/4.48.0.txt
 </li><li>
 <p>Modification of the Sequel::JDBC::TypeConvertor class is now deprecated.  External jdbc subadapters that were using this to add custom conversion procs should be modified.</p>
 </li><li>
-<p>Having the pg_row extension respect conversion procs for subtypes added after the registeration of the composite type is now deprecated. Now, all subtypes should have the appropriate conversion proc added before the composite type is registered.</p>
+<p>Having the pg_row extension respect conversion procs for subtypes added after the registration of the composite type is now deprecated. Now, all subtypes should have the appropriate conversion proc added before the composite type is registered.</p>
 </li><li>
 <p>Array#sql_array in the <a href="../core_extensions_rdoc.html">core_extensions</a> extension is now deprecated. Switch to using Array#sql_value_list.</p>
 </li><li>

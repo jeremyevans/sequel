@@ -37,7 +37,7 @@ doc/release_notes/5.15.0.txt
 <ul><li>
 <p>A :qualify_tables option has been added to the class_table_inheritance plugin, which will automatically qualify subclass tables with the same qualifier as the superclass table if the superclass table is qualified.</p>
 </li><li>
-<p>Model#save_validation_on_next_save! has been added, which skips all validation on the next save to the object, including the running of validation related hooks.  This method is designed for use only when Model#valid? is called on the object before saving, to avoid running validations on the object twice.  This method takes precedence even over an explicit validate: true option passed to Model#save, and as such should be used with care.</p>
+<p>Model#skip_validation_on_next_save! has been added, which skips all validation on the next save to the object, including the running of validation related hooks.  This method is designed for use only when Model#valid? is called on the object before saving, to avoid running validations on the object twice.  This method takes precedence even over an explicit validate: true option passed to Model#save, and as such should be used with care.</p>
 </li><li>
 <p>The postgres adapter now supports a :conn_str Database option to use a PostgreSQL connection string (e.g. “host=foo port=2442”) when connecting.  This option has preference over other connection related options if it is present.</p>
 </li></ul>

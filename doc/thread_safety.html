@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Thread Safety - Sequel: The Database Toolkit for Ruby</title>
+  <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="ruby, sequel, sql, toolkit, orm, plugins, documentation" />
+  <meta name="description" content="Ruby Sequel is a lightweight database toolkit for Ruby." />
+
+  <link rel="icon" type="image/icon" sizes="32x32" href="../images/favicon.ico">
+  <link href="../css/application.css" media="screen" rel="stylesheet" type="text/css" />
+  <link href="../css/guide.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="body">
+  <header class="header">
+    <nav class="nav nav--header">
+      <a href="../index.html">
+        <img src="../images/ruby-sequel.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--header" />
+      </a>
+      <ul class="nav__ul nav__ul--header">
+        <li class="nav__li">
+          <a href="../documentation.html" class="nav__a">Documentation</a>
+        </li>
+        <li class="nav__li">
+          <a href="../plugins.html" class="nav__a">Plugins</a>
+        </li>
+        <li class="nav__li">
+          <a href="../development.html" class="nav__a">Development</a>
+        </li>
+        <li class="nav__li">
+          <a href="../links.html" class="nav__a">Links</a>
+        </li>
+      </ul>
+      <form class="nav__form nav__form--header" action="https://www.google.com/search" autocomplete="off">
+        <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
+      </form>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="main__container">
+      <div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Thread+Safety"><a href="#label-Thread+Safety">Thread Safety</a></h1>
+
+<p>Most <a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a> usage (and all common <a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a> usage) is thread safe by default.  Specifically, multiple threads can operate on Database instances, Dataset instances, and Model classes concurrently without problems.  In general, Database instance and Model classes are not modified after application startup, and Dataset instances are always frozen.</p>
+
+<h2 id="label-Connection+Pool"><a href="#label-Connection+Pool">Connection Pool</a></h2>
+
+<p>In order to allow multiple threads to operate on the same database at the same time, <a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a> uses a connection pool.  The connection pool is designed so that a thread uses a connection for the minimum amount of time, returning the connection to the pool as soon as it is done using the connection.  If a thread requests a connection and the pool does not have an available connection, a new connection will be created.  If the maximum number of connections in the pool has already been reached, the thread will block until a connection is available or the connection pool timeout has elapsed (in which case a Sequel::PoolTimeout error will be raised).</p>
+
+<h2 id="label-Exceptions"><a href="#label-Exceptions">Exceptions</a></h2>
+
+<p>This is a small list of things that are specifically non thread-safe.  This is not an exhaustive list, there may be cases not mentioned here.</p>
+
+<p>1) Model instances: Model instances are not thread-safe unless they are frozen first.  Multiple threads should not operate on an unfrozen model instance concurrently.</p>
+
+<p>2) Model class modifications: Model class modifications, such as adding associations and loading plugins, are not designed to be thread safe.  You should not modify a class in one thread if any other thread can concurrently access it.  Model subclassing is designed to be thread-safe, so you create a model subclass in a thread and modify it safely.</p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <nav class="nav">
+      <a href="../index.html">
+        <img src="../images/ruby-sequel-monocrome.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--footer" />
+      </a>
+      <ul class="nav__ul">
+        <li class="nav__li">
+          <a href="../documentation.html" class="nav__a">Documentation</a>
+          <a href="../documentation.html#general-overview" class="a">General Overview</a>
+          <a href="../documentation.html#databases" class="a">Databases</a>
+          <a href="../documentation.html#datasets" class="a">Datasets</a>
+          <a href="../documentation.html#models" class="a">Models</a>
+          <a href="../documentation.html#misc" class="a">Misc</a>
+          <a href="../documentation.html#rdoc" class="a">RDoc</a>
+          <a href="../documentation.html#release-notes" class="a">Release Notes</a>
+        </li>
+        <li class="nav__li">
+          <a href="../plugins.html" class="nav__a">Plugins</a>
+          <a href="../plugins.html#model-plugins" class="a">Model Plugins</a>
+          <a href="../plugins.html#sequel-extensions" class="a">Sequel Extensions</a>
+        </li>
+        <li class="nav__li">
+          <a href="../development.html" class="nav__a">Development</a>
+          <a href="../development.html#bugs" class="a">Reporting Bugs</a>
+          <a href="../development.html#contribute" class="a">Contribute</a>
+          <a href="../development.html#code" class="a">Source Code</a>
+          <a href="../development.html#license" class="a">License</a>
+        </li>
+        <li class="nav__li">
+          <a href="../links.html" class="nav__a">Links</a>
+          <a href="../links.html#articles" class="a">Articles</a>
+          <a href="../links.html#presentations" class="a">Presentations</a>
+          <a href="../links.html#logos" class="a">Logos &amp; Badges</a>
+          <a href="../links.html#using-sequel" class="a">Using Sequel</a>
+          <a href="https://rubygems.org/gems/sequel/" class="a">RubyGems</a>
+          <a href="https://github.com/jeremyevans/sequel/" class="a">GitHub</a>
+        </li>
+      </ul>
+      <form action="https://www.google.com/search" autocomplete="off">
+        <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
+      </form>
+    </nav>
+  </footer>
+</body>
+</html>

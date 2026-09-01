@@ -92,7 +92,7 @@ doc/release_notes/4.42.0.txt
 
 <p>Sequel’s default remains the same as before, to convert identifiers to uppercase on input and lowercase on output on databases that fold unquoted identifiers to uppercase (per the SQL standard), and to not mangle identifiers at all on databases that fold unquoted identifiers to lowercase (MySQL, PostgreSQL, SQLite).  The identifier_mangling extension just allows you to change the default behavior.</p>
 </li><li>
-<p>On DB2, Dataset#with_convert_smallint_to_bool has been added, which returns a modified dataset with the convert_smallint_to_bool setting changed.  Previously, chaging the smallint_to_bool setting required mutating a dataset.</p>
+<p>On DB2, Dataset#with_convert_smallint_to_bool has been added, which returns a modified dataset with the convert_smallint_to_bool setting changed.  Previously, changing the smallint_to_bool setting required mutating a dataset.</p>
 </li><li>
 <p>The mock adapter now supports Dataset#with_{autoid,fetch,numrows}, allowing mocking of results when using frozen datasets.</p>
 </li></ul>

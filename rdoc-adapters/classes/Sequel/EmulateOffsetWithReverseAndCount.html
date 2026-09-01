@@ -123,7 +123,7 @@ Sequel::EmulateOffsetWithReverseAndCount
 <span class="line-num">49</span>   <span class="ruby-keyword">else</span>
 <span class="line-num">50</span>     <span class="ruby-comment"># Sequel doesn&#39;t allow a nonpositive limit.  If the offset</span>
 <span class="line-num">51</span>     <span class="ruby-comment"># is greater than the number of rows, the empty result set</span>
-<span class="line-num">52</span>     <span class="ruby-comment"># shuld be returned, so use a condition that is always false.</span>
+<span class="line-num">52</span>     <span class="ruby-comment"># should be returned, so use a condition that is always false.</span>
 <span class="line-num">53</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">1</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">0</span>)
 <span class="line-num">54</span>   <span class="ruby-keyword">end</span>
 <span class="line-num">55</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:append_sql</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>

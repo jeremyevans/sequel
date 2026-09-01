@@ -57,7 +57,7 @@ doc/release_notes/4.34.0.txt
 </li><li>
 <p>The Dataset#to_hash, to_hash_groups, select_hash, and select_hash_groups methods now take an options hash as a third argument.  This options hash can now contain a :hash option, which specifies the object in which the resulting values should be placed.  You can use this to have the values inserted into a custom hash, or another object responding to [] and []=.</p>
 </li><li>
-<p>A validators_operator validation has been added to the validation_helpers plugin:</p>
+<p>A validates_operator validation has been added to the validation_helpers plugin:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Example</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
@@ -73,7 +73,7 @@ doc/release_notes/4.34.0.txt
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_range_type</span>(<span class="ruby-string">&#39;timerange&#39;</span>)
 </pre>
 </li><li>
-<p>The dataset_associations plugin now supports a :dataset_associations_join association option on associations that use joined datasets.  This option will have the datasets returned by the dataset association methods join to the same tables that would be joined when retriving the associated objects, allowing selected columns, orders, and filters that reference columns in the joined tables to work correctly.</p>
+<p>The dataset_associations plugin now supports a :dataset_associations_join association option on associations that use joined datasets.  This option will have the datasets returned by the dataset association methods join to the same tables that would be joined when retrieving the associated objects, allowing selected columns, orders, and filters that reference columns in the joined tables to work correctly.</p>
 </li><li>
 <p>The Database :preconnect option can now be set to :concurrently, which will create the connections in separate threads. This can significantly speed up preconnection in high-latency environments.</p>
 </li><li>

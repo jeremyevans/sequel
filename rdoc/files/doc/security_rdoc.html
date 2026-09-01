@@ -296,7 +296,7 @@ doc/security.rdoc
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-value">column:</span> <span class="ruby-identifier">params</span>[<span class="ruby-value">:value</span>].<span class="ruby-identifier">to_s</span>) <span class="ruby-comment"># Safe</span>
 </pre>
 
-<p>Because using the auto_literal_strings extension makes SQL injection so much eaiser, it is recommended to not use it, and instead use Sequel.lit with placeholders.</p>
+<p>Because using the auto_literal_strings extension makes SQL injection so much easier, it is recommended to not use it, and instead use Sequel.lit with placeholders.</p>
 
 <h3 id="label-SQL+Identifier+Injections"><a href="#label-SQL+Identifier+Injections">SQL Identifier Injections</a></h3>
 
@@ -319,7 +319,7 @@ doc/security.rdoc
 
 <p>In general, even if doesn’t lead to SQL Injection, you should avoid using identifiers derived from user input unless absolutely necessary.</p>
 
-<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> also allows you to create identifiers using <a href="../../classes/Sequel/SQL/Builders.html#method-i-identifier">Sequel.identifier</a> for plain identifiers, <a href="../../classes/Sequel/SQL/Builders.html#method-i-qualify">Sequel.qualify</a> and <a href="">Sequel::SQL::Indentifier#[][Sequel::SQL::QualifyingMethods#</a>] for qualified identifiers, and <a href="../../classes/Sequel/SQL/Builders.html#method-i-as">Sequel.as</a> for aliased expressions.  So if you pass any of those values derived from user input, you are dealing with the same scenario.</p>
+<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> also allows you to create identifiers using <a href="../../classes/Sequel/SQL/Builders.html#method-i-identifier">Sequel.identifier</a> for plain identifiers, <a href="../../classes/Sequel/SQL/Builders.html#method-i-qualify">Sequel.qualify</a> and <a href="../../classes/Sequel/SQL/QualifyingMethods.html#method-i-5B-5D"><code>Sequel::SQL::Identifier#[][rdoc-ref:Sequel::SQL::QualifyingMethods#[]</code></a>] for qualified identifiers, and <a href="../../classes/Sequel/SQL/Builders.html#method-i-as">Sequel.as</a> for aliased expressions.  So if you pass any of those values derived from user input, you are dealing with the same scenario.</p>
 
 <p>Note that the issues with SQL identifiers do not just apply to places where strings are used as identifiers, they also apply to all places where <a href="../../classes/Sequel.html"><code>Sequel</code></a> uses symbols as identifiers.  However, if you are creating symbols from user input, you at least have a denial of service vulnerability in ruby &lt;2.2, and possibly a more serious vulnerability.</p>
 

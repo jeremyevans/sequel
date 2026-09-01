@@ -397,9 +397,9 @@ Sequel::Dataset::PreparedStatementMethods
 <span class="line-num">206</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:insert_pk</span>, <span class="ruby-value">:single_value</span>
 <span class="line-num">207</span>     <span class="ruby-identifier">with_sql_single_value</span>(<span class="ruby-identifier">prepared_sql</span>)
 <span class="line-num">208</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
-<span class="line-num">209</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">209</span>     <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">210</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>[<span class="ruby-value">0</span>]
-<span class="line-num">211</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">211</span>     <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">212</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">:map</span>, <span class="ruby-value">:as_hash</span>, <span class="ruby-value">:to_hash</span>, <span class="ruby-value">:to_hash_groups</span>
 <span class="line-num">213</span>       <span class="ruby-identifier">force_prepared_sql</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">type</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) 
 <span class="line-num">214</span>     <span class="ruby-keyword">end</span>

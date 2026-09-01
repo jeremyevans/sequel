@@ -203,7 +203,7 @@ Artist.filter(:name.like(&#39;A%)).eager(:albums_with_10_tracks).all
 <span class="ruby-comment"># UPDATE albums SET artist_id = NULL WHERE artist_id = 1</span>
 </pre>
 
-<p>All associations can specify a :select option to change which columns are selected.  Previously only many to many associations suppported this.</p>
+<p>All associations can specify a :select option to change which columns are selected.  Previously only many to many associations supported this.</p>
 
 <p>The SQL used when eagerly loading through eager_graph can be modified via the :graph_join_type, :graph_conditions, and :graph_join_conditions options.</p>
 

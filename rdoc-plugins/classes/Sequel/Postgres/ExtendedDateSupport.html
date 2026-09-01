@@ -69,7 +69,7 @@ Sequel::Postgres::ExtendedDateSupport
 <td class='context-item-value'>[Java::JavaSQL::Types::DATE, Java::JavaSQL::Types::TIMESTAMP]</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>:nocov:</p>
+<p>simplecov:disable</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -157,7 +157,7 @@ Sequel::Postgres::ExtendedDateSupport
 </div>
 <div class='description'>
 
-<p>Add dataset methods and update the conversion proces for dates and timestamps.</p>
+<p>Add dataset methods and update the conversion process for dates and timestamps.</p>
 
 </div>
 <div class='source'>
@@ -284,10 +284,10 @@ Sequel::Postgres::ExtendedDateSupport
 <span class="line-num">114</span>         <span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">value</span>)
 <span class="line-num">115</span>       <span class="ruby-keyword">elsif</span> <span class="ruby-constant">TIME_CAN_PARSE_BC</span>
 <span class="line-num">116</span>         <span class="ruby-constant">Time</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">value</span>)
-<span class="line-num">117</span>       <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">117</span>       <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">118</span>       <span class="ruby-keyword">else</span>
 <span class="line-num">119</span>         <span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">value</span>).<span class="ruby-identifier">to_time</span>
-<span class="line-num">120</span>       <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">120</span>       <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">121</span>       <span class="ruby-keyword">end</span>
 <span class="line-num">122</span> 
 <span class="line-num">123</span>       <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_output_timestamp</span>(<span class="ruby-identifier">dt</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">application_timezone</span>)

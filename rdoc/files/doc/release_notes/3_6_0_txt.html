@@ -51,7 +51,7 @@ doc/release_notes/3.6.0.txt
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT :n FROM t WHERE p &gt; :q AND p &lt; :r&#39;</span>, <span class="ruby-value">:n</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>,<span class="ruby-value">:q</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>,<span class="ruby-value">:r</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>]
 </pre>
 
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> doesn’t subsitute values that don’t appear in the hash:</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> doesn’t substitute values that don’t appear in the hash:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;price &lt; :p AND id in :ids&#39;</span>, <span class="ruby-value">:p</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">100</span>)
 <span class="ruby-comment"># WHERE (price &lt; 100 AND id in :ids)</span>
@@ -179,7 +179,7 @@ doc/release_notes/3.6.0.txt
 
 <p>A consequence of this change is that attempting to load a *_to_many association for a new model object now returns an empty array instead of raising an exception.  This has its own advantage of allowing the same association viewing code to work on both new and existing objects.  Previously, you had to actively avoid calling the association method on new objects, or <a href="../../../classes/Sequel.html"><code>Sequel</code></a> would raise an exception.</p>
 </li><li>
-<p>Dataset aggreate methods (sum/avg/min/max/range/interval) now work correctly with limited, grouped, or compound datasets. Previously, count worked with them, but other aggregate methods did not.  These methods now use a subquery if called on a limited, grouped or compound dataset.</p>
+<p>Dataset aggregate methods (sum/avg/min/max/range/interval) now work correctly with limited, grouped, or compound datasets. Previously, count worked with them, but other aggregate methods did not.  These methods now use a subquery if called on a limited, grouped or compound dataset.</p>
 </li><li>
 <p>It is no longer required to have an existing GROUP BY clause to use a HAVING clause (except on SQLite, which doesn’t permit it).  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> has always had this limitation, but it’s not required by the SQL standard, and there are valid reasons to use HAVING without GROUP BY.</p>
 </li><li>

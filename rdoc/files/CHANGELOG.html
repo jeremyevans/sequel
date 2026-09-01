@@ -33,6 +33,25 @@ CHANGELOG
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.108.0+-282026-09-01-29"><a href="#label-5.108.0+-282026-09-01-29"><a href="doc/release_notes/5_108_0_txt.html">5.108.0</a> (2026-09-01)</a></h3>
+<ul><li>
+<p>Support :allow_migration_number option for TimestampMigrator (jeremyevans)</p>
+</li><li>
+<p>Recognize additional disconnect errors in the mysql and mysql2 adapters (sdalu) (#2382)</p>
+</li><li>
+<p>Deprecate Sequel.require (jeremyevans)</p>
+</li><li>
+<p>Add ndims, position, positions, prepend, sample, shuffle, and trim to pg_array_ops extension (jeremyevans)</p>
+</li><li>
+<p>Support :select and :select_where options for Postgres Dataset#insert_conflict on PostgreSQL 19+ (jeremyevans)</p>
+</li><li>
+<p>Support cast* methods directly on Postgres::PGArray instances (jeremyevans)</p>
+</li><li>
+<p>Replace Model#_save_update_changed_colums_hash with _save_update_changed_columns_hash (jeremyevans) (#2379)</p>
+</li><li>
+<p>Replace Dataset#aggreate_dataset_use_from_self? with aggregate_dataset_use_from_self? (jeremyevans) (#2379)</p>
+</li></ul>
+
 <h3 id="label-5.107.0+-282026-08-01-29"><a href="#label-5.107.0+-282026-08-01-29"><a href="doc/release_notes/5_107_0_txt.html">5.107.0</a> (2026-08-01)</a></h3>
 <ul><li>
 <p>Support Dataset#explain :query_plan option on SQLite, for EXPLAIN QUERY PLAN (cllns)</p>
@@ -52,7 +71,7 @@ CHANGELOG
 
 <h3 id="label-5.106.0+-282026-07-01-29"><a href="#label-5.106.0+-282026-07-01-29"><a href="doc/release_notes/5_106_0_txt.html">5.106.0</a> (2026-07-01)</a></h3>
 <ul><li>
-<p>Add Sequel::Constants::ALL to support GROUP BY ALL via group(Sequel::ALL) on PostgreSQL 19+ (jeremyevans)</p>
+<p>Add Sequel::Constants::ALL (jeremyevans)</p>
 </li><li>
 <p>Support :ignore_nulls window function option on PostgreSQL 19+ (jeremyevans)</p>
 </li><li>
@@ -228,7 +247,7 @@ CHANGELOG
 </li><li>
 <p>Support :no_inherit option for NOT NULL constraints on PostgreSQL 18+ (jeremyevans)</p>
 </li><li>
-<p>Support not_null: {name: “constaint_name”} column option for naming NOT NULL constraints on PostgreSQL 18+ (jeremyevans)</p>
+<p>Support not_null: {name: “constraint_name”} column option for naming NOT NULL constraints on PostgreSQL 18+ (jeremyevans)</p>
 </li><li>
 <p>Support :period foreign_key option for PERIOD on PostgreSQL 18+ (jeremyevans)</p>
 </li><li>
@@ -1687,7 +1706,7 @@ CHANGELOG
 </li><li>
 <p>Make schema_caching extension work with :callable_default schema values (jeremyevans)</p>
 </li><li>
-<p>Freeze string valuse in hashes returned by Database#schema when using the schema_caching extension (jeremyevans)</p>
+<p>Freeze string values in hashes returned by Database#schema when using the schema_caching extension (jeremyevans)</p>
 </li><li>
 <p>Protect migration file loading with a mutex to not break when multiple threads load migration files simultaneously (jeremyevans)</p>
 </li><li>
@@ -1829,7 +1848,7 @@ CHANGELOG
 </li><li>
 <p>Don’t create empty arrays for unused association callbacks (jeremyevans)</p>
 </li><li>
-<p>Cache association method name symbols instead of recomputing them everytime (jeremyevans)</p>
+<p>Cache association method name symbols instead of recomputing them every time (jeremyevans)</p>
 </li><li>
 <p>Raise an exception if attempting to create a prepared statement using a dataset with a delayed evaluation (jeremyevans)</p>
 </li><li>

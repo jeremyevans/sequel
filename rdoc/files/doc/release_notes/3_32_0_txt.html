@@ -151,7 +151,7 @@ WHERE (1 = 1) # true
 WHERE (b IN (1, 2)) # NULL
 WHERE (b NOT IN (1, 2)) # NULL</pre>
 
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> chooses to default to behavior consistent with the non-empty array cases (similar to SQLAlchemy).  However, there are two downsides to this handling.  The first is that some databases with poor optimizers (e.g. MySQL) might do a full table scan with the default syntax.  The second is that the static boolean handling may be generally perferable, if you believe that IN/NOT IN with an empty array should always be true or false and never NULL even if the left hand argument is NULL.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> chooses to default to behavior consistent with the non-empty array cases (similar to SQLAlchemy).  However, there are two downsides to this handling.  The first is that some databases with poor optimizers (e.g. MySQL) might do a full table scan with the default syntax.  The second is that the static boolean handling may be generally preferable, if you believe that IN/NOT IN with an empty array should always be true or false and never NULL even if the left hand argument is NULL.</p>
 
 <p>As there really isn’t a truly correct answer in this case, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> defaults to the “correct” NULL handling, and allows you to switch to the static boolean handling via:</p>
 

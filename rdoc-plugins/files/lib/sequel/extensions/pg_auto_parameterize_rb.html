@@ -62,7 +62,7 @@ lib/sequel/extensions/pg_auto_parameterize.rb
 <span class="ruby-comment"># SELECT foo(&#39;a&#39;) AS &quot;f&quot; FROM &quot;t&quot; GROUP BY foo(&#39;a&#39;)</span>
 </pre>
 
-<p>Will get auto paramterized as:</p>
+<p>Will get auto parameterized as:</p>
 
 <pre class="ruby"><span class="ruby-comment"># SELECT foo($1) AS &quot;f&quot; FROM &quot;t&quot; GROUP BY foo($2)</span>
 </pre>

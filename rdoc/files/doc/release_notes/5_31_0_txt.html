@@ -35,7 +35,7 @@ doc/release_notes/5.31.0.txt
 <div id='description'>
 <h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
-<p>A forbid_lazy_load plugin has been added to forbid the lazy loading of model associations if the current object was retreived with other objects.  This plugin helps detect N+1 query issues.  This plugin will raise an error if a lazy load is detected in such cases:</p>
+<p>A forbid_lazy_load plugin has been added to forbid the lazy loading of model associations if the current object was retrieved with other objects.  This plugin helps detect N+1 query issues.  This plugin will raise an error if a lazy load is detected in such cases:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:forbid_lazy_load</span>
 <span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tracks</span>

@@ -37,7 +37,7 @@ doc/release_notes/1.3.txt
 
 <p>The latest release of sequel_model includes a new associations functionality written by Jeremy Evans which replaces the old relations code in previous versions. Please note that this version is not completely backward-compatible and you should therefore upgrade with caution.</p>
 
-<p>The new implementation supports three kinds of relations: one_to_many, many_to_one and many_to_many, which correspond to has_many, belongs_to and has_and_belongs_to_many relations in ActiveRecord. In fact, the new implementation includes aliases for ActiveRecord assocation macros and is basically compatible with ActiveRecord conventions. It also supports DRY implicit class name references. Here’s a simple example:</p>
+<p>The new implementation supports three kinds of relations: one_to_many, many_to_one and many_to_many, which correspond to has_many, belongs_to and has_and_belongs_to_many relations in ActiveRecord. In fact, the new implementation includes aliases for ActiveRecord association macros and is basically compatible with ActiveRecord conventions. It also supports DRY implicit class name references. Here’s a simple example:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-identifier">has_many</span> <span class="ruby-value">:books</span> <span class="ruby-comment"># equivalent to one_to_many</span>

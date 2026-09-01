@@ -46,7 +46,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>:nocov:</p>
+<p>simplecov:enable</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -560,10 +560,10 @@ Superclass:
 <span class="line-num">459</span>   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@range</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@range</span>
 <span class="line-num">460</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range for an empty PostgreSQL range&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span>
 <span class="line-num">461</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range excludes beginning element&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">exclude_begin?</span>
-<span class="line-num">462</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">462</span>   <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">463</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range has unbounded beginning&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-constant">STARTLESS_RANGE_NOT_SUPPORTED</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>
 <span class="line-num">464</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range has unbounded ending&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-constant">ENDLESS_RANGE_NOT_SUPPORTED</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>
-<span class="line-num">465</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">465</span>   <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">466</span>   <span class="ruby-ivar">@range</span> = <span class="ruby-constant">Range</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>, <span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>, <span class="ruby-identifier">exclude_end?</span>)
 <span class="line-num">467</span> <span class="ruby-keyword">end</span></pre>
 </div>

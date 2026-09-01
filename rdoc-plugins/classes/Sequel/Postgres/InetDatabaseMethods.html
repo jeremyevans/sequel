@@ -74,9 +74,9 @@ Sequel::Postgres::InetDatabaseMethods
 <span class="line-num">41</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
 <span class="line-num">42</span>     <span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">InetDatasetMethods</span>)
 <span class="line-num">43</span> 
-<span class="line-num">44</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">44</span>     <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">45</span>     <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-keyword">defined?</span>(<span class="ruby-constant">SEQUEL_PG_VERSION_INTEGER</span>) <span class="ruby-operator">||</span> <span class="ruby-constant">SEQUEL_PG_VERSION_INTEGER</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">11300</span>
-<span class="line-num">46</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">46</span>     <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">47</span>       <span class="ruby-comment"># sequel_pg 1.13.0+ will use inet/cidr conversion procs, but doing so is</span>
 <span class="line-num">48</span>       <span class="ruby-comment"># slower, so don&#39;t add the conversion procs if using sequel_pg 1.13.0+.</span>
 <span class="line-num">49</span>       <span class="ruby-identifier">meth</span> = <span class="ruby-constant">IPAddr</span>.<span class="ruby-identifier">method</span>(<span class="ruby-value">:new</span>)

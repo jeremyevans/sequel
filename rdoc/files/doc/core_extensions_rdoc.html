@@ -429,7 +429,7 @@ doc/core_extensions.rdoc
 
 <h4 id="label-sql_or"><a href="#label-sql_or">sql_or</a></h4>
 
-<p>Array#sql_or nd Hash#sql_or treat the receiver as a conditions specifier, matching any of the conditions in the array:</p>
+<p>Array#sql_or and Hash#sql_or treat the receiver as a conditions specifier, matching any of the conditions in the array:</p>
 
 <pre class="ruby">{<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}.<span class="ruby-identifier">sql_or</span>       <span class="ruby-comment"># SQL: a = 1 OR b IN (2, 3)</span>
 [[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_or</span> <span class="ruby-comment"># SQL: a = 1 OR b IN (2, 3)</span>
@@ -457,7 +457,7 @@ doc/core_extensions.rdoc
 
 <h4 id="label-sql_string_join"><a href="#label-sql_string_join">sql_string_join</a></h4>
 
-<p>Array#sql_string_join joins all of the elements in the array in an SQL string concatentation expression:</p>
+<p>Array#sql_string_join joins all of the elements in the array in an SQL string concatenation expression:</p>
 
 <pre class="ruby">[<span class="ruby-value">:a</span>].<span class="ruby-identifier">sql_string_join</span>           <span class="ruby-comment"># SQL: a</span>
 [<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>].<span class="ruby-identifier">sql_string_join</span>       <span class="ruby-comment"># SQL: a || b</span>

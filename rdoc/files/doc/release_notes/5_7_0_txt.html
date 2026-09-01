@@ -93,7 +93,7 @@ doc/release_notes/5.7.0.txt
 
 <h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
-<p>The switch to using identity columns instead of serial columns by default on PostgreSQL 10.2+ may break backwards compatibilty in some situations, such as code that relies on what are generally considered bugs in serial columns, such as CREATE TABLE LIKE using the same sequence for the column in both the existing table and the new table, or that dropping the default value for the column does not drop the related sequence.</p>
+<p>The switch to using identity columns instead of serial columns by default on PostgreSQL 10.2+ may break backwards compatibility in some situations, such as code that relies on what are generally considered bugs in serial columns, such as CREATE TABLE LIKE using the same sequence for the column in both the existing table and the new table, or that dropping the default value for the column does not drop the related sequence.</p>
 </li></ul>
 </div>
 <div id='context'>

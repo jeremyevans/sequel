@@ -142,11 +142,11 @@ Superclass:
 <span class="line-num">125</span>     <span class="ruby-identifier">parts</span>[<span class="ruby-value">:seconds</span>] = <span class="ruby-identifier">seconds</span>
 <span class="line-num">126</span>   <span class="ruby-keyword">end</span>
 <span class="line-num">127</span> 
-<span class="line-num">128</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">128</span>   <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">129</span>   <span class="ruby-keyword">if</span> <span class="ruby-constant">USE_PARTS_ARRAY</span>
 <span class="line-num">130</span>     <span class="ruby-identifier">parts</span> = <span class="ruby-identifier">parts</span>.<span class="ruby-identifier">to_a</span>
 <span class="line-num">131</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">132</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">132</span>   <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">133</span> 
 <span class="line-num">134</span>   <span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">value</span>, <span class="ruby-identifier">parts</span>)
 <span class="line-num">135</span> <span class="ruby-keyword">end</span></pre>

@@ -271,7 +271,7 @@ doc/migration.rdoc
 <p>Requires manual merging of simultaneous migrations</p>
 </li></ul>
 
-<h3 id="label-TimeStampMigrator"><a href="#label-TimeStampMigrator"><code>TimeStampMigrator</code></a></h3>
+<h3 id="label-TimestampMigrator"><a href="#label-TimestampMigrator"><code>TimestampMigrator</code></a></h3>
 <ul><li>
 <p>More complex, uses migration versions where the version should represent a timestamp</p>
 </li><li>
@@ -351,7 +351,7 @@ doc/migration.rdoc
 
 <p>For a single developer, the <code>TimestampMigrator</code> has no real benefits, so I would always recommend the <code>IntegerMigrator</code>.  When dealing with multiple developers, it depends on the size of the development team, the team’s communication level, and the level of overlap between developers.</p>
 
-<p>Let’s say Alice works on a new feature that requires a migration at the same time Bob works on a separate feature that requires an unrelated migration.  If both developers are committing to their own private respositories, when it comes time to merge, the <code>TimestampMigrator</code> will not require any manually changes.  That’s because Alice will have a migration such as <code>20100512_do_this.rb</code> and Bob will have one such as <code>20100512_do_that.rb</code>.</p>
+<p>Let’s say Alice works on a new feature that requires a migration at the same time Bob works on a separate feature that requires an unrelated migration.  If both developers are committing to their own private repositories, when it comes time to merge, the <code>TimestampMigrator</code> will not require any manually changes.  That’s because Alice will have a migration such as <code>20100512_do_this.rb</code> and Bob will have one such as <code>20100512_do_that.rb</code>.</p>
 
 <p>If the <code>IntegerMigrator</code> was used, Alice would have <code>34_do_this.rb</code> and Bob would have <code>34_do_that.rb</code>.  When the <code>IntegerMigrator</code> was used, it would raise an exception due to the duplicate migration version.  The only way to fix it would be to renumber one of the two migrations, and have the affected developer manually modify their database.</p>
 
@@ -408,7 +408,7 @@ doc/migration.rdoc
     <span class="ruby-identifier">from</span>(<span class="ruby-value">:albums_artists</span>).<span class="ruby-identifier">insert</span>([<span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>],
      <span class="ruby-identifier">from</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">select</span>(<span class="ruby-value">:id</span>, <span class="ruby-value">:artist_id</span>).<span class="ruby-identifier">exclude</span>(<span class="ruby-value">artist_id:</span> <span class="ruby-keyword">nil</span>))
 
-    <span class="ruby-comment"># Drop the now unnecesssary column from the albums table</span>
+    <span class="ruby-comment"># Drop the now unnecessary column from the albums table</span>
     <span class="ruby-identifier">drop_column</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">:artist_id</span>
   <span class="ruby-keyword">end</span>
   <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>

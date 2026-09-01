@@ -190,7 +190,7 @@ doc/release_notes/4.46.0.txt
 <span class="ruby-keyword">end</span>
 </pre>
 </li><li>
-<p>Database#pragma_get and pragma_set on SQLite are now deprecated, along with any method that calls them, such as auto_vacuum, temp_store, foreign_keys, case_sensitive_like, synchronous, and their setter methods.  To set these pragrams for all SQLite database connections, the appropriate options should be passed when creating the Database instance.</p>
+<p>Database#pragma_get and pragma_set on SQLite are now deprecated, along with any method that calls them, such as auto_vacuum, temp_store, foreign_keys, case_sensitive_like, synchronous, and their setter methods.  To set these pragmas for all SQLite database connections, the appropriate options should be passed when creating the Database instance.</p>
 </li><li>
 <p>Automatically looking up the dataset class for a Database instance by looking for a DatasetClass constant in the Database’s class is now deprecated.  All adapters that ship with <a href="../../../classes/Sequel.html"><code>Sequel</code></a> have been converted, but external adapters should now define the Database#dataset_class_default private method appropriately to return the correct dataset class.</p>
 </li><li>

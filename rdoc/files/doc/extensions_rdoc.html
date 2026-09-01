@@ -46,7 +46,7 @@ doc/extensions.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:named_timezones</span>
 </pre>
 
-<p>All this does is require the relevent extension from <code>sequel/extensions/named_timezones</code> somewhere in the ruby path.  Global extensions are just a simpler, consistent way to require code that modifies <a href="../../classes/Sequel.html"><code>Sequel</code></a>.</p>
+<p>All this does is require the relevant extension from <code>sequel/extensions/named_timezones</code> somewhere in the ruby path.  Global extensions are just a simpler, consistent way to require code that modifies <a href="../../classes/Sequel.html"><code>Sequel</code></a>.</p>
 
 <h2 id="label-Database+Extensions"><a href="#label-Database+Extensions">Database Extensions</a></h2>
 
@@ -55,7 +55,7 @@ doc/extensions.rdoc
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_block</span>
 </pre>
 
-<p>The first thing that this does is load the relevent extension globally.  However, Database extensions should be structured in a way that loading the relevent extension globally just adds a module with the related behavior, it doesn’t modify any other state.  After loading the extension globally, it modifies the related <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> object to modify it’s behavior, usually by extending it with a module.</p>
+<p>The first thing that this does is load the relevant extension globally.  However, Database extensions should be structured in a way that loading the relevant extension globally just adds a module with the related behavior, it doesn’t modify any other state.  After loading the extension globally, it modifies the related <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> object to modify it’s behavior, usually by extending it with a module.</p>
 
 <p>If you want a Database extension loaded into all future Database instances, you can use <a href="../../classes/Sequel/Database.html#method-c-extension"><code>Sequel::Database.extension</code></a>:</p>
 
@@ -71,7 +71,7 @@ doc/extensions.rdoc
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">extension</span>(<span class="ruby-value">:columns_introspection</span>)
 </pre>
 
-<p>The first thing loading a Dataset extension does is load the relevent extension globally.  Similar to Database extensions, loading a Dataset extension globally should not affect state other than maybe adding a module.  After loading the extension globally, it returned a modified copy of the <a href="../../classes/Sequel/Dataset.html"><code>Sequel::Dataset</code></a> with the extension loaded into it.</p>
+<p>The first thing loading a Dataset extension does is load the relevant extension globally.  Similar to Database extensions, loading a Dataset extension globally should not affect state other than maybe adding a module.  After loading the extension globally, it returned a modified copy of the <a href="../../classes/Sequel/Dataset.html"><code>Sequel::Dataset</code></a> with the extension loaded into it.</p>
 
 <p>If you want to load an extension into all future datasets for a given <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance, you can also load it as a Database extension:</p>
 

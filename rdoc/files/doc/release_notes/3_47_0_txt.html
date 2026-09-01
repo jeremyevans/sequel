@@ -67,7 +67,7 @@ doc/release_notes/3.47.0.txt
 </li><li>
 <p>validates_schema_types has been added to validation_helpers, which validates that the column values are instances of the expected ruby type for the given database schema type.  This is a more robust version of the validates_not_string extension, and users of validates_not_string are encouraged to switch soon, as validates_not_string is going away in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.</p>
 
-<p>validates_schema_type has been added to validation_class_methods, which preforms the same validation, but it requires the columns be listed explicitly.</p>
+<p>validates_schema_type has been added to validation_class_methods, which performs the same validation, but it requires the columns be listed explicitly.</p>
 
 <p>validates_type in validation_helpers has been expanded to accept an array of allowable classes.</p>
 
@@ -129,7 +129,7 @@ doc/release_notes/3.47.0.txt
 </li><li>
 <p>Loading the touch plugin into a model subclass after it has been loaded into a model superclass no longer ignores inherited touched associations.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer resets the conversion procs for the Database instance when using Databaset#extension to load a pg_* extension that adds global conversion procs.  Instead, the global conversion procs are added to the instance-specific conversion procs.  The result of this is that manually added conversion procs will not be lost if an extension is loaded afterward.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer resets the conversion procs for the Database instance when using Database#extension to load a pg_* extension that adds global conversion procs.  Instead, the global conversion procs are added to the instance-specific conversion procs.  The result of this is that manually added conversion procs will not be lost if an extension is loaded afterward.</p>
 </li><li>
 <p>The jdbc adapter now references the driver class before loading subadapter specific code, which can fix issues if the database tries to connect on initialization (such as the jdbc/postgres adapter if the pg_hstore extension is loaded previously).</p>
 </li><li>
@@ -155,7 +155,7 @@ doc/release_notes/3.47.0.txt
 </li><li>
 <p>The default validation error message for validates_type has been modified.</p>
 </li><li>
-<p>Database#schema_column_type was made public accidently by an adapter and a few extensions.  That has been fixed, but if you were calling it with an explicit receiver and it happened to work by accident before, you’ll need to update your code.</p>
+<p>Database#schema_column_type was made public accidentally by an adapter and a few extensions.  That has been fixed, but if you were calling it with an explicit receiver and it happened to work by accident before, you’ll need to update your code.</p>
 </li></ul>
 
 <h1 id="label-Sequel+4+Implementation+Planning"><a href="#label-Sequel+4+Implementation+Planning"><a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4 Implementation Planning</a></h1>

@@ -136,7 +136,7 @@ doc/release_notes/4.9.0.txt
 <ul><li>
 <p>In some cases <a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer adds superfluous parentheses when constructing SQL strings.  If you are testing for specific SQL, this can cause test failures.</p>
 </li><li>
-<p>The pg_array extension no longer recognizes the :typecast_method option when registering an array type.  The option allowed reuse of an existing typecast method, but as that results in an incorrect type at the database level, the option was fundementally broken.</p>
+<p>The pg_array extension no longer recognizes the :typecast_method option when registering an array type.  The option allowed reuse of an existing typecast method, but as that results in an incorrect type at the database level, the option was fundamentally broken.</p>
 </li><li>
 <p>The internals of the PostgreSQL array parser have changed.  If you were relying on them, you’ll need to update your code.</p>
 </li><li>

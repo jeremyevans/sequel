@@ -40,7 +40,7 @@ doc/release_notes/4.38.0.txt
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>}
 </pre>
 
-<p>This is because a in this case returns a Sequel::SQL::Indentifier, which defines - to return a <a href="../../../classes/Sequel/SQL/NumericExpression.html"><code>Sequel::SQL::NumericExpression</code></a>.  By supporting coerce, the following code now also works:</p>
+<p>This is because a in this case returns a <a href="../../../classes/Sequel/SQL/Identifier.html"><code>Sequel::SQL::Identifier</code></a>, which defines - to return a <a href="../../../classes/Sequel/SQL/NumericExpression.html"><code>Sequel::SQL::NumericExpression</code></a>.  By supporting coerce, the following code now also works:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-value">1</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">a</span>}
 </pre>

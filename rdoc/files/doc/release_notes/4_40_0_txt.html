@@ -78,9 +78,9 @@ doc/release_notes/4.40.0.txt
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>]}
 </pre>
 
-<p>This offers a easy way to create qualified identifers when symbol splitting has been disabled.</p>
+<p>This offers a easy way to create qualified identifiers when symbol splitting has been disabled.</p>
 </li><li>
-<p>A symbol_aref extension has been added, allowing the use of Symbol#[] to create qualified identifiers if passed a Symbol, SQL::Identifier, or SQL::QualifiedIdentifier.  This doesn’t break any existing ruby behavior, as ruby currrently raises an exception in such cases.  Example:</p>
+<p>A symbol_aref extension has been added, allowing the use of Symbol#[] to create qualified identifiers if passed a Symbol, SQL::Identifier, or SQL::QualifiedIdentifier.  This doesn’t break any existing ruby behavior, as ruby currently raises an exception in such cases.  Example:</p>
 
 <pre class="ruby"><span class="ruby-value">:table</span>[<span class="ruby-value">:column</span>] <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>
 </pre>

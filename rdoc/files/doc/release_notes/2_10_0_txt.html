@@ -71,7 +71,7 @@ doc/release_notes/2.10.0.txt
 
 <p>Also note that this doesn’t relate solely to migrations, as any database schema modification method that accepts types will accept one of the above classes.</p>
 </li><li>
-<p>A ton of internal work was done to better support databases that fold unqouted identifiers to uppercase (which is the SQL standard). <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now allows you to set a method to call on identifiers going both into and out of the database.  The default is to downcase identifiers coming out, and upcase identifiers going in, though this is overridden by the PostgreSQL, MySQL, and SQLite adapters to not do anything (since they fold to lowercase by default).</p>
+<p>A ton of internal work was done to better support databases that fold unquoted identifiers to uppercase (which is the SQL standard). <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now allows you to set a method to call on identifiers going both into and out of the database.  The default is to downcase identifiers coming out, and upcase identifiers going in, though this is overridden by the PostgreSQL, MySQL, and SQLite adapters to not do anything (since they fold to lowercase by default).</p>
 
 <p>The settings are called identifier_input_method and identifier_output_method, and like most <a href="../../../classes/Sequel.html"><code>Sequel</code></a> settings, they can be set globally, per database, or per dataset:</p>
 
@@ -195,7 +195,7 @@ egrep -nr &#39;[^:]:[&#39;\&#39;&#39;&quot;]?[a-zA-Z_0-9]*[&#39;\&#39;&#39;&quot
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer modifies the MySQL::Result class when using the MySQL adapter.</p>
 </li></ul>
 
-<p>Backwards Compatibilty</p>
+<p>Backwards Compatibility</p>
 <hr>
 <ul><li>
 <p>If you were previously using a database that returned uppercase identifiers, it will probably return lowercase identifiers by default now.  To get back the old behavior:</p>

@@ -33,7 +33,7 @@ lib/sequel/extensions/string_agg.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The <a href="string_agg_rb.html">string_agg</a> extension adds the ability to perform database-independent aggregate string concatentation.  For example, with a table like:</p>
+<p>The <a href="string_agg_rb.html">string_agg</a> extension adds the ability to perform database-independent aggregate string concatenation.  For example, with a table like:</p>
 
 <pre class="ruby"><span class="ruby-identifier">c1</span> <span class="ruby-operator">|</span> <span class="ruby-identifier">c2</span>
 <span class="ruby-operator">-</span><span class="ruby-operator">-</span><span class="ruby-operator">-</span><span class="ruby-operator">+</span><span class="ruby-operator">-</span><span class="ruby-operator">-</span><span class="ruby-operator">-</span>
@@ -62,7 +62,7 @@ b  | 4</pre>
 <span class="ruby-identifier">sa</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:column_name</span>, <span class="ruby-string">&#39;-&#39;</span>) <span class="ruby-comment"># custom separator</span>
 </pre>
 
-<p>You can specify the order in which the concatention happens by calling <code>order</code> on the expression:</p>
+<p>You can specify the order in which the concatenation happens by calling <code>order</code> on the expression:</p>
 
 <pre class="ruby"><span class="ruby-identifier">sa</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:column_name</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:other_column</span>)
 </pre>
@@ -79,7 +79,7 @@ b  | 4</pre>
   <span class="ruby-identifier">select_append</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c2</span>))
 </pre>
 
-<p>This extension currenly supports the following databases:</p>
+<p>This extension currently supports the following databases:</p>
 <ul><li>
 <p>PostgreSQL 9+</p>
 </li><li>

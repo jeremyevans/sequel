@@ -37,7 +37,7 @@ doc/release_notes/3.13.0.txt
 <ul><li>
 <p>A json_serializer plugin was added that allows you to serialize model instances or datasets to JSON using to_json.  It requires the json library.  The API was modeled on ActiveRecord’s JSON serialization support.  You can use :only and :except options to specify the columns included, :include to specify associations to include, as well pass options to nested associations using a hash.  In addition to serializing to JSON, it also adds support for parsing JSON to model objects via JSON.parse or from_json.</p>
 </li><li>
-<p>An xml_serializer plugin was added that allows you to serialize model instances or datasets to XML.  It requries the nokogiri library.  It has a similar API to the json_serializer plugin, using to_xml instead of to_json, and the from_xml class method instead of JSON.parse.</p>
+<p>An xml_serializer plugin was added that allows you to serialize model instances or datasets to XML.  It requires the nokogiri library.  It has a similar API to the json_serializer plugin, using to_xml instead of to_json, and the from_xml class method instead of JSON.parse.</p>
 </li><li>
 <p>A tree plugin was added that allows you to treat <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> objects as being part of a tree.  It provides similar features to rcte_tree, but works on databases that don’t support recursive common table expressions.  In addition to the standard parent and children associations, it provides instance methods to get the ancestors, descendants, and siblings of the given tree node, and class methods to get the roots of the tree.</p>
 </li><li>

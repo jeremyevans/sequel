@@ -46,7 +46,7 @@ doc/release_notes/2.9.0.txt
 <span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">intersect</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">union</span>(<span class="ruby-identifier">ds3</span>)
 </pre>
 </li><li>
-<p>Exception classes ValidationFailure and BeforeHookFailure were added so it is eaiser to catch a failed validation.  These are both subclasses of <a href="../../../classes/Sequel/Error.html"><code>Sequel::Error</code></a>, so there shouldn’t be any backwards compatibility issues.  Error messages are also improved, as the ValidationFailure message is a string containing all validation failures and the BeforeHookFailure message contains which hook type caused the failure (i.e. before_save, before_create, or before_validate).</p>
+<p>Exception classes ValidationFailure and BeforeHookFailure were added so it is easier to catch a failed validation.  These are both subclasses of <a href="../../../classes/Sequel/Error.html"><code>Sequel::Error</code></a>, so there shouldn’t be any backwards compatibility issues.  Error messages are also improved, as the ValidationFailure message is a string containing all validation failures and the BeforeHookFailure message contains which hook type caused the failure (i.e. before_save, before_create, or before_validation).</p>
 </li><li>
 <p>The sequel command line tool now has a -L option to load all files in the given directory.  This is mainly useful for loading a directory of model files. The files are loaded after the database connection is set up.</p>
 </li><li>
@@ -75,7 +75,7 @@ doc/release_notes/2.9.0.txt
 </li><li>
 <p>The SQLite adapter no longer loses primary key information when dropping columns.</p>
 </li><li>
-<p>The SQLite adapter now supports dropping indicies.</p>
+<p>The SQLite adapter now supports dropping indices.</p>
 </li><li>
 <p>A bug in the MSSQL adapter’s literalization of LiteralStrings has been fixed.</p>
 </li><li>
@@ -92,7 +92,7 @@ doc/release_notes/2.9.0.txt
 <p>Model#inspect now calls Model#inspect_values for easier overloading.</p>
 </li></ul>
 
-<p>Backwards Compatibilty</p>
+<p>Backwards Compatibility</p>
 <hr>
 <ul><li>
 <p>The API to Model#save_failure (a private method) was changed to remove the second argument.</p>

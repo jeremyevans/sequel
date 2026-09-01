@@ -89,8 +89,6 @@ doc/opening_databases.rdoc
 
 <p>Note that if you do not pass a block to Sequel.connect, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will automatically retain a reference to the object in the <code>Sequel::DATABASES</code> array.  So calling <code>Sequel.connect</code> multiple times (say once per request), can result in a memory leak.  For any application where database access is needed for a long period of time, it’s best to store the result of <code>Sequel.connect</code> in a constant, as recommended above.</p>
 
-<h2 id="label-Using+the+Sequel.connect+method"><a href="#label-Using+the+Sequel.connect+method">Using the Sequel.connect method</a></h2>
-
 <h2 id="label-General+connection+options"><a href="#label-General+connection+options">General connection options</a></h2>
 
 <p>These options are shared by all adapters unless otherwise noted.</p>
@@ -120,6 +118,8 @@ doc/opening_databases.rdoc
 <p>The amount of seconds after which the queries are logged at :warn level</p>
 </td></tr><tr><td class='label'>:password </td><td>
 <p>The password for the user account</p>
+</td></tr><tr><td class='label'>:port </td><td>
+<p>The port of the database server to which to connect</p>
 </td></tr><tr><td class='label'>:preconnect </td><td>
 <p>Whether to automatically make the maximum number of connections when setting up the pool. Can be set to “concurrently” to connect in parallel.</p>
 </td></tr><tr><td class='label'>:preconnect_extensions </td><td>
@@ -277,7 +277,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 </td></tr><tr><td class='label'>:encoding </td><td>
 <p>Specify the encoding/character set to use for the connection.</p>
 </td></tr><tr><td class='label'>:fractional_seconds </td><td>
-<p>On MySQL 5.6.5+, this option is recognized and will include fractional seconds in time/timestamp values, as well as have the schema method create columns that can contain fractional seconds by deafult.  This option is also supported on other adapters that connect to MySQL.</p>
+<p>On MySQL 5.6.5+, this option is recognized and will include fractional seconds in time/timestamp values, as well as have the schema method create columns that can contain fractional seconds by default.  This option is also supported on other adapters that connect to MySQL.</p>
 </td></tr><tr><td class='label'>:socket </td><td>
 <p>Can be used to specify a Unix socket file to connect to instead of a TCP host and port.</p>
 </td></tr><tr><td class='label'>:sql_mode </td><td>

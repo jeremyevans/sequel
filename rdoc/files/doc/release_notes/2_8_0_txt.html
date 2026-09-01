@@ -151,7 +151,7 @@ doc/release_notes/2.8.0.txt
 <pre>Sequel.odbc(..., :db_type=&gt;&#39;mssql&#39;)</pre>
 </li></ul>
 
-<p>Backwards Compatibilty</p>
+<p>Backwards Compatibility</p>
 <hr>
 <ul><li>
 <p>The hash returned by Database#schema when no table name is provided uses quoted strings instead of symbols as keys.  The hash has a default proc, so using the symbol will return the same value as before, but if you use each to iterate through the hash, the keys will be different.  This was necessary to handle schema-qualified tables.</p>

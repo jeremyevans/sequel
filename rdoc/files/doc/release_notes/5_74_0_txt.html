@@ -66,7 +66,7 @@ doc/release_notes/5.74.0.txt
 <ul><li>
 <p>SQLite generated columns now show up in Database#schema when using SQLite 3.37+.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now attempts to avoid an infinite loop in pathlogical cases in the jdbc adapter, where the exception cause chain has a loop. Additionally, if an exception is already recognized as a disconnect, or an exception already responds to a getSQLState method, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer looks at the causes of the exception.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now attempts to avoid an infinite loop in pathological cases in the jdbc adapter, where the exception cause chain has a loop. Additionally, if an exception is already recognized as a disconnect, or an exception already responds to a getSQLState method, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer looks at the causes of the exception.</p>
 </li></ul>
 </div>
 <div id='context'>

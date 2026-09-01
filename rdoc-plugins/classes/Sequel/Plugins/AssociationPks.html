@@ -50,7 +50,7 @@ Sequel::Plugins::AssociationPks
 <span class="ruby-comment"># Persist changes</span>
 </pre>
 
-<p>Note that it uses the singular form of the association name. Also note that the setter both associates to new primary keys not in the assocation and disassociates from primary keys not provided to the method.</p>
+<p>Note that it uses the singular form of the association name. Also note that the setter both associates to new primary keys not in the association and disassociates from primary keys not provided to the method.</p>
 
 <p>This plugin makes modifications directly to the underlying tables, it does not create or return any model objects, and therefore does not call any callbacks.  If you have any association callbacks, you probably should not use the setter methods this plugin adds.</p>
 

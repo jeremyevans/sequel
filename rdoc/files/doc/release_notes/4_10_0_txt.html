@@ -56,7 +56,7 @@ ds2     187%     32%</pre>
 </li><li>
 <p>Dataset#import and multi_insert can now insert multiple rows in a single query on H2, HSQLDB, Derby, SQLAnywhere, CUBRID, SQLite, Oracle, DB2, and Firebird, which should be significantly faster than previous versions that issued a separate INSERT query per row.</p>
 </li><li>
-<p>The many_to_many setter method in the association_pks plugin now uses Dataset#import to insert many rows at once, instead of using a seperate query per insert.</p>
+<p>The many_to_many setter method in the association_pks plugin now uses Dataset#import to insert many rows at once, instead of using a separate query per insert.</p>
 </li><li>
 <p>The jdbc adapter’s type conversion has been rewritten to be more similar to the other adapters, setting up the type conversion procs before iterating over results.  This increases performance up to 20%.</p>
 </li><li>

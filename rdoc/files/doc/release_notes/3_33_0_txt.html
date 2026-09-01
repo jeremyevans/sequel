@@ -88,7 +88,7 @@ doc/release_notes/3.33.0.txt
 <span class="ruby-keyword">end</span>
 </pre>
 
-<p>That will make it so that a transaction is not used for that particular migration.  The second way is passing the :use_tranctions=&gt;false option when calling Migrator.run (using the API), which will completely disable transactions for all migrations during the migrator run.</p>
+<p>That will make it so that a transaction is not used for that particular migration.  The second way is passing the :use_transactions=&gt;false option when calling Migrator.run (using the API), which will completely disable transactions for all migrations during the migrator run.</p>
 </li><li>
 <p>The postgres adapter now respects an :sslmode option when using pg as the underlying driver, you can set the value of this option to disable, allow, prefer, or require.</p>
 </li><li>

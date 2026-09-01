@@ -2017,7 +2017,7 @@ Superclass:
 
 <p>Disconnects all available connections from the connection pool.  Any connections currently in use will not be disconnected. Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:server </td><td>
-<p>Should be a symbol specifing the server to disconnect from,</p>
+<p>Should be a symbol specifying the server to disconnect from,</p>
 
 <pre>or an array of symbols to specify multiple servers.</pre>
 </td></tr></tbody></table>
@@ -2633,7 +2633,7 @@ Superclass:
 </td>
 <td class='context-item-value'>[W]</td>
 <td class='context-item-desc'>
-<p>Set the timezone to use for this database, overridding <code>Sequel.database_timezone</code>.</p>
+<p>Set the timezone to use for this database, overriding <code>Sequel.database_timezone</code>.</p>
 </td>
 </tr>
 </table>
@@ -3409,7 +3409,7 @@ Superclass:
 
 <p>If a transaction is not currently in progress, ignore the block. Otherwise, add the block to the list of the blocks to call after the currently in progress transaction rolls back (and only if it rolls back). Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:savepoint </td><td>
-<p>If currently inside a savepoint, run this hook immediately when any enclosing savepoint is rolled back, which may be before the transaction commits or rollsback.</p>
+<p>If currently inside a savepoint, run this hook immediately when any enclosing savepoint is rolled back, which may be before the transaction commits or rolls back.</p>
 </td></tr><tr><td class='label'>:server </td><td>
 <p>The server/shard to use.</p>
 </td></tr></tbody></table>
@@ -3488,7 +3488,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>When exiting the transaction block through methods other than an exception (e.g. normal exit, non-local return, or throw), set the current transaction to rollback instead of committing.  This is designed for use in cases where you want to preform a non-local return but also want to rollback instead of committing. Options:</p>
+<p>When exiting the transaction block through methods other than an exception (e.g. normal exit, non-local return, or throw), set the current transaction to rollback instead of committing.  This is designed for use in cases where you want to perform a non-local return but also want to rollback instead of committing. Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:cancel </td><td>
 <p>Cancel the current <a href="Database.html#method-i-rollback_on_exit"><code>rollback_on_exit</code></a> setting, so exiting will commit instead of rolling back.</p>
 </td></tr><tr><td class='label'>:savepoint </td><td>

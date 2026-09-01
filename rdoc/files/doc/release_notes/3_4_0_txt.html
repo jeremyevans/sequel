@@ -137,7 +137,7 @@ doc/release_notes/3.4.0.txt
 
 <p>There are three conversion methods that are called:</p>
 <ul><li>
-<p>Sequel.database_to_application_timestamp - Called on time objects coming out of the database.  If the object coming out of the database (usually a string) does not have an offset, assume it is already in the database_timezone.  Return a Time/DateTime object (depending on Sequel.datetime_class), in the application_timzone.</p>
+<p>Sequel.database_to_application_timestamp - Called on time objects coming out of the database.  If the object coming out of the database (usually a string) does not have an offset, assume it is already in the database_timezone.  Return a Time/DateTime object (depending on Sequel.datetime_class), in the application_timezone.</p>
 </li><li>
 <p>Sequel.application_to_database_timestamp - Used when literalizing Time/DateTime objects into an SQL string.  Converts the object to the database_timezone before literalizing them.</p>
 </li><li>

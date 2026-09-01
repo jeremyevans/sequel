@@ -69,7 +69,7 @@ Sequel::Plugins::ValidationHelpers
 <p>Do not try to validate columns that are already invalid.</p>
 </td></tr></tbody></table>
 
-<p>The default validation options for all models can be modified by overridding the Model#default_validation_helpers_options private method. By changing the default options, you can setup internationalization of the error messages.  For example, you would modify the default options:</p>
+<p>The default validation options for all models can be modified by overriding the Model#default_validation_helpers_options private method. By changing the default options, you can setup internationalization of the error messages.  For example, you would modify the default options:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-identifier">private</span>

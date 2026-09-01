@@ -132,9 +132,9 @@ end</td>
 <span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">def_dataset_methods</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">meths</span>)
 <span class="line-num">32</span>   <span class="ruby-constant">Array</span>(<span class="ruby-identifier">meths</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">meth</span><span class="ruby-operator">|</span>
 <span class="line-num">33</span>     <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">class_eval</span>(<span class="ruby-node">&quot;def #{meth}(*args, &amp;block); dataset.#{meth}(*args, &amp;block) end&quot;</span>, <span class="ruby-keyword">__FILE__</span>, <span class="ruby-keyword">__LINE__</span>)
-<span class="line-num">34</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">34</span>     <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">35</span>     <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:ruby2_keywords</span>, <span class="ruby-identifier">meth</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:ruby2_keywords</span>, <span class="ruby-keyword">true</span>)
-<span class="line-num">36</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">36</span>     <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">37</span>   <span class="ruby-keyword">end</span>
 <span class="line-num">38</span> <span class="ruby-keyword">end</span></pre>
 </div>

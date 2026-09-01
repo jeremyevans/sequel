@@ -64,15 +64,15 @@ Sequel::Plugins::AutoRestrictEagerGraph::ClassMethods
 [show source]
 </a>
 <pre id='method-i-associate-source'>   <span class="ruby-comment"># File lib/sequel/plugins/auto_restrict_eager_graph.rb</span>
-<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">associate</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">51</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-keyword">super</span>
-<span class="line-num">52</span> 
-<span class="line-num">53</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:block</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:allow_eager_graph</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:orig_opts</span>].<span class="ruby-identifier">any?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-operator">|</span> <span class="ruby-regexp">/\Agraph_/</span> <span class="ruby-operator">=~</span> <span class="ruby-identifier">k</span>}
-<span class="line-num">54</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:allow_eager_graph</span>] = <span class="ruby-keyword">false</span>
-<span class="line-num">55</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">56</span> 
-<span class="line-num">57</span>   <span class="ruby-identifier">opts</span>
-<span class="line-num">58</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">52</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">associate</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">53</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-keyword">super</span>
+<span class="line-num">54</span> 
+<span class="line-num">55</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:block</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:allow_eager_graph</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:orig_opts</span>].<span class="ruby-identifier">any?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-operator">|</span> <span class="ruby-regexp">/\Agraph_/</span> <span class="ruby-operator">=~</span> <span class="ruby-identifier">k</span>}
+<span class="line-num">56</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:allow_eager_graph</span>] = <span class="ruby-keyword">false</span>
+<span class="line-num">57</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">58</span> 
+<span class="line-num">59</span>   <span class="ruby-identifier">opts</span>
+<span class="line-num">60</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

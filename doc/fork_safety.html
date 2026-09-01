@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Fork Safety - Sequel: The Database Toolkit for Ruby</title>
+  <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="ruby, sequel, sql, toolkit, orm, plugins, documentation" />
+  <meta name="description" content="Ruby Sequel is a lightweight database toolkit for Ruby." />
+
+  <link rel="icon" type="image/icon" sizes="32x32" href="../images/favicon.ico">
+  <link href="../css/application.css" media="screen" rel="stylesheet" type="text/css" />
+  <link href="../css/guide.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="body">
+  <header class="header">
+    <nav class="nav nav--header">
+      <a href="../index.html">
+        <img src="../images/ruby-sequel.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--header" />
+      </a>
+      <ul class="nav__ul nav__ul--header">
+        <li class="nav__li">
+          <a href="../documentation.html" class="nav__a">Documentation</a>
+        </li>
+        <li class="nav__li">
+          <a href="../plugins.html" class="nav__a">Plugins</a>
+        </li>
+        <li class="nav__li">
+          <a href="../development.html" class="nav__a">Development</a>
+        </li>
+        <li class="nav__li">
+          <a href="../links.html" class="nav__a">Links</a>
+        </li>
+      </ul>
+      <form class="nav__form nav__form--header" action="https://www.google.com/search" autocomplete="off">
+        <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
+      </form>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="main__container">
+      <div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Fork+Safety"><a href="#label-Fork+Safety">Fork Safety</a></h1>
+
+<p>If you are forking or using a library that forks after you have created a <a href="..//rdoc/classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance, then you must disconnect database connections before forking. If you don’t do this, you can end up with child processes sharing database connections and all sorts of weird behavior, including crashes.  <a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a> will automatically create new connections on an as needed basis in the child processes, so you only need to do the following in the parent process:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">disconnect</span>
+</pre>
+
+<p>Or if you have connections to multiple databases:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
+</pre>
+
+<h2 id="label-Puma"><a href="#label-Puma">Puma</a></h2>
+
+<p>When using the Puma web server in clustered mode (which is the default behavior in Puma 5+ when using multiple processes), you should disconnect inside the <code>before_fork</code> hook in your Puma config:</p>
+
+<pre class="ruby"><span class="ruby-identifier">before_fork</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
+<span class="ruby-keyword">end</span>
+</pre>
+
+<h2 id="label-Unicorn"><a href="#label-Unicorn">Unicorn</a></h2>
+
+<p>When using the Unicorn web server and preloading the application (+preload_app true+ in the Unicorn config), you should disconnect inside the <code>before_fork</code> hook in the Unicorn config:</p>
+
+<pre class="ruby"><span class="ruby-identifier">before_fork</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
+<span class="ruby-keyword">end</span>
+</pre>
+
+<h2 id="label-Passenger"><a href="#label-Passenger">Passenger</a></h2>
+
+<p>In Passenger web server, you should disconnect inside the <code>starting_worker_process</code> event hook:</p>
+
+<pre class="ruby"><span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">PhusionPassenger</span>)
+  <span class="ruby-constant">PhusionPassenger</span>.<span class="ruby-identifier">on_event</span>(<span class="ruby-value">:starting_worker_process</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">forked</span><span class="ruby-operator">|</span>
+    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">forked</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>Note that this disconnects after forking instead of before forking.  Passenger does not offer a before fork hook.</p>
+
+<h2 id="label-Spring"><a href="#label-Spring">Spring</a></h2>
+
+<p>In Spring application preloader, you should disconnect inside the <code>after_fork</code> hook:</p>
+
+<pre class="ruby"><span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">Spring</span>)
+  <span class="ruby-constant">Spring</span>.<span class="ruby-identifier">after_fork</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>As the method indicates, this disconnects after forking instead of before forking. Spring does not offer a before fork hook.</p>
+
+<h2 id="label-Resque"><a href="#label-Resque">Resque</a></h2>
+
+<p>In Resque, you should disconnect inside the <code>before_fork</code> hook:</p>
+
+<pre class="ruby"><span class="ruby-constant">Resque</span>.<span class="ruby-identifier">before_fork</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">job</span><span class="ruby-operator">|</span>
+  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
+<span class="ruby-keyword">end</span>
+</pre>
+
+<h2 id="label-Parallel"><a href="#label-Parallel">Parallel</a></h2>
+
+<p>If you’re using the Parallel gem with processes, you should disconnect before calling it:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
+<span class="ruby-constant">Parallel</span>.<span class="ruby-identifier">map</span>([<span class="ruby-string">&#39;a&#39;</span>,<span class="ruby-string">&#39;b&#39;</span>,<span class="ruby-string">&#39;c&#39;</span>], <span class="ruby-value">in_processes:</span> <span class="ruby-value">3</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">one_letter</span><span class="ruby-operator">|</span> }
+</pre>
+
+<h2 id="label-Other+Libraries+Calling+fork"><a href="#label-Other+Libraries+Calling+fork">Other Libraries Calling fork</a></h2>
+
+<p>For any other library that calls fork, you should disconnect before calling a method that forks:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
+<span class="ruby-constant">SomeLibrary</span>.<span class="ruby-identifier">method_that_forks</span>
+</pre>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <nav class="nav">
+      <a href="../index.html">
+        <img src="../images/ruby-sequel-monocrome.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--footer" />
+      </a>
+      <ul class="nav__ul">
+        <li class="nav__li">
+          <a href="../documentation.html" class="nav__a">Documentation</a>
+          <a href="../documentation.html#general-overview" class="a">General Overview</a>
+          <a href="../documentation.html#databases" class="a">Databases</a>
+          <a href="../documentation.html#datasets" class="a">Datasets</a>
+          <a href="../documentation.html#models" class="a">Models</a>
+          <a href="../documentation.html#misc" class="a">Misc</a>
+          <a href="../documentation.html#rdoc" class="a">RDoc</a>
+          <a href="../documentation.html#release-notes" class="a">Release Notes</a>
+        </li>
+        <li class="nav__li">
+          <a href="../plugins.html" class="nav__a">Plugins</a>
+          <a href="../plugins.html#model-plugins" class="a">Model Plugins</a>
+          <a href="../plugins.html#sequel-extensions" class="a">Sequel Extensions</a>
+        </li>
+        <li class="nav__li">
+          <a href="../development.html" class="nav__a">Development</a>
+          <a href="../development.html#bugs" class="a">Reporting Bugs</a>
+          <a href="../development.html#contribute" class="a">Contribute</a>
+          <a href="../development.html#code" class="a">Source Code</a>
+          <a href="../development.html#license" class="a">License</a>
+        </li>
+        <li class="nav__li">
+          <a href="../links.html" class="nav__a">Links</a>
+          <a href="../links.html#articles" class="a">Articles</a>
+          <a href="../links.html#presentations" class="a">Presentations</a>
+          <a href="../links.html#logos" class="a">Logos &amp; Badges</a>
+          <a href="../links.html#using-sequel" class="a">Using Sequel</a>
+          <a href="https://rubygems.org/gems/sequel/" class="a">RubyGems</a>
+          <a href="https://github.com/jeremyevans/sequel/" class="a">GitHub</a>
+        </li>
+      </ul>
+      <form action="https://www.google.com/search" autocomplete="off">
+        <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
+      </form>
+    </nav>
+  </footer>
+</body>
+</html>

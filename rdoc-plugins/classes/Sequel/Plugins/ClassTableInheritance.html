@@ -103,7 +103,7 @@ Cook      Executive
 
 <h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Subclass+loading"><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Subclass+loading">Subclass loading</a></h1>
 
-<p>When model objects are retrieved for a superclass the result can contain subclass instances that only have column entries for the columns in the superclass table.  Calling the column method on the subclass instance for a column not in the superclass table will cause a query to the database to get the value for that column.  If the subclass instance was retreived using Dataset#all, the query to the database will attempt to load the column values for all subclass instances that were retrieved.  For example:</p>
+<p>When model objects are retrieved for a superclass the result can contain subclass instances that only have column entries for the columns in the superclass table.  Calling the column method on the subclass instance for a column not in the superclass table will cause a query to the database to get the value for that column.  If the subclass instance was retrieved using Dataset#all, the query to the database will attempt to load the column values for all subclass instances that were retrieved.  For example:</p>
 
 <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Employee</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># [&lt;#Staff&gt;, &lt;#Manager&gt;, &lt;#Executive&gt;]</span>
 <span class="ruby-identifier">a</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;Staff&#39;}</span>

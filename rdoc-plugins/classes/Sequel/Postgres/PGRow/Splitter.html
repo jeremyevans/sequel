@@ -76,9 +76,9 @@ Superclass:
 <span class="line-num">247</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">skip</span>(<span class="ruby-regexp">/\)/</span>)
 <span class="line-num">248</span>     <span class="ruby-identifier">values</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword">nil</span>
 <span class="line-num">249</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">250</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">250</span>     <span class="ruby-comment"># simplecov:disable</span>
 <span class="line-num">251</span>     <span class="ruby-keyword">until</span> <span class="ruby-identifier">eos?</span>
-<span class="line-num">252</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">252</span>     <span class="ruby-comment"># simplecov:enable</span>
 <span class="line-num">253</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">skip</span>(<span class="ruby-regexp">/&quot;/</span>)
 <span class="line-num">254</span>         <span class="ruby-identifier">values</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">scan</span>(<span class="ruby-regexp">/(\\.|&quot;&quot;|[^&quot;])*/</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/\\(.)|&quot;(&quot;)/</span>, <span class="ruby-string">&#39;\1\2&#39;</span>)
 <span class="line-num">255</span>         <span class="ruby-identifier">skip</span>(<span class="ruby-regexp">/&quot;[,)]/</span>)

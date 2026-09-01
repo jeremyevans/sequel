@@ -43,7 +43,7 @@ lib/sequel/extensions/sql_log_normalizer.rb
 <span class="ruby-comment"># SELECT * FROM &quot;table&quot; WHERE ((&quot;a&quot; = ?) AND (&quot;b&quot; = ?)) LIMIT ?</span>
 </pre>
 
-<p>The normalization is done by scanning the SQL string being executed for literal strings and numbers, and replacing them with question marks.  While this should work for all or almost all production queries, there are pathlogical queries that will not be handled correctly, such as the use of apostrophes in identifiers:</p>
+<p>The normalization is done by scanning the SQL string being executed for literal strings and numbers, and replacing them with question marks.  While this should work for all or almost all production queries, there are pathological queries that will not be handled correctly, such as the use of apostrophes in identifiers:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:&quot;asf&#39;bar&quot;</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-string">&#39;something&#39;</span>).<span class="ruby-identifier">first</span>
 <span class="ruby-comment"># Logged as:</span>

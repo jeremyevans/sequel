@@ -166,7 +166,7 @@ doc/release_notes/3.34.0.txt
 <p>Model.to_hash calls without an argument</p>
 </li></ul>
 
-<p>The statically cached model instances are frozen so they are not accidently modified.</p>
+<p>The statically cached model instances are frozen so they are not accidentally modified.</p>
 </li><li>
 <p>A many_to_one_pk_lookup plugin has been added that changes the many_to_one association retrieval code to do a simple primary key lookup on the associated class in most cases.  This results in significantly better performance, especially if the associated model is using a caching plugin (either caching or static_cache).</p>
 </li></ul>
@@ -325,7 +325,7 @@ doc/release_notes/3.34.0.txt
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">type_supported?</span>(<span class="ruby-value">:hstore</span>)
 </pre>
 </li><li>
-<p>Datatabase#reset_conversion_procs has been added to the postgres adapter, for use by extensions that modify the default conversion procs and want to have the database use the updated defaults.</p>
+<p>Database#reset_conversion_procs has been added to the postgres adapter, for use by extensions that modify the default conversion procs and want to have the database use the updated defaults.</p>
 </li><li>
 <p>A Database#convert_infinite_timestamps accessor has been added to the postgres adapter, allowing you to return infinite timestamps as nil, a string, or a float.</p>
 </li><li>

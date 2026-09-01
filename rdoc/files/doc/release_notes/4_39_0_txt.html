@@ -120,7 +120,7 @@ doc/release_notes/4.39.0.txt
 </li><li>
 <p>The active_model plugin now uses a rollback checker instead of an after_rollback hook, so models that use the active_model plugin no longer store all saved model instances in memory until transaction commit.</p>
 </li><li>
-<p>When using the IntegerMigrator, attempting to migrate to a migration number above the maximum will now migrate to the lastest version, and attempting to migrate to a migration number below 0 will now migrate all the way down.</p>
+<p>When using the IntegerMigrator, attempting to migrate to a migration number above the maximum will now migrate to the latest version, and attempting to migrate to a migration number below 0 will now migrate all the way down.</p>
 </li><li>
 <p>The pg_interval extension now supports ActiveSupport::Duration objects that use week and hour parts (new in ActiveSupport 5).</p>
 </li></ul>

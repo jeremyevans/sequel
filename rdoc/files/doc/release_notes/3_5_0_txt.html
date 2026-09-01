@@ -325,7 +325,7 @@ end</pre>
 
 <p>If you want to check if there were changes to columns since the object was first initialized, you should use !changed_columns.empty?, which was the historical way to handle the situation.</p>
 </li><li>
-<p>The DataObjects (do) adpater now supports DataObjects 0.10.</p>
+<p>The DataObjects (do) adapter now supports DataObjects 0.10.</p>
 </li><li>
 <p>Dataset#select_more and Dataset#order_more no longer affect the receiver.  They are supposed to just return a modified copy of the receiver instead of modifying the receiver itself.  For a few versions they have been broken in that they modified the receiver in addition to returning a modified copy.</p>
 </li><li>
@@ -381,7 +381,7 @@ end</pre>
 
 <p>In certain cases, this change can cause tables to be aliased differently, so if you were graphing previously joined datasets and then filtering using the automatically generated aliases, you might need to modify your code.</p>
 </li><li>
-<p>The DataObjects (do) adpater no longer supports DataObjects 0.9.x.</p>
+<p>The DataObjects (do) adapter no longer supports DataObjects 0.9.x.</p>
 </li><li>
 <p>The Dataset#virtual_row_block_call private instance method has been removed.</p>
 </li><li>

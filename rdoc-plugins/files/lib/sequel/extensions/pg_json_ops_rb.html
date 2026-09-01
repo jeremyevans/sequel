@@ -129,7 +129,7 @@ lib/sequel/extensions/pg_json_ops.rb
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">path_query_first_tz</span>(<span class="ruby-string">&#39;$.foo&#39;</span>) <span class="ruby-comment"># jsonb_path_query_first_tz(jsonb_column, &#39;$.foo&#39;)</span>
 </pre>
 
-<p>On PostgreSQL 14+, The JSONB <code>[]</code> method will use subscripts instead of being the same as <code>get</code>, if the value being wrapped is an identifer:</p>
+<p>On PostgreSQL 14+, The JSONB <code>[]</code> method will use subscripts instead of being the same as <code>get</code>, if the value being wrapped is an identifier:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb_op</span>(<span class="ruby-value">:jsonb_column</span>)[<span class="ruby-value">1</span>]       <span class="ruby-comment"># jsonb_column[1]</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb_op</span>(<span class="ruby-value">:jsonb_column</span>)[<span class="ruby-value">1</span>][<span class="ruby-value">2</span>]    <span class="ruby-comment"># jsonb_column[1][2]</span>
@@ -199,7 +199,7 @@ lib/sequel/extensions/pg_json_ops.rb
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">strip_nulls</span>(<span class="ruby-value">in_arrays:</span> <span class="ruby-keyword">false</span>)  <span class="ruby-comment"># json_strip_nulls(json_column, false)</span>
 </pre>
 
-<p>If you are also using the <a href="pg_json_rb.html">pg_json</a> extension, you should load it before loading this extension.  Doing so will allow you to use the op method on JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations on json/jsonb literals.</p>
+<p>If you are also using the <a href="pg_json_rb.html">pg_json</a> extension, you should load it before loading this extension.  Doing so will allow you to use the op method on JSONHash, JSONArray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations on json/jsonb literals.</p>
 
 <p>In order to get the automatic conversion from a ruby array to a PostgreSQL array (as shown in the [] and get_text examples above), you need to load the <a href="pg_array_rb.html">pg_array</a> extension.</p>
 
