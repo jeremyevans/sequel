@@ -1,0 +1,74 @@
+= New Features
+
+* On PostgreSQL 19+, Dataset#insert_conflict now supports :select and
+  :select_where options for the new INSERT ... ON CONFLICT ...
+  DO SELECT ... RETURNING syntax.
+
+    DB[:table].
+      returning(:a).
+      insert_conflict(target: :a, select: true).
+      insert(a: 1, b: 2)
+    # INSERT INTO TABLE (a, b) VALUES (1, 2) ON CONFLICT (a)
+    # DO SELECT RETURNING a
+
+    DB[:table].returning(:a).for_update.
+      insert_conflict(target: :a,
+        select: true,
+        select_where: {Sequel[:excluded][:b] => 3}).
+      insert(a: 1, b: 2)
+    # INSERT INTO TABLE (a, b) VALUES (1, 2) ON CONFLICT (a)
+    # DO SELECT FOR UPDATE WHERE (excluded.b = 3) RETURNING a
+
+* The pg_array_ops extension now supports the following additional
+  methods for handling the related database functions:
+
+  * ndims
+  * position
+  * positions
+  * prepend
+  * sample
+  * shuffle
+  * trim
+
+* In the pg_array extension, Postgres::PGArray instances now support
+  cast* methods, making it easier to cast an array of one database type
+  to a different database type.
+
+* In the migration extention, Sequel::TimestampMigrator now supports
+  an :allow_migration_number option, which can be used to check
+  migration numbers for reasonableness. The value can be a range,
+  proc, or other object supporting ===.
+
+= Other Improvements
+
+* Additional disconnect errors are now recognized in the mysql and
+  mysql2 adapters, specifically handling cases where the
+  MariaDB Connector/C library is used.
+
+= Sequel 6 Planning
+
+* Sequel 6 planning has started. See
+  https://github.com/jeremyevans/sequel/discussions/2381 for details.
+
+* This is the last version of Sequel to support Ruby 1.9.  As part of
+  Sequel 6 preparation, Ruby 1.9 support will be dropped in Sequel
+  5.109.
+
+= Backwards Compatibility
+
+* A couple of typos in method names have been fixed:
+
+  * Dataset#aggreate_dataset_use_from_self? has been renamed to
+    #aggregate_dataset_use_from_self?
+
+  * Model#_save_update_changed_colums_hash has been renamed to
+    #_save_update_changed_columns_hash
+
+  The old methods with typos will call the new methods, and work with
+  deprecation warnings until Sequel 6. If you have an external
+  extension, adapter, or plugin defining the old method name with the
+  typo, you should switch to using the fixed name.
+
+* Sequel.require is now deprecated. It was originally added to improve
+  performance back in the Ruby 1.8 era, but since the introduction of
+  require_relative in Ruby 1.9, there has not been a reason to use it.
