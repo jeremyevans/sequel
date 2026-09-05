@@ -984,7 +984,8 @@ module Sequel
               comma = true
             end
             ds.literal_append(sql, v)
-            sql << " AS " << k.to_s
+            sql << " AS "
+            ds.send(:identifier_append, sql, k)
           end
         end
       end
@@ -1254,7 +1255,8 @@ module Sequel
               comma = true
             end
             ds.literal_append(sql, v)
-            sql << " AS " << k.to_s
+            sql << " AS "
+            ds.send(:identifier_append, sql, k)
           end
         end
 

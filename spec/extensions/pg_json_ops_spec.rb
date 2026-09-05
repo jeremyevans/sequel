@@ -304,6 +304,10 @@ describe "Sequel::Postgres::JSONOp" do
     @l[@jb.exists('$.a', passing: {})].must_equal "json_exists(j, '$.a')"
     @l[@jb.exists('$.a', passing: {v: 1})].must_equal "json_exists(j, '$.a' PASSING 1 AS v)"
     @l[@jb.exists('$.a', passing: {v: 1, k: 'a'})].must_equal "json_exists(j, '$.a' PASSING 1 AS v, 'a' AS k)"
+
+    @db.extend_datasets{def quote_identifiers?; true end}
+    @l[@jb.exists('$.a', passing: {v: 1})].must_equal "json_exists(\"j\", '$.a' PASSING 1 AS \"v\")"
+    @l[@jb.exists('$.a', passing: {v: 1, k: 'a'})].must_equal "json_exists(\"j\", '$.a' PASSING 1 AS \"v\", 'a' AS \"k\")"
   end
 
   it "#exists should support :on_error option" do
@@ -653,6 +657,10 @@ describe "Sequel::Postgres::JSONOp" do
     @l[@j.table('$', :passing=>{}){String :a}].must_equal "json_table(j, '$' COLUMNS(a text))"
     @l[@j.table('$', :passing=>{a: 1}){String :a}].must_equal "json_table(j, '$' PASSING 1 AS a COLUMNS(a text))"
     @l[@j.table('$', :passing=>{a: 1, b: "2"}){String :a}].must_equal "json_table(j, '$' PASSING 1 AS a, '2' AS b COLUMNS(a text))"
+
+    @db.extend_datasets{def quote_identifiers?; true end}
+    @l[@j.table('$', :passing=>{a: 1}){String :a}].must_equal "json_table(\"j\", '$' PASSING 1 AS \"a\" COLUMNS(\"a\" text))"
+    @l[@j.table('$', :passing=>{a: 1, b: "2"}){String :a}].must_equal "json_table(\"j\", '$' PASSING 1 AS \"a\", '2' AS \"b\" COLUMNS(\"a\" text))"
   end
 
   it "#table should support :on_error option " do

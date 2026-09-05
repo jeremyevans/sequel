@@ -1,5 +1,7 @@
 === master
 
+* Quote identifiers used in PASSING clauses in the pg_json_ops extension (jeremyevans)
+
 * Make Model.sti_class in single_table_inheritance plugin return root class if specified constant exists but is not a descendant of the root class (jeremyevans)
 
 * Limit the :synchronous option value to Database#transaction on Postgresql to supported values (jeremyevans)
