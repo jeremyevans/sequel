@@ -486,6 +486,7 @@ describe "Sequel Mock Adapter" do
     Sequel.mock(:host=>'access').select(Date.new(2011, 12, 13)).sql.must_equal 'SELECT #2011-12-13#'
     Sequel.mock(:host=>'db2').select(1).sql.must_equal 'SELECT 1 FROM "SYSIBM"."SYSDUMMY1"'
     Sequel.mock(:host=>'mssql')[:A].full_text_search(:B, 'C').with_quote_identifiers(false).sql.must_equal "SELECT * FROM A WHERE (CONTAINS (B, 'C'))"
+    Sequel.mock(:host=>'mssql')[:A].full_text_search(:B, %w'C"\' D').with_quote_identifiers(false).sql.must_equal "SELECT * FROM A WHERE (CONTAINS (B, '\"C\"\"''\" OR \"D\"'))"
     Sequel.mock(:host=>'mysql')[:a].full_text_search(:b, 'c').with_quote_identifiers(false).sql.must_equal "SELECT * FROM a WHERE (MATCH (b) AGAINST ('c'))"
     Sequel.mock(:host=>'oracle')[:a].limit(1).with_quote_identifiers(false).sql.upcase.must_equal 'SELECT * FROM (SELECT * FROM A) T1 WHERE (ROWNUM <= 1)'
     Sequel.mock(:host=>'postgres')[:a].full_text_search(:b, 'c').with_quote_identifiers(false).sql.must_equal "SELECT * FROM a WHERE (to_tsvector(CAST('simple' AS regconfig), (COALESCE(b, ''))) @@ to_tsquery(CAST('simple' AS regconfig), 'c'))"

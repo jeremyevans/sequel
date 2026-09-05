@@ -1,5 +1,7 @@
 === master
 
+* Quote elements of terms array/set argument given to Dataset#full_text_search on Microsoft SQL Server (jeremyevans)
+
 * Clear parameters after prepared statement execution in jdbc and sqlite3 adapters (jeremyevans)
 
 * Support prevent_lock_column_increase! class method in the optimistic locking plugins (jeremyevans)

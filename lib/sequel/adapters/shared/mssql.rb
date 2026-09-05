@@ -679,7 +679,10 @@ module Sequel
    
       # MSSQL uses the CONTAINS keyword for full text search
       def full_text_search(cols, terms, opts = OPTS)
-        terms = "\"#{Sequel.array_or_set_join(terms, '" OR "')}\"" if terms.is_a?(Array) || terms.is_a?(Set)
+        case terms
+        when Array, Set
+          terms = Sequel.array_or_set_join(terms.map{|term| "\"#{term.to_s.gsub('"', '""')}\""}, " OR ")
+        end
         where(Sequel.lit("CONTAINS (?, ?)", cols, terms))
       end
 
