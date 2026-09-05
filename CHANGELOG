@@ -1,5 +1,7 @@
 === master
 
+* Allow the caching plugin to support composite primary keys where multiple columns can contain "," by adding composite_cache_key class method (jeremyevans)
+
 * Make lit_require_frozen extension not freeze literal strings in BooleanExpression.from_value_pair, avoiding safety issues (jeremyevans)
 
 * Treat literal string as unsafe in lit_require_frozen extension if it differs from its frozen source (jeremyevans)

@@ -103,6 +103,8 @@ describe Sequel::Model, "caching" do
     m = c.new
     m.values[:ttt] = 333
     m.cache_key.must_equal "#{m.class}:333"
+    def c.scalar_cache_key(x); x.to_s * 2 end
+    m.cache_key.must_equal "#{m.class}:333333"
     
     # composite primary key
     @c.set_primary_key [:a, :b, :c]
@@ -117,6 +119,13 @@ describe Sequel::Model, "caching" do
     m.values[:c] = 456
     m.values[:b] = 789
     m.cache_key.must_equal "#{m.class}:123,789,456"
+
+    def c.composite_cache_key(x); x.join('|') end
+    m.cache_key.must_equal "#{m.class}:123|789|456"
+    m.values[:a] = '1,3'
+    m.values[:c] = '4,6'
+    m.values[:b] = '7,9'
+    m.cache_key.must_equal "#{m.class}:1,3|7,9|4,6"
   end
 
   it "should generate a cache key via the Model.cache_key method" do

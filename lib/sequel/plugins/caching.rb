@@ -29,6 +29,13 @@ module Sequel
     #
     # You should not use this plugin if you are using sharding and there are different
     # rows for the same primary key on different shards.
+    #
+    # Note that if you are using a composite key, and multiple columns in the composite
+    # key could potentially contain the character ",", you should override the
+    # +composite_cache_key+ class method to return an an unambiguous string identifying
+    # the specific primary key argument given. For consistency, if you would like to
+    # modify the cache key string used for scalar primary keys, you can override the
+    # +scalar_cache_key+ class method.
     # 
     # Usage:
     #
@@ -81,8 +88,26 @@ module Sequel
 
         # Return a key string for the given primary key.
         def cache_key(pk)
-          raise(Error, 'no primary key for this record') unless pk.is_a?(Array) ? pk.all? : pk
-          "#{cache_key_prefix}:#{Array(pk).join(',')}"
+          case pk
+          when Array
+            raise(Error, 'no primary key for this record') unless pk.all?
+            "#{cache_key_prefix}:#{composite_cache_key(pk)}"
+          else
+            raise(Error, 'no primary key for this record') unless pk
+            "#{cache_key_prefix}:#{scalar_cache_key(pk)}"
+          end
+        end
+
+        # Return an appropriate cache key string for a valid scalar primary key.
+        # By default, converts the primary key to a string.
+        def scalar_cache_key(pk)
+          pk.to_s
+        end
+
+        # Return an appropriate cache key string for a valid composite primary key.
+        # By default, joins with the parts of the compsite key with ",".
+        def composite_cache_key(pk)
+          pk.join(',')
         end
         
         Plugins.inherited_instance_variables(self, :@cache_store=>nil, :@cache_ttl=>nil, :@cache_ignore_exceptions=>nil)
