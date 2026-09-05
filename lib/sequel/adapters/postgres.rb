@@ -371,7 +371,8 @@ module Sequel
         # 
         # The following options are respected:
         #
-        # :format :: The format to use.  text is the default, so this should be :csv or :binary.
+        # :format :: The format to use. The PostgreSQL default is text, possible options are :csv,
+        #            :json, or :binary.
         # :options :: An options SQL string to use, which should contain comma separated options.
         # :server :: The server on which to run the query.
         #

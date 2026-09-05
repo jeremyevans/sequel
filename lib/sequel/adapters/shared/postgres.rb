@@ -2376,8 +2376,14 @@ module Sequel
           if opts[:options] || opts[:format]
             options = String.new
             options << " ("
-            options << "FORMAT #{opts[:format]}" if opts[:format]
-            options << "#{', ' if opts[:format]}#{opts[:options]}" if opts[:options]
+            if format = opts[:format]
+              sql_format = format.to_s.downcase
+              unless %w[text csv json binary].freeze.include?(sql_format)
+                raise Error, "unsupported COPY TO format: #{format.inspect}"
+              end
+              options << "FORMAT #{format}"
+            end
+            options << "#{', ' if format}#{opts[:options]}" if opts[:options]
             options << ')'
           end
           table = if table.is_a?(::Sequel::Dataset)

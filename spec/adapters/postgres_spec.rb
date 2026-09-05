@@ -3692,6 +3692,15 @@ if uses_pg_or_jdbc && DB.server_version >= 90000
       @db.copy_table(:test_copy, :format=>:csv).must_equal "1,2\n3,4\n"
     end
 
+    it "should work with known formats" do
+      @db.copy_table(:test_copy, :format=>'TExt').must_equal "1\t2\n3\t4\n"
+      @db.copy_table(:test_copy, :format=>'binary').must_be_kind_of String
+      proc{@db.copy_table(:test_copy, :format=>'bad')}.must_raise(Sequel::Error).wont_be_kind_of(Sequel::DatabaseError)
+      if DB.server_version >= 190000
+        @db.copy_table(:test_copy, :format=>:json).must_equal "{\"x\":1,\"y\":2}\n{\"x\":3,\"y\":4}\n"
+      end
+    end
+
     it "should treat string as SQL code" do
       @db.copy_table('COPY "test_copy" TO STDOUT').must_equal "1\t2\n3\t4\n"
     end

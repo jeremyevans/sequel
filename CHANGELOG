@@ -1,3 +1,7 @@
+=== master
+
+* Limit the :format option value to Database#copy_table on PostgreSQL to supported formats (jeremyevans)
+
 === 5.108.0 (2026-09-01)
 
 * Support :allow_migration_number option for TimestampMigrator (jeremyevans)
