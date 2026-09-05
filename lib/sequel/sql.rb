@@ -1060,122 +1060,126 @@ module Sequel
     # in a boolean value in SQL.
     class BooleanExpression < ComplexExpression
       include BooleanMethods
-      
-      # Take pairs of values (e.g. a hash or array of two element arrays)
-      # and converts it to a +BooleanExpression+.  The operator and args
-      # used depends on the case of the right (2nd) argument:
-      #
-      # 0..10 :: left >= 0 AND left <= 10
-      # [1,2] :: left IN (1,2)
-      # nil :: left IS NULL
-      # true :: left IS TRUE 
-      # false :: left IS FALSE 
-      # /as/ :: left ~ 'as'
-      # :blah :: left = blah
-      # 'blah' :: left = 'blah'
-      #
-      # If multiple arguments are given, they are joined with the op given (AND
-      # by default, OR possible).  If negate is set to true,
-      # all subexpressions are inverted before used.  Therefore, the following
-      # expressions are equivalent:
-      #
-      #   ~from_value_pairs(hash)
-      #   from_value_pairs(hash, :OR, true)
-      def self.from_value_pairs(pairs, op=:AND, negate=false)
-        pairs = pairs.map{|l,r| from_value_pair(l, r)}
-        pairs.map!{|ce| invert(ce)} if negate
-        pairs.length == 1 ? pairs[0] : new(op, *pairs)
+
+      module ClassMethods
+        # Take pairs of values (e.g. a hash or array of two element arrays)
+        # and converts it to a +BooleanExpression+.  The operator and args
+        # used depends on the case of the right (2nd) argument:
+        #
+        # 0..10 :: left >= 0 AND left <= 10
+        # [1,2] :: left IN (1,2)
+        # nil :: left IS NULL
+        # true :: left IS TRUE 
+        # false :: left IS FALSE 
+        # /as/ :: left ~ 'as'
+        # :blah :: left = blah
+        # 'blah' :: left = 'blah'
+        #
+        # If multiple arguments are given, they are joined with the op given (AND
+        # by default, OR possible).  If negate is set to true,
+        # all subexpressions are inverted before used.  Therefore, the following
+        # expressions are equivalent:
+        #
+        #   ~from_value_pairs(hash)
+        #   from_value_pairs(hash, :OR, true)
+        def from_value_pairs(pairs, op=:AND, negate=false)
+          pairs = pairs.map{|l,r| from_value_pair(l, r)}
+          pairs.map!{|ce| invert(ce)} if negate
+          pairs.length == 1 ? pairs[0] : new(op, *pairs)
+        end
+
+        # Return a BooleanExpression based on the right side of the pair.
+        def from_value_pair(l, r)
+          case r
+          when Range
+            unless r.begin.nil?
+              begin_expr = new(:>=, l, r.begin)
+            end
+            unless r.end.nil?
+              end_expr = new(r.exclude_end? ? :< : :<=, l, r.end)
+            end
+            if begin_expr
+              if end_expr
+                new(:AND, begin_expr, end_expr)
+              else
+                begin_expr
+              end
+            elsif end_expr
+              end_expr
+            else
+              new(:'=', 1, 1)
+            end
+          when ::Array, ::Set
+            r = r.dup.freeze unless r.frozen?
+            new(:IN, l, r)
+          when ::String
+            r = r.dup.freeze unless r.frozen?
+            new(:'=', l, r)
+          when ::Sequel::Dataset
+            new(:IN, l, r)
+          when NegativeBooleanConstant
+            new(:"IS NOT", l, r.constant)
+          when BooleanConstant
+            new(:IS, l, r.constant)
+          when NilClass, TrueClass, FalseClass
+            new(:IS, l, r)
+          when Regexp
+            StringExpression.like(l, r)
+          when DelayedEvaluation
+            Sequel.delay{|ds| from_value_pair(l, r.call(ds))}
+          when Dataset::PlaceholderLiteralizer::Argument
+            prev_transform = r.instance_variable_get(:@transformer)
+            r.transform do |v|
+              if prev_transform
+                v = prev_transform.call(v)
+              end
+              from_value_pair(l, v)
+            end
+          else
+            new(:'=', l, r)
+          end
+        end
+        private :from_value_pair
+        
+        # Invert the expression, if possible.  If the expression cannot
+        # be inverted, raise an error.  An inverted expression should match everything that the
+        # uninverted expression did not match, and vice-versa, except for possible issues with
+        # SQL NULL (i.e. 1 == NULL is NULL and 1 != NULL is also NULL).
+        #
+        #   BooleanExpression.invert(:a) # NOT "a"
+        def invert(ce)
+          case ce
+          when BooleanExpression
+            case op = ce.op
+            when :AND, :OR
+              BooleanExpression.new(ComplexExpression::OPERATOR_INVERSIONS[op], *ce.args.map{|a| BooleanExpression.invert(a)})
+            when :IN, :"NOT IN"
+              BooleanExpression.new(ComplexExpression::OPERATOR_INVERSIONS[op], *ce.args.dup)
+            else
+              if ce.args.length == 2
+                case ce.args[1]
+                when Function, LiteralString, PlaceholderLiteralString
+                  # Special behavior to not push down inversion in this case because doing so
+                  # can result in incorrect behavior for ANY/SOME/ALL operators.
+                  BooleanExpression.new(:NOT, ce)
+                else
+                  BooleanExpression.new(ComplexExpression::OPERATOR_INVERSIONS[op], *ce.args.dup)
+                end
+              else
+                BooleanExpression.new(ComplexExpression::OPERATOR_INVERSIONS[op], *ce.args.dup)
+              end
+            end
+          when StringExpression, NumericExpression
+            raise(Sequel::Error, "cannot invert #{ce.inspect}")
+          when Constant
+            ComplexExpression::CONSTANT_INVERSIONS[ce] || raise(Sequel::Error, "cannot invert #{ce.inspect}")
+          else
+            BooleanExpression.new(:NOT, ce)
+          end
+        end
       end
 
-      # Return a BooleanExpression based on the right side of the pair.
-      def self.from_value_pair(l, r)
-        case r
-        when Range
-          unless r.begin.nil?
-            begin_expr = new(:>=, l, r.begin)
-          end
-          unless r.end.nil?
-            end_expr = new(r.exclude_end? ? :< : :<=, l, r.end)
-          end
-          if begin_expr
-            if end_expr
-              new(:AND, begin_expr, end_expr)
-            else
-              begin_expr
-            end
-          elsif end_expr
-            end_expr
-          else
-            new(:'=', 1, 1)
-          end
-        when ::Array, ::Set
-          r = r.dup.freeze unless r.frozen?
-          new(:IN, l, r)
-        when ::String
-          r = r.dup.freeze unless r.frozen?
-          new(:'=', l, r)
-        when ::Sequel::Dataset
-          new(:IN, l, r)
-        when NegativeBooleanConstant
-          new(:"IS NOT", l, r.constant)
-        when BooleanConstant
-          new(:IS, l, r.constant)
-        when NilClass, TrueClass, FalseClass
-          new(:IS, l, r)
-        when Regexp
-          StringExpression.like(l, r)
-        when DelayedEvaluation
-          Sequel.delay{|ds| from_value_pair(l, r.call(ds))}
-        when Dataset::PlaceholderLiteralizer::Argument
-          prev_transform = r.instance_variable_get(:@transformer)
-          r.transform do |v|
-            if prev_transform
-              v = prev_transform.call(v)
-            end
-            from_value_pair(l, v)
-          end
-        else
-          new(:'=', l, r)
-        end
-      end
-      private_class_method :from_value_pair
-      
-      # Invert the expression, if possible.  If the expression cannot
-      # be inverted, raise an error.  An inverted expression should match everything that the
-      # uninverted expression did not match, and vice-versa, except for possible issues with
-      # SQL NULL (i.e. 1 == NULL is NULL and 1 != NULL is also NULL).
-      #
-      #   BooleanExpression.invert(:a) # NOT "a"
-      def self.invert(ce)
-        case ce
-        when BooleanExpression
-          case op = ce.op
-          when :AND, :OR
-            BooleanExpression.new(OPERATOR_INVERSIONS[op], *ce.args.map{|a| BooleanExpression.invert(a)})
-          when :IN, :"NOT IN"
-            BooleanExpression.new(OPERATOR_INVERSIONS[op], *ce.args.dup)
-          else
-            if ce.args.length == 2
-              case ce.args[1]
-              when Function, LiteralString, PlaceholderLiteralString
-                # Special behavior to not push down inversion in this case because doing so
-                # can result in incorrect behavior for ANY/SOME/ALL operators.
-                BooleanExpression.new(:NOT, ce)
-              else
-                BooleanExpression.new(OPERATOR_INVERSIONS[op], *ce.args.dup)
-              end
-            else
-              BooleanExpression.new(OPERATOR_INVERSIONS[op], *ce.args.dup)
-            end
-          end
-        when StringExpression, NumericExpression
-          raise(Sequel::Error, "cannot invert #{ce.inspect}")
-        when Constant
-          CONSTANT_INVERSIONS[ce] || raise(Sequel::Error, "cannot invert #{ce.inspect}")
-        else
-          BooleanExpression.new(:NOT, ce)
-        end
-      end
+      extend ClassMethods
 
       # Always use an AND operator for & on BooleanExpressions
       def &(ce)

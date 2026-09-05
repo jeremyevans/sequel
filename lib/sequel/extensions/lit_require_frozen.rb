@@ -63,6 +63,20 @@ module Sequel
     class Error < Sequel::Error
     end
 
+    module BooleanExpressionClassMethods
+      private
+
+      # Do not freeze literal strings in value pairs, so they don't skip
+      # the frozen checks.
+      def from_value_pair(l, r)
+        if LiteralString === r
+          new(:'=', l, r)
+        else
+          super
+        end
+      end
+    end
+
     module DatabaseMethods
       def self.extended(db)
         db.extend_datasets(DatasetMethods)
@@ -125,6 +139,8 @@ module Sequel
       end
     end
   end
+
+  SQL::BooleanExpression.extend(LitRequireFrozen::BooleanExpressionClassMethods)
 
   Dataset.register_extension(:lit_require_frozen, LitRequireFrozen::DatasetMethods)
   Database.register_extension(:lit_require_frozen, LitRequireFrozen::DatabaseMethods)

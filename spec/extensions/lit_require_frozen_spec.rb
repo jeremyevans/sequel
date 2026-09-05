@@ -47,6 +47,10 @@ describe "lit_require_frozen extension" do
     proc{@db.literal(s)}.must_raise Sequel::LitRequireFrozen::Error
   end
 
+  it "disallows unfrozen literal string passed as a hash filter" do
+    proc{@db[:t].where(id: Sequel.lit("a".dup)).sql}.must_raise Sequel::LitRequireFrozen::Error
+  end
+
   it "disallows placeholder literal string with unfrozen placeholder string" do
     proc{@db.literal(Sequel.lit(":a".dup, a: "a"))}.must_raise Sequel::LitRequireFrozen::Error
   end

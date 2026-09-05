@@ -1,5 +1,7 @@
 === master
 
+* Make lit_require_frozen extension not freeze literal strings in BooleanExpression.from_value_pair, avoiding safety issues (jeremyevans)
+
 * Treat literal string as unsafe in lit_require_frozen extension if it differs from its frozen source (jeremyevans)
 
 * Don't use a placeholder loader in Dataset#first when passed a negative limit (jeremyevans)
