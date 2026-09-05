@@ -75,7 +75,14 @@ module Sequel
         def copy_table(table, opts=OPTS)
           synchronize(opts[:server]) do |conn|
             copy_manager = Java::OrgPostgresqlCopy::CopyManager.new(conn)
-            copier = copy_manager.copy_out(copy_table_sql(table, opts))
+            sql = copy_table_sql(table, opts)
+
+            begin
+              copier = copy_manager.copy_out(sql)
+            rescue *DATABASE_ERROR_CLASSES => e
+              raise_error(e)
+            end
+              
             begin
               if defined?(yield)
                 while buf = copier.readFromCopy

@@ -3701,6 +3701,10 @@ if uses_pg_or_jdbc && DB.server_version >= 90000
       end
     end
 
+    it "should raise database error for bad options" do
+      proc{@db.copy_table(:test_copy, :options=>"FORMAT bad")}.must_raise(Sequel::DatabaseError).wont_be_kind_of(Sequel::DatabaseDisconnectError)
+    end
+
     it "should treat string as SQL code" do
       @db.copy_table('COPY "test_copy" TO STDOUT').must_equal "1\t2\n3\t4\n"
     end

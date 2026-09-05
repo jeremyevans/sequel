@@ -381,7 +381,9 @@ module Sequel
         # of the data.
         def copy_table(table, opts=OPTS)
           synchronize(opts[:server]) do |conn|
-            conn.execute(copy_table_sql(table, opts))
+            sql = copy_table_sql(table, opts)
+            check_database_errors{conn.execute(sql)}
+
             begin
               if defined?(yield)
                 while buf = conn.get_copy_data

@@ -1,5 +1,7 @@
 === master
 
+* Convert database exception class to Sequel exception class for failures in Database#copy_table query (jeremyevans)
+
 * Limit the :format option value to Database#copy_table on PostgreSQL to supported formats (jeremyevans)
 
 === 5.108.0 (2026-09-01)
