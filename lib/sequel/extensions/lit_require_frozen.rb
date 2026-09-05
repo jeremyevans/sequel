@@ -105,7 +105,7 @@ module Sequel
       def _check_unfrozen_literal_string(str)
         return if !str.is_a?(String) || str.frozen?
 
-        if str.is_a?(LiteralString)
+        if str.is_a?(LiteralString) && str == str.source
           _check_unfrozen_literal_string(str.source)
         else
           raise Error, "cannot treat unfrozen string as literal SQL: #{str.inspect}"

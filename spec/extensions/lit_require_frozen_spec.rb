@@ -41,6 +41,12 @@ describe "lit_require_frozen extension" do
     proc{@db.literal(Sequel.lit("a".dup))}.must_raise Sequel::LitRequireFrozen::Error
   end
 
+  it "disallows literal strings with different content than string they were based on" do
+    s = Sequel.lit("a".freeze)
+    s << "1"
+    proc{@db.literal(s)}.must_raise Sequel::LitRequireFrozen::Error
+  end
+
   it "disallows placeholder literal string with unfrozen placeholder string" do
     proc{@db.literal(Sequel.lit(":a".dup, a: "a"))}.must_raise Sequel::LitRequireFrozen::Error
   end
