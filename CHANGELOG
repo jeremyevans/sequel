@@ -1,5 +1,7 @@
 === master
 
+* Don't use a placeholder loader in Dataset#first when passed a negative limit (jeremyevans)
+
 * Quote identifiers used in PASSING clauses in the pg_json_ops extension (jeremyevans)
 
 * Make Model.sti_class in single_table_inheritance plugin return root class if specified constant exists but is not a descendant of the root class (jeremyevans)

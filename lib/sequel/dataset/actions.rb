@@ -242,7 +242,7 @@ module Sequel
         end
       when 1
         arg = args[0]
-        if arg.is_a?(Integer)
+        if arg.is_a?(Integer) && arg >= 0
           res = if block
             if loader = cached_placeholder_literalizer(:_first_integer_cond_loader) do |pl|
                 where(pl.arg).limit(pl.arg)

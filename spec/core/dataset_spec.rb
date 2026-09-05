@@ -3106,6 +3106,8 @@ describe "Dataset #first and #last" do
       ds.first(i).must_equal [{:s=>"SELECT * FROM test ORDER BY a LIMIT #{i}"}]
       ds.last(i).must_equal [{:s=>"SELECT * FROM test ORDER BY a DESC LIMIT #{i}"}]
     end
+    proc{ds.first(-1)}.must_raise(Sequel::Error)
+    proc{ds.last(-1)}.must_raise(Sequel::Error)
   end
   
   it "should return the first matching record if a block is given without an argument" do
@@ -3141,6 +3143,8 @@ describe "Dataset #first and #last" do
       ds.first(i){z > 26}.must_equal [{:s=>"SELECT * FROM test WHERE (z > 26) ORDER BY a LIMIT #{i}"}]
       ds.last(i){z > 26}.must_equal [{:s=>"SELECT * FROM test WHERE (z > 26) ORDER BY a DESC LIMIT #{i}"}]
     end
+    proc{ds.first(-1){z > 26}}.must_raise(Sequel::Error)
+    proc{ds.last(-1){z > 26}}.must_raise(Sequel::Error)
   end
 
   it "should return nil if no records match" do
