@@ -200,8 +200,12 @@ END_MIG
 
     # Recreate the column in the passed Schema::CreateTableGenerator from the given name and parsed database schema.
     def recreate_column(name, schema, gen, options)
+      db_type = schema[:db_type]
+      db_type = literal(db_type) if options[:same_db] && database_type == :sqlite
+
       if options[:single_pk] && schema_autoincrementing_primary_key?(schema)
-        type_hash = options[:same_db] ? {:type=>schema[:db_type]} : column_schema_to_ruby_type(schema)
+        type_hash = options[:same_db] ? {:type=>db_type} : column_schema_to_ruby_type(schema)
+
         [:table, :key, :on_delete, :on_update, :deferrable].each{|f| type_hash[f] = schema[f] if schema[f]}
         if type_hash == {:type=>Integer} || type_hash == {:type=>"integer"} || type_hash == {:type=>"INTEGER"}
           type_hash.delete(:type)
@@ -220,7 +224,7 @@ END_MIG
         end
       else
         col_opts = if options[:same_db]
-          h = {:type=>schema[:db_type]}
+          h = {:type=>db_type}
           if database_type == :mysql && h[:type].start_with?("timestamp")
             h[:null] = true
           end

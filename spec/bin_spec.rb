@@ -190,16 +190,22 @@ Sequel.migration do
   end
 end
 END
-    bin(:args=>'-D').must_equal <<END
+    fix_inspect =  if RUBY_VERSION >= '3.4'
+      proc{|s| s.gsub(/:([\w]+)=>/, '\1: ')}
+    else
+      fix_inspect = proc{|s| s}
+    end
+
+    bin(:args=>'-D').must_equal fix_inspect.(<<END)
 Sequel.migration do
   change do
     create_table(:a) do
-      primary_key :a
-      column :name, "varchar(255)"
+      primary_key :a, :type=>"'#{int_type}'"
+      column :name, "'varchar(255)'"
     end
     
     create_table(:b) do
-      foreign_key :a, :a
+      foreign_key :a, :a, :type=>"'#{int_type}'"
       
       index [:a]
     end

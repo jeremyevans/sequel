@@ -144,6 +144,12 @@ describe "Sequel::Database dump methods" do
     @d.dump_table_schema(Sequel.identifier(:t__t1)).must_equal fix_inspect.("create_table(Sequel::SQL::Identifier.new(:t__t1)) do\n  primary_key :c1\n  String :c2, :size=>20\nend")
   end
 
+  it "should quote data types if using with :same_db options on SQLite" do
+    def @d.database_type; :sqlite end
+    def @d.schema(*s) [[:c1, {:db_type=>"malicious';sql", :max_length=>10}]] end
+    @d.dump_table_schema(:t1, :same_db=>true, :trust_db=>true).must_equal fix_inspect.("create_table(:t1) do\n  column :c1, \"'malicious'';sql'\"\nend")
+  end
+
   it "should dump string column sizes using :max_length" do
     def @d.schema(*s) [[:c1, {:db_type=>'varchar', :max_length=>10}]] end
     @d.dump_table_schema(:t6).must_equal fix_inspect.("create_table(:t6) do\n  String :c1, :size=>10\nend")
