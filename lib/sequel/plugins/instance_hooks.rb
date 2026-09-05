@@ -93,6 +93,25 @@ module Sequel
           super
         end
         
+        # Run and clear save/update/validation hooks when saving changes even if the
+        # object wasn't modified.
+        def save_changes(opts=OPTS)
+          ret = super
+          if ret.nil? && @instance_hooks
+            run_before_instance_hooks(:before_validation)
+            run_before_instance_hooks(:after_validation)
+            run_before_instance_hooks(:before_save)
+            run_before_instance_hooks(:before_update)
+            ret = super
+            run_before_instance_hooks(:after_update)
+            run_before_instance_hooks(:after_save)
+            [:before_validation, :after_validation, :before_save, :before_update, :after_update, :after_save].each do |type|
+              @instance_hooks.delete(type)
+            end
+          end
+          ret
+        end
+
         private
         
         # Add the block as an instance level hook.  For before hooks, add it to

@@ -168,6 +168,23 @@ describe "InstanceHooks plugin" do
     @r.must_equal [5, 3, 4, 6, 2, 1]
   end
 
+  it "should clear only related hooks on successful update, even there are no modified columns" do
+    @x.after_destroy_hook{r 1}
+    @x.before_destroy_hook{r 2}
+    @x.before_update_hook{r 3}
+    @x.after_update_hook{r 4}
+    @x.before_save_hook{r 5}
+    @x.after_save_hook{r 6}
+    @x.after_validation_hook{r 7}
+    @x.before_validation_hook{r 8}
+    @x.save_changes.must_be_nil
+    @r.must_equal [8, 7, 5, 3, 4, 6]
+    @x.save_changes.must_be_nil
+    @r.must_equal [8, 7, 5, 3, 4, 6]
+    @x.destroy
+    @r.must_equal [8, 7, 5, 3, 4, 6, 2, 1]
+  end
+
   it "should clear only related hooks on successful destroy" do
     @x.after_destroy_hook{r 1}
     @x.before_destroy_hook{r 2}

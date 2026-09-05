@@ -1,5 +1,7 @@
 === master
 
+* Run and clear instance hooks if Model#save_changes skips update due to the object being unmodified (jeremyevans)
+
 * Clear instance filters if Model#save_changes skips update due to the object being unmodified (jeremyevans)
 
 * Quote elements of terms array/set argument given to Dataset#full_text_search on Microsoft SQL Server (jeremyevans)
