@@ -39,6 +39,27 @@ pg_xmin_optimistic_locking_specs = Module.new do
     @o.xmin.must_equal 3
   end
 
+  it "should allow increasing the xmin by default" do
+    lv = @o.xmin
+    nlv = @o.xmin += 1
+    @o.xmin.must_equal nlv
+    @o.xmin -= 1
+    @o.xmin.must_equal lv
+  end
+
+  it "should not allow increasing the xmin if prevent_lock_column_increase! is used" do
+    @c.prevent_lock_column_increase!
+    lv = @o.xmin
+    nlv = @o.xmin += 1
+    @o.xmin.must_equal lv
+    @o.xmin = nil
+    @o.xmin.must_be_nil
+    @o.xmin = nlv
+    @o.xmin.must_equal nlv
+    @o.xmin -= 1
+    @o.xmin.must_equal lv
+  end
+
   it "should raise error when updating stale object" do
     @db.fetch = []
     proc{@o.save}.must_raise(Sequel::NoExistingObject)

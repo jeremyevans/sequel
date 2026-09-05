@@ -846,17 +846,21 @@ describe "MSSQL optimistic locking plugin" do
     @db.drop_table?(:items)
   end
 
-  it "should not allow stale updates" do
-    c = Class.new(Sequel::Model(:items))
-    c.plugin :mssql_optimistic_locking
-    o = c.create(:name=>'test')
-    o2 = c.first
-    ts = o.timestamp
-    ts.wont_equal nil
-    o.name = 'test2'
-    o.save
-    o.timestamp.wont_equal ts
-    proc{o2.save}.must_raise(Sequel::NoExistingObject)
+  [true, false].each do |prevent_increase|
+    it "should not allow stale updates#{" with prevent_lock_column_increase!" if prevent_increase}" do
+      c = Class.new(Sequel::Model(:items))
+      c.plugin :mssql_optimistic_locking
+      c.prevent_lock_column_increase! if prevent_increase
+      o = c.create(:name=>'test')
+      o2 = c.first
+      ts = o.timestamp
+      ts.wont_equal nil
+      o.name = 'test2'
+      o.save
+      o.timestamp.wont_equal ts
+      proc{o2.save}.must_raise(Sequel::NoExistingObject)
+      o.save
+    end
   end
 end unless DB.adapter_scheme == :odbc
 

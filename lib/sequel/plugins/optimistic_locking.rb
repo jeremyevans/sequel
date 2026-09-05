@@ -20,6 +20,11 @@ module Sequel
     #
     #     plugin :optimistic_locking, lock_column: :version
     #
+    # By default, the plugin allows using the lock column setter method to
+    # either increase or decrease the lock column value. To prevent increases,
+    # which could potentially be used to skip an update when it update should
+    # be made, you can use the +prevent_lock_column_increase!+ class method.
+    #
     # This plugin relies on the instance_filters plugin.
     module OptimisticLocking
       # Exception class raised when trying to update or destroy a stale object.
@@ -42,9 +47,10 @@ module Sequel
         def _update_columns(columns)
           lc = model.lock_column
           lcv = get_column_value(lc)
-          columns[lc] = lcv + 1
+          new_lcv = columns[lc] = lcv + 1
           super
-          set_column_value("#{lc}=", lcv + 1)
+          set_column_value("#{lc}=", nil)
+          set_column_value("#{lc}=", new_lcv)
           changed_columns.delete(lc)
           nil
         end

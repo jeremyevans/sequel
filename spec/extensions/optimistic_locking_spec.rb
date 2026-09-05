@@ -62,6 +62,29 @@ describe "optimistic_locking plugin" do
     proc{p2.destroy}.must_raise(Sequel::Plugins::OptimisticLocking::Error)
   end 
 
+  it "should allow increasing the lock version by default" do
+    p = @c[1]
+    lv = p.lock_version
+    nlv = p.lock_version += 1
+    p.lock_version.must_equal nlv
+    p.lock_version -= 1
+    p.lock_version.must_equal lv
+  end
+
+  it "should not allow increasing the lock version if prevent_lock_column_increase! is used" do
+    @c.prevent_lock_column_increase!
+    p = @c[1]
+    lv = p.lock_version
+    nlv = p.lock_version += 1
+    p.lock_version.must_equal lv
+    p.lock_version = nil
+    p.lock_version.must_be_nil
+    p.lock_version = nlv
+    p.lock_version.must_equal nlv
+    p.lock_version -= 1
+    p.lock_version.must_equal lv
+  end
+
   it "should not raise an error when updating the same record twice" do
     p1 = @c[1]
     p1.update(:name=>'Jim')

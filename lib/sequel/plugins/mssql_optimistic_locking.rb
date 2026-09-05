@@ -22,6 +22,11 @@ module Sequel
     #
     #     plugin :mssql_optimistic_locking, lock_column: :column_name
     #
+    # By default, the plugin allows using the lock column setter method to
+    # either increase or decrease the lock column value. To prevent increases,
+    # which could potentially be used to skip an update when it update should
+    # be made, you can use the +prevent_lock_column_increase!+ class method.
+    #
     # This plugin relies on the instance_filters plugin.
     module MssqlOptimisticLocking
       # Load the instance_filters plugin into the model.

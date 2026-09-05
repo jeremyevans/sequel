@@ -12,6 +12,19 @@ module Sequel
       module ClassMethods
         # The column holding the version of the lock
         attr_accessor :lock_column
+
+        # Prevent increasing the value of the lock column. If the lock column
+        # has an existing value, do not allow setting a value that is higher
+        # than it.
+        def prevent_lock_column_increase!
+          # SEQUEL6: Make default, require explicit opt out to increase
+          lc = lock_column
+          define_method(:"#{lc}=") do |v|
+            unless v && (lv = send(lc)) && v > lv
+              super(v)
+            end
+          end
+        end
         
         Plugins.inherited_instance_variables(self, :@lock_column=>nil)
       end

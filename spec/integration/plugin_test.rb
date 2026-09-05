@@ -671,45 +671,50 @@ describe "Serialization plugin" do
   end
 end
 
-describe "OptimisticLocking plugin" do 
-  before(:all) do
-    @db = DB
-    @db.create_table!(:people) do
-      primary_key :id
-      String :name
-      Integer :lock_version, :default=>0, :null=>false
+[true, false].each do |prevent_increase|
+  describe "optimistic_locking plugin#{" with prevent_lock_column_increase!" if prevent_increase}" do 
+    before(:all) do
+      @db = DB
+      @db.create_table!(:people) do
+        primary_key :id
+        String :name
+        Integer :lock_version, :default=>0, :null=>false
+      end
+      class ::Person < Sequel::Model(@db)
+      end
+      Person.class_eval do
+        plugin :optimistic_locking
+        prevent_lock_column_increase! if prevent_increase
+      end
     end
-    class ::Person < Sequel::Model(@db)
-      plugin :optimistic_locking
+    before do
+      @db[:people].delete
+      @p = Person.create(:name=>'John')
     end
-  end
-  before do
-    @db[:people].delete
-    @p = Person.create(:name=>'John')
-  end
-  after(:all) do
-    @db.drop_table?(:people)
-    Object.send(:remove_const, :Person)
-  end
+    after(:all) do
+      @db.drop_table?(:people)
+      Object.send(:remove_const, :Person)
+    end
 
-  it "should raise an error when updating a stale record" do
-    p1 = Person[@p.id]
-    p2 = Person[@p.id]
-    p1.update(:name=>'Jim')
-    proc{p2.update(:name=>'Bob')}.must_raise(Sequel::Plugins::OptimisticLocking::Error)
-  end
+    it "should raise an error when updating a stale record" do
+      p1 = Person[@p.id]
+      p2 = Person[@p.id]
+      p1.update(:name=>'Jim')
+      proc{p2.update(:name=>'Bob')}.must_raise(Sequel::Plugins::OptimisticLocking::Error)
+    end
 
-  it "should raise an error when destroying a stale record" do
-    p1 = Person[@p.id]
-    p2 = Person[@p.id]
-    p1.update(:name=>'Jim')
-    proc{p2.destroy}.must_raise(Sequel::Plugins::OptimisticLocking::Error)
-  end
+    it "should raise an error when destroying a stale record" do
+      p1 = Person[@p.id]
+      p2 = Person[@p.id]
+      p1.update(:name=>'Jim')
+      proc{p2.destroy}.must_raise(Sequel::Plugins::OptimisticLocking::Error)
+    end
 
-  it "should not raise an error when updating the same record twice" do
-    p1 = Person[@p.id]
-    p1.update(:name=>'Jim')
-    p1.update(:name=>'Bob')
+    it "should not raise an error when updating the same record twice" do
+      p1 = Person[@p.id]
+      p1.update(:name=>'Jim')
+      p1.update(:name=>'Bob')
+    end
   end
 end
 

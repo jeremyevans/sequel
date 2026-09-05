@@ -31,6 +31,27 @@ describe "MSSSQL optimistic locking plugin" do
     @o.timestamp.must_equal '2345'
   end
 
+  it "should allow increasing the xmin by default" do
+    lv = @o.timestamp
+    nlv = @o.timestamp = @o.timestamp.succ
+    @o.timestamp.must_equal nlv
+    @o.timestamp = lv
+    @o.timestamp.must_equal lv
+  end
+
+  it "should not allow increasing the timestamp if prevent_lock_column_increase! is used" do
+    @c.prevent_lock_column_increase!
+    lv = @o.timestamp
+    nlv = @o.timestamp = @o.timestamp.succ
+    @o.timestamp.must_equal lv
+    @o.timestamp = nil
+    @o.timestamp.must_be_nil
+    @o.timestamp = nlv
+    @o.timestamp.must_equal nlv
+    @o.timestamp = lv
+    @o.timestamp.must_equal lv
+  end
+
   it "should raise error when updating stale object" do
     @db.fetch = []
     @o.timestamp = '2345'
