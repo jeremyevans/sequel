@@ -95,6 +95,13 @@ describe Sequel::Model, "single table inheritance plugin" do
     StiTest.all.collect{|x| x.class}.must_equal [StiTest]
   end
 
+  it "should fallback to the main class if the given class does not exist" do
+    StiTest.dataset = StiTest.dataset.with_fetch(:kind=>'Hash')
+    StiTest.all.collect{|x| x.class}.must_equal [StiTest]
+    StiTest.dataset = StiTestSub1.dataset.with_fetch(:kind=>'Hash')
+    StiTestSub1.all.collect{|x| x.class}.must_equal [StiTest]
+  end
+
   it "should inherit dataset_modules correctly in subclass" do
     StiTest.dataset_module{def foo; 1; end}
     Object.send(:remove_const, :StiTestSub1)

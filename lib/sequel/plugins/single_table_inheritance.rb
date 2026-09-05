@@ -12,6 +12,11 @@ module Sequel
     # argument to the plugin) holds the class name as a string.  However,
     # you can override this by using the <tt>:model_map</tt> option and/or
     # the <tt>:key_map</tt> option.
+    #
+    # The +sti_key+ column can be set via mass assignment, just like any
+    # non-primary key column. Make sure to follow the recommendations in the
+    # {mass assignment guide}[rdoc-ref:doc/mass_assignment.rdoc]
+    # to ensure this column is not set with untrusted data.
     #   
     # You should only load this plugin in the parent class, not in the subclasses.
     #   
@@ -84,6 +89,7 @@ module Sequel
           @sti_key_array = nil
           @sti_key = key 
           @sti_dataset = dataset
+          @sti_root_class = self
           @sti_model_map = opts[:model_map] || lambda{|v| v if v && v != ''}
           @sti_key_map = if km = opts[:key_map]
             if km.is_a?(Hash)
@@ -150,7 +156,7 @@ module Sequel
         # This defaults to a lookup in the key map.
         attr_reader :sti_key_chooser
 
-        Plugins.inherited_instance_variables(self, :@sti_dataset=>nil, :@sti_key=>nil, :@sti_key_map=>nil, :@sti_model_map=>nil, :@sti_key_chooser=>nil)
+        Plugins.inherited_instance_variables(self, :@sti_dataset=>nil, :@sti_key=>nil, :@sti_key_map=>nil, :@sti_model_map=>nil, :@sti_key_chooser=>nil, :@sti_root_class=>nil)
 
         # Freeze STI information when freezing model class.  Note that
         # because of how STI works, you should not freeze an STI subclass
@@ -221,11 +227,23 @@ module Sequel
         # Return a class object.  If a class is given, return it directly.
         # Treat strings and symbols as class names.  If nil is given or
         # an invalid class name string or symbol is used, return self.
+        # If the class is valid but is not a subclass of the class that
+        # loaded the single_table_inheritance plugin, use the class that
+        # loaded the plugin.
         # Raise an error for other types.
         def sti_class(v)
           case v
           when String, Symbol
-            constantize(v) rescue self
+            begin
+              klass = constantize(v)
+              if Class === klass && @sti_root_class >= klass
+                klass
+              else
+                @sti_root_class
+              end
+            rescue
+              self
+            end
           when nil
             self
           when Class
