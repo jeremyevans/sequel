@@ -3443,3 +3443,65 @@ describe "single_statement_dataset_destroy plugin" do
     @class.count.must_equal 3
   end
 end
+
+describe "select_on_skipped_update plugin" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:sosu_test) do
+      primary_key :id
+      String :name
+    end
+  end
+  before do
+    @a = a = []
+    id = @db[:sosu_test].insert(name: 'a')
+    @class = Class.new(Sequel::Model(@db[:sosu_test])) do
+      self.require_modification = true
+      plugin :select_on_skipped_update
+    end
+    @p = @class[id]
+  end
+  after do
+    @db[:sosu_test].delete
+  end
+  after(:all) do
+    @db.drop_table?(:sosu_test)
+  end
+
+  it "should raise NoMatchingRow if object doesn't exist for save_changed on unmodified row" do
+    @p.save_changes
+    @p.this.delete
+    proc{@p.save_changes}.must_raise Sequel::NoMatchingRow
+  end 
+
+  it "should raise NoMatchingRow if object doesn't exist for save with no columns to update" do
+    @p.save(columns: [])
+    @p.this.delete
+    proc{@p.save(columns: [])}.must_raise Sequel::NoMatchingRow
+  end 
+  
+  it "should not raise NoMatchingRow if object doesn't require modification" do
+    @p.require_modification = false
+    @p.this.delete
+    @p.save_changes
+    @p.save(columns: [])
+  end 
+  
+  it "should work correctly if the object was modified" do
+    @p.name = 'Bob'
+    @p.save_changes
+    @p.refresh
+    @p.name.must_equal 'Bob'
+    @p.name = 'Jim'
+    @p.save(columns: [:name])
+    @p.name.must_equal 'Jim'
+  end 
+
+  it "works with filters set by the instance_filters plugin" do
+    @class.plugin :instance_filters
+    @p.instance_filter{{name: 'a'}}
+    @p.save_changes
+    @p.instance_filter{{name: 'b'}}
+    proc{@p.save_changes}.must_raise Sequel::NoMatchingRow
+  end 
+end

@@ -24,6 +24,7 @@ Sequel::Model.plugin :prepared_statements if ENV['SEQUEL_MODEL_PREPARED_STATEMEN
 Sequel::Model.plugin :throw_failures if ENV['SEQUEL_MODEL_THROW_FAILURES']
 Sequel::Model.plugin :primary_key_lookup_check_values if ENV['SEQUEL_PRIMARY_KEY_LOOKUP_CHECK_VALUES']
 Sequel::Model.plugin :split_values if ENV["SEQUEL_SPLIT_VALUES"]
+Sequel::Model.plugin :select_on_skipped_update if ENV["SEQUEL_SELECT_ON_SKIPPED_UPDATE"]
 Sequel::Model.use_transactions = false
 Sequel::Model.cache_anonymous_models = false
 
