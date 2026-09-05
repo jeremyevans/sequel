@@ -1,5 +1,7 @@
 === master
 
+* Limit the :synchronous option value to Database#transaction on Postgresql to supported values (jeremyevans)
+
 * Quote SQLite database types when dumping schema with :same_db option in the schema_dumper extension (jeremyevans)
 
 * Convert database exception class to Sequel exception class for failures in Database#copy_table query (jeremyevans)

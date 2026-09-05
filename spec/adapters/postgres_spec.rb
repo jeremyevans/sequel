@@ -2042,13 +2042,13 @@ describe "A PostgreSQL dataset" do
     @db.transaction(:synchronous=>false){}
 
     @db.transaction(:synchronous=>nil){}
-    if @db.server_version >= 90100
-      @db.transaction(:synchronous=>:local){}
+    @db.transaction(:synchronous=>:local){} if @db.server_version >= 90100
+    @db.transaction(:synchronous=>:remote_write){} if @db.server_version >= 90200
+    @db.transaction(:synchronous=>:remote_apply){} if @db.server_version >= 90600
+  end
 
-      if @db.server_version >= 90200
-        @db.transaction(:synchronous=>:remote_write){}
-      end
-    end
+  deprecated "should warn for invalid synchronous option" do
+    @db.transaction(:synchronous=>:garbage){}
   end
 
   it "should have #transaction support read only transactions" do

@@ -2111,7 +2111,7 @@ module Sequel
 
       # If the :synchronous option is given and non-nil, set synchronous_commit
       # appropriately.  Valid values for the :synchronous option are true,
-      # :on, false, :off, :local, and :remote_write.
+      # :on, false, :off, :local, :remote_apply, and :remote_write.
       def begin_new_transaction(conn, opts)
         super
         if opts.has_key?(:synchronous)
@@ -2121,6 +2121,12 @@ module Sequel
           when false
             sync = :off
           when nil
+            return
+          when :on, :off, :local, :remote_apply, :remote_write
+            nil
+          else
+            # SEQUEL6: raise
+            Sequel::Deprecation.deprecate("Unsupported :synchronous option given to Database#transaction: #{sync.inspect}, this will raise an error in Sequel 6.")
             return
           end
 
