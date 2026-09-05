@@ -366,6 +366,21 @@ describe "Prepared Statements and Bound Arguments" do
     @c.filter(:numb=>:$n).prepare(:first, :select_n1)
     @db.call(:select_n1, :n=>10).must_equal @c.load(:id=>1, :numb=>10)
   end
+
+  it "should raise error if calling a prepared statement with the wrong number of arguments" do
+    @db.synchronize do
+      @c.filter(:numb=>:$n).prepare(:select, :select_n1)
+      @db.call(:select_n1, :n=>10).must_equal [@c.load(:id=>1, :numb=>10)]
+      begin
+       result = @db.call(:select_n1)
+      rescue Sequel::DatabaseError
+        # allowed to raise
+      else
+        # also allowed to treat missing parameter as NULL
+        result.must_equal []
+      end
+    end
+  end
 end
 
 describe "Bound Argument Types" do

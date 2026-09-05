@@ -496,6 +496,7 @@ module Sequel
           rescue *DATABASE_ERROR_CLASSES => e
             raise_error(e)
           ensure
+            cps.clear_parameters
             cps.close unless name
           end
         end

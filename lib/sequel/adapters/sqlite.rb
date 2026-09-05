@@ -336,16 +336,20 @@ module Sequel
           log_sql << sql
           log_sql << ")"
         end
-        if block
-          log_connection_yield(log_sql, conn, args){cps.execute(ps_args, &block)}
-        else
-          log_connection_yield(log_sql, conn, args){cps.execute!(ps_args){|r|}}
-          case type
-          when :insert
-            conn.last_insert_row_id
-          when :update
-            conn.changes
+        begin
+          if block
+            log_connection_yield(log_sql, conn, args){cps.execute(ps_args, &block)}
+          else
+            log_connection_yield(log_sql, conn, args){cps.execute!(ps_args){|r|}}
+            case type
+            when :insert
+              conn.last_insert_row_id
+            when :update
+              conn.changes
+            end
           end
+        ensure
+          cps.clear_bindings!
         end
       end
       
