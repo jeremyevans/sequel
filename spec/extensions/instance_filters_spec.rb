@@ -94,6 +94,14 @@ describe "instance_filters plugin" do
     DB.sqls.must_equal ["UPDATE people SET name = 'Bob' WHERE (id = 1)"]
   end
 
+  it "should drop instance filters after updating even if no columns were modified" do
+    @p.instance_filter(:name=>'Joe')
+    @p.update(:name=>'John')
+    DB.sqls.must_equal []
+    @p.update(:name=>'Bob')
+    DB.sqls.must_equal ["UPDATE people SET name = 'Bob' WHERE (id = 1)"]
+  end
+
   it "shouldn't allow instance filters on frozen objects" do
     @p.instance_filter(:name=>'Joe')
     @p.freeze

@@ -80,6 +80,14 @@ module Sequel
           instance_filters << [args, block]
         end
       
+        # Clear instance filters when saving changes even if the
+        # object wasn't modified.
+        def save_changes(opts=OPTS)
+          ret = super
+          clear_instance_filters if ret.nil?
+          ret
+        end
+
         private
         
         # If there are any instance filters, make sure not to use the

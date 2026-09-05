@@ -1,5 +1,7 @@
 === master
 
+* Clear instance filters if Model#save_changes skips update due to the object being unmodified (jeremyevans)
+
 * Quote elements of terms array/set argument given to Dataset#full_text_search on Microsoft SQL Server (jeremyevans)
 
 * Clear parameters after prepared statement execution in jdbc and sqlite3 adapters (jeremyevans)
