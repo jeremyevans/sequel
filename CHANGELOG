@@ -1,5 +1,7 @@
 === master
 
+* Do not emulate LIKE with REGEXP on SQLAnywhere (jeremyevans)
+
 * Add select_on_skipped_update plugin for running SELECT query to check for object existance if an UPDATE statement is skipped (jeremyevans)
 
 * Run and clear instance hooks if Model#save_changes skips update due to the object being unmodified (jeremyevans)

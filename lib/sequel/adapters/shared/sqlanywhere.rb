@@ -305,38 +305,6 @@ module Sequel
           super(sql, :+, args)
         when :<<, :>>
           complex_expression_emulate_append(sql, op, args)
-        when :LIKE, :"NOT LIKE"
-          sql << '('
-          literal_append(sql, args[0])
-          sql << (op == :LIKE ? ' REGEXP ' : ' NOT REGEXP ')
-          pattern = String.new
-          last_c = ''
-          args[1].each_char do |c|
-            if  c == '_' and not pattern.end_with?('\\') and last_c != '\\'
-              pattern << '.'
-            elsif c == '%' and not pattern.end_with?('\\') and last_c != '\\'
-              pattern << '.*'
-            elsif c == '[' and not pattern.end_with?('\\') and last_c != '\\'
-              pattern << '\['
-            elsif c == ']' and not pattern.end_with?('\\') and last_c != '\\'
-              pattern << '\]'
-            elsif c == '*' and not pattern.end_with?('\\') and last_c != '\\'
-              pattern << '\*'
-            elsif c == '?' and not pattern.end_with?('\\') and last_c != '\\'
-              pattern << '\?'
-            else
-              pattern << c
-            end
-            if c == '\\' and last_c == '\\'
-              last_c = ''
-            else
-              last_c = c
-            end
-          end
-          literal_append(sql, pattern)
-          sql << " ESCAPE "
-          literal_append(sql, "\\")
-          sql << ')'
         when :ILIKE, :"NOT ILIKE"
           super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args)
         when :extract

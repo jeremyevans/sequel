@@ -2011,7 +2011,7 @@ describe "Dataset string methods" do
     @ds.exclude(Sequel.expr(:a).like('foo', 'bar')).all.must_equal []
   end
   
-  it "#like should be case sensitive" do
+  cspecify "#like should be case sensitive", :sqlanywhere do
     wait{@ds.insert('foo', 'bar')}
     @ds.filter(Sequel.expr(:a).like('Foo')).all.must_equal []
     @ds.filter(Sequel.expr(:b).like('baR')).all.must_equal []
@@ -2059,7 +2059,9 @@ describe "Dataset string methods" do
     @ds.filter(Sequel.expr(:b).ilike("#{@ds.escape_like('Bar%')}%")).select_order_map(:b).must_equal ['bar%', 'bar%.', 'bar%..']
 
     Sequel.extension(:escaped_like)
-    @ds.filter(Sequel.expr(:a).escaped_like('?', 'Foo_')).select_order_map(:a).must_equal []
+    unless @db.database_type == :sqlanywhere
+      @ds.filter(Sequel.expr(:a).escaped_like('?', 'Foo_')).select_order_map(:a).must_equal []
+    end
     @ds.filter(Sequel.expr(:a).escaped_like('?', 'foo_')).select_order_map(:a).must_equal ['foo_']
     @ds.filter(Sequel.expr(:b).escaped_like('?', ['bar%'])).select_order_map(:b).must_equal ['bar%']
     @ds.filter(Sequel.expr(:a).escaped_like('??', ['fo', 'o\\_'])).select_order_map(:a).must_equal ['foo\\_']
