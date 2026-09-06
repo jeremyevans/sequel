@@ -1,5 +1,7 @@
 === master
 
+* Fix JRUBY_VERSION checks to handle JRuby 10+ (jeremyevans)
+
 * Correctly parse offset of timestamptz value in jdbc/postgresql adapter (jeremyevans)
 
 * Raise if attempting to parse a PostgreSQL array with more than 6 dimensions (jeremyevans)

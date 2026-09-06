@@ -24,7 +24,7 @@ module Sequel
     
     # Default database error classes
     DATABASE_ERROR_CLASSES = [NativeException]
-    if JRUBY_VERSION < '9.2'
+    if JRUBY_VERSION.to_r < Rational('9.2')
       # On JRuby <9.2, still include ::NativeException, as it is still needed in some cases
       DATABASE_ERROR_CLASSES << ::NativeException
     end
