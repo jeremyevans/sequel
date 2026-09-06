@@ -209,7 +209,7 @@ module Sequel
         INTEGER_TYPE = Java::JavaSQL::Types::INTEGER
         STRING_TYPE = Java::JavaSQL::Types::VARCHAR
         ARRAY_TYPE = Java::JavaSQL::Types::ARRAY
-        PG_SPECIFIC_TYPES = [Java::JavaSQL::Types::ARRAY, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT, Java::JavaSQL::Types::TIME_WITH_TIMEZONE, Java::JavaSQL::Types::TIME].freeze
+        PG_SPECIFIC_TYPES = [Java::JavaSQL::Types::ARRAY, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT, Java::JavaSQL::Types::TIME_WITH_TIMEZONE, Java::JavaSQL::Types::TIME, Java::JavaSQL::Types::TIMESTAMP_WITH_TIMEZONE, Java::JavaSQL::Types::TIMESTAMP].freeze
 
         # Return PostgreSQL hstore types as ruby Hashes instead of
         # Java HashMaps.  Only used if the database does not have a
