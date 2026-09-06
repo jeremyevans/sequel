@@ -156,7 +156,15 @@ module Sequel
     #   Sequel.extension(:blank)
     #   Sequel.extension(:core_extensions, :named_timezones)
     def extension(*extensions)
-      extensions.each{|e| orig_require("sequel/extensions/#{e}")}
+      extensions.each do |e|
+        e = e.to_s
+
+        if %r{..[/\\]} =~ e
+          raise Error, "cannot use extension with ../ for security reasons"
+        end
+
+        orig_require("sequel/extensions/#{e}")
+      end
     end
     
     # The exception classed raised if there is an error parsing JSON.

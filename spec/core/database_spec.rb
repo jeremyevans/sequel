@@ -307,6 +307,10 @@ describe "Sequel.extension" do
   it "should attempt to load the given extension" do
     proc{Sequel.extension :blah}.must_raise(LoadError)
   end
+
+  it "should not be loadable if they contain ../ or ..\\" do
+    proc{Sequel.extension 'foo/../bar'}.must_raise(Sequel::Error)
+  end
 end
 
 describe "Database#log_info" do
