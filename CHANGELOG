@@ -1,5 +1,7 @@
 === master
 
+* Raise if attempting to parse a PostgreSQL array with more than 6 dimensions (jeremyevans)
+
 * Do not allow Sequel.extension to load extensions with ../ or ..\ for security reasons (jeremyevans)
 
 * Deprecate support for arbitrary join types in Dataset#join_table (jeremyevans)

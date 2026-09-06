@@ -48,6 +48,8 @@ describe "pg_array extension" do
     c.call('{{"a b"},{c}}').to_a.must_equal [['a b'], ['c']]
     c.call('{{{a},{b}},{{c},{d}}}').to_a.must_equal [[['a'], ['b']], [['c'], ['d']]]
     c.call('{{{a,e},{b,f}},{{c,g},{d,h}}}').to_a.must_equal [[['a', 'e'], ['b', 'f']], [['c', 'g'], ['d', 'h']]]
+    c.call("{{{{{{}}}}}}").to_a.must_equal [[[[[[]]]]]]
+    proc{c.call("{{{{{{{}}}}}}}")}.must_raise Sequel::Error
   end
 
   it "should parse text arrays with embedded deliminaters" do

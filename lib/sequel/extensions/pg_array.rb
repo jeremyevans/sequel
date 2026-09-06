@@ -390,6 +390,7 @@ module Sequel
               elsif char == '{'
                 raise Sequel::Error, "invalid array, opening brace with existing recorded data" unless @recorded.empty?
 
+                raise Sequel::Error, "cannot parse array with more than 6 dimensions" if @stack.length >= 6
                 # Start of new array, add it to the stack
                 new = []
                 @stack.last << new

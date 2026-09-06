@@ -3938,6 +3938,17 @@ describe 'PostgreSQL array handling' do
     @db.drop_table?(:items)
   end
 
+  it 'should only allow parsing of up to 6 dimensional arrays' do
+    c = Sequel::Postgres::PGArray::Creator.new(:text)
+    c.call("{}").to_a.must_equal []
+    c.call("{{}}").to_a.must_equal [[]]
+    c.call("{{{}}}").to_a.must_equal [[[]]]
+    c.call("{{{{}}}}").to_a.must_equal [[[[]]]]
+    c.call("{{{{{}}}}}").to_a.must_equal [[[[[]]]]]
+    c.call("{{{{{{}}}}}}").to_a.must_equal [[[[[[]]]]]]
+    proc{c.call("{{{{{{{}}}}}}}")}.must_raise(Sequel::Error, ArgumentError)
+  end
+
   it 'insert and retrieve integer and float arrays of various sizes' do
     @db.create_table!(:items) do
       column :i2, 'int2[]'
