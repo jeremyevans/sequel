@@ -154,7 +154,11 @@ module Sequel
         # a PGObject instance with unknown type and the bound argument string value,
         # and set that as the prepared statement argument.
         def set_ps_arg(cps, arg, i)
-          if v = bound_variable_arg(arg, nil)
+          unless v = bound_variable_arg(arg, nil)
+            v = arg.strftime("%F %T.%6N%z") if arg.is_a?(DateTime)
+          end
+
+          if v
             obj = Java::OrgPostgresqlUtil::PGobject.new
             obj.setType("unknown")
             obj.setValue(v)

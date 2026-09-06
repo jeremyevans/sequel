@@ -1,5 +1,7 @@
 === master
 
+* Make DateTime bound variable usage in the jdbc/postgresql adapter work correctly when timezone offset is different than local (jeremyevans)
+
 * Fix JRUBY_VERSION checks to handle JRuby 10+ (jeremyevans)
 
 * Correctly parse offset of timestamptz value in jdbc/postgresql adapter (jeremyevans)
