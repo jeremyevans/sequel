@@ -12,11 +12,34 @@ module Sequel
         
         # Get the last inserted id using SCOPE_IDENTITY().
         def last_insert_id(conn, opts=OPTS)
-          statement(conn) do |stmt|
-            sql = opts[:prepared] ? 'SELECT @@IDENTITY' : 'SELECT SCOPE_IDENTITY()'
-            rs = log_connection_yield(sql, conn){stmt.executeQuery(sql)}
-            rs.next
-            rs.getLong(1)
+          if (stmt = opts[:stmt]) && opts[:prepared]
+            rs = stmt.getGeneratedKeys
+            begin
+              if rs.next
+                begin
+                  rs.getLong(1)
+                rescue
+                  rs.getObject(1) rescue nil
+                end
+              end
+            ensure
+              rs.close
+            end
+          else
+            statement(conn) do |stmt|
+              sql = 'SELECT SCOPE_IDENTITY()'
+              rs = log_connection_yield(sql, conn){stmt.executeQuery(sql)}
+              rs.next
+              rs.getLong(1)
+            end
+          end
+        end
+
+        def prepare_jdbc_statement(conn, sql, opts)
+          if opts[:type] == :insert
+            conn.prepareStatement(sql, JavaSQL::Statement::RETURN_GENERATED_KEYS)
+          else
+            super
           end
         end
         

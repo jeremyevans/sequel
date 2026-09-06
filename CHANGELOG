@@ -1,5 +1,7 @@
 === master
 
+* Use RETURN_GENERATED_KEYS for prepared statement inserts in the jdbc adapter for Microsoft SQL Server (jeremyevans)
+
 * Do not emulate LIKE with REGEXP on SQLAnywhere (jeremyevans)
 
 * Add select_on_skipped_update plugin for running SELECT query to check for object existance if an UPDATE statement is skipped (jeremyevans)
