@@ -1,5 +1,7 @@
 === master
 
+* Deprecate support for arbitrary join types in Dataset#join_table (jeremyevans)
+
 * Use RETURN_GENERATED_KEYS for prepared statement inserts in the jdbc adapter for Microsoft SQL Server (jeremyevans)
 
 * Do not emulate LIKE with REGEXP on SQLAnywhere (jeremyevans)

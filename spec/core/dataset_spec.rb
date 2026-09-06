@@ -2723,7 +2723,7 @@ describe "Dataset#join_table" do
     @d.cross_join(@d.lateral).select_sql.must_equal 'SELECT * FROM "items" CROSS JOIN LATERAL (SELECT * FROM "items") AS "t1"'
   end
   
-  it "should support arbitrary join types" do
+  deprecated "should support arbitrary join types" do
     @d.join_table(:magic, :categories, :category_id=>:id).sql.must_equal 'SELECT * FROM "items" MAGIC JOIN "categories" ON ("categories"."category_id" = "items"."id")'
   end
 
@@ -2767,7 +2767,7 @@ describe "Dataset#join_table" do
   end
 
   it "should default to a plain join if nil is used for the type" do
-    @d.join_table(nil, :categories, :category_id=>:id).sql.must_equal 'SELECT * FROM "items"  JOIN "categories" ON ("categories"."category_id" = "items"."id")'
+    @d.join_table(nil, :categories, :category_id=>:id).sql.must_equal 'SELECT * FROM "items" JOIN "categories" ON ("categories"."category_id" = "items"."id")'
   end
 
   it "should use an inner join for Dataset#join" do

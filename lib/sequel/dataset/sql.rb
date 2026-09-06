@@ -1346,10 +1346,21 @@ module Sequel
     alias delete_returning_sql insert_returning_sql
     alias update_returning_sql insert_returning_sql
 
-    # SQL fragment specifying a JOIN type, converts underscores to
-    # spaces and upcases.
+    JOIN_TYPE_SQL = {}
+    (CONDITIONED_JOIN_TYPES + UNCONDITIONED_JOIN_TYPES).each do |join_type|
+      JOIN_TYPE_SQL[join_type] = "#{join_type.to_s.tr('_', ' ').upcase} JOIN".freeze
+    end
+    JOIN_TYPE_SQL[nil] = "JOIN"
+    JOIN_TYPE_SQL.freeze
+    private_constant :JOIN_TYPE_SQL
+
+    # SQL fragment for join type
     def join_type_sql(join_type)
-      "#{join_type.to_s.tr('_', ' ').upcase} JOIN"
+      JOIN_TYPE_SQL.fetch(join_type) do
+        # SEQUEL6: Raise error
+        Sequel::Deprecation.deprecate("Unrecognized join type used: #{join_type.inspect}. This will raise an error starting in Sequel 6.")
+        "#{join_type.to_s.tr('_', ' ').upcase} JOIN"
+      end
     end
 
     # Append USING clause for JOIN USING
