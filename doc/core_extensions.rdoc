@@ -48,7 +48,7 @@ Sequel has no internal dependency on the core extensions.  This includes Sequel'
 
 == Refinements
 
-Most of the these extensions can be added on a per-file basis using refinements (if you are using Ruby 2.0+).  To use refinements, first load them:
+Most of the these extensions can be added on a per-file basis using refinements.  To use refinements, first load them:
 
   Sequel.extension :core_refinements
 

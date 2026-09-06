@@ -374,9 +374,7 @@ module Sequel
 
     # Whether to commit the current transaction. Thread.current.status is
     # checked because Thread#kill skips rescue blocks (so exception would be
-    # nil), but the transaction should still be rolled back. On Ruby 1.9 (but
-    # not 2.0+), the thread status will still be "run", so Thread#kill
-    # will erroneously commit the transaction, and there isn't a workaround.
+    # nil), but the transaction should still be rolled back.
     def commit_or_rollback_transaction(exception, conn, opts)
       if exception
         false

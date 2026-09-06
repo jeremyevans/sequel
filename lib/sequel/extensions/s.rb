@@ -29,8 +29,7 @@
 #
 #   Object.send(:include, Sequel::S)
 #
-# If you are using Ruby 2+, and you would like to use refinements, you
-# can use Sequel::S as a refinement, in which case the private #S method
+# You can use also Sequel::S as a refinement, in which case the private #S method
 # will be available on all objects while the refinement is active.
 #
 #   using Sequel::S
@@ -38,7 +37,6 @@
 #   S(:column) + 1
 #
 # Related module: Sequel::S
-
 
 # 
 module Sequel::S
@@ -50,11 +48,9 @@ module Sequel::S
   end
 
   # simplecov:disable
-  if RUBY_VERSION >= '2.0.0'
-    include_meth = RUBY_VERSION >= '3.1' ? :import_methods : :include
+  include_meth = RUBY_VERSION >= '3.1' ? :import_methods : :include
   # simplecov:enable
-    refine Object do
-      send include_meth, Sequel::S
-    end
+  refine Object do
+    send include_meth, Sequel::S
   end
 end

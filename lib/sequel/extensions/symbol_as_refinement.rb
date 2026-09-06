@@ -23,10 +23,7 @@
 #
 # Related module: Sequel::SymbolAs
 
-# simplecov:disable
-raise(Sequel::Error, "Refinements require ruby 2.0.0 or greater") unless RUBY_VERSION >= '2.0.0'
-# simplecov:enable
-
+#
 module Sequel::SymbolAs
   refine Symbol do
     def as(aliaz, columns=nil)
@@ -34,4 +31,3 @@ module Sequel::SymbolAs
     end
   end
 end
-

@@ -1181,23 +1181,21 @@ database_transaction_specs = Module.new do
     @db.sqls.must_equal ['BEGIN', 'BEGIN -- test', 'DROP TABLE test;', 'COMMIT -- test', 'COMMIT']
   end
   
-  if RUBY_ENGINE == 'ruby' && !RUBY_VERSION.start_with?('1.9')
-    it "should handle Thread#kill for transactions inside threads" do
-      q = Queue.new
-      q1 = Queue.new
-      t = Thread.new do
-        @db.transaction do
-          @db.execute 'DROP TABLE test'
-          q1.push nil
-          q.pop
-          @db.execute 'DROP TABLE test2'
-        end
+  it "should handle Thread#kill for transactions inside threads" do
+    q = Queue.new
+    q1 = Queue.new
+    t = Thread.new do
+      @db.transaction do
+        @db.execute 'DROP TABLE test'
+        q1.push nil
+        q.pop
+        @db.execute 'DROP TABLE test2'
       end
-      q1.pop
-      t.kill
-      t.join
-      @db.sqls.must_equal ['BEGIN', 'DROP TABLE test', 'ROLLBACK']
     end
+    q1.pop
+    t.kill
+    t.join
+    @db.sqls.must_equal ['BEGIN', 'DROP TABLE test', 'ROLLBACK']
   end
 
   it "should raise an Error if after_commit or after_rollback is called without a block" do

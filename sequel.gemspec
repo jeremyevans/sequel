@@ -18,7 +18,7 @@ SEQUEL_GEMSPEC = Gem::Specification.new do |s|
     'mailing_list_uri'  => 'https://github.com/jeremyevans/sequel/discussions',
     'source_code_uri'   => 'https://github.com/jeremyevans/sequel',
   }
-  s.required_ruby_version = ">= 1.9.2"
+  s.required_ruby_version = ">= 2.0"
   s.files = %w(MIT-LICENSE bin/sequel) + Dir["lib/**/*.rb"]
   s.require_path = "lib"
   s.bindir = 'bin'

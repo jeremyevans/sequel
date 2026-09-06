@@ -465,9 +465,9 @@ describe Sequel::Model, ".dataset_module" do
   end
 
   it "should have dataset_module support a method with keyword arguments" do
-    @c.dataset_module { eval('def with_foo(name: (raise)); end') }
+    @c.dataset_module { def with_foo(name: (raise)); end }
     proc{@c.with_foo}.must_raise(StandardError)
-  end if RUBY_VERSION >= '2.0'
+  end
 end
 
 describe "A model class with implicit table name" do

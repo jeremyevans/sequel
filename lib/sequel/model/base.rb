@@ -2433,12 +2433,7 @@ END
     plugin self
     def_initialize_nil_instance_variables
 
-    singleton_class.send(:undef_method, :dup, :clone, :initialize_copy)
-    # simplecov:disable
-    if RUBY_VERSION >= '1.9.3'
-    # simplecov:enable
-      singleton_class.send(:undef_method, :initialize_clone, :initialize_dup)
-    end
+    singleton_class.send(:undef_method, :dup, :clone, :initialize_copy, :initialize_clone, :initialize_dup)
 
     # simplecov:disable
     if defined?(Sequel::Postgres::SEQUEL_PG_VERSION_INTEGER) && Sequel::Postgres::SEQUEL_PG_VERSION_INTEGER >= 11800

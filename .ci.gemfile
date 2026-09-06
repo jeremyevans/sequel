@@ -44,17 +44,13 @@ end
 
 if RUBY_VERSION < '3.1.0' && RUBY_VERSION >= '3.0.0'
   gem 'json', '2.5.1'
-elsif RUBY_VERSION < '2.0.0'
-  gem 'json', '<1.8.5'
 elsif RUBY_VERSION < '2.3.0'
   gem 'json', '<2.6'
 else
   gem 'json'
 end
 
-if RUBY_VERSION < '2.0.0'
-  gem 'rake', '<10'
-elsif RUBY_VERSION < '2.3.0'
+if RUBY_VERSION < '2.3.0'
   gem 'rake', '<13'
 else
   gem 'rake'
@@ -86,13 +82,8 @@ platforms :ruby do
     gem 'sqlite3'
   end
 
-  if RUBY_VERSION < '2.0.0'
-    gem "pg", '<0.19.0'
-    gem "mysql2", '<0.5'
-  else
-    gem "pg", RUBY_VERSION < '2.2.0' ? '<1.2.0' : '>0'
-    gem "mysql2", "!= 0.5.7"
-  end
+  gem "pg", RUBY_VERSION < '2.2.0' ? '<1.2.0' : '>0'
+  gem "mysql2", "!= 0.5.7"
 
   # Test current sequel_pg on half of the MRIs, and pure-ruby on the other half
   # Avoid pulling in bigdecimal gem on Ruby < 2.1
@@ -103,10 +94,6 @@ end
 
 # JRuby Adapter Dependencies
 platforms :jruby do
-  if RUBY_VERSION < '2.4'
-    gem 'racc', '<1.6'
-  end
-
   gem 'jdbc-sqlite3', '<3.42'
   gem 'jdbc-mysql'
   gem 'jdbc-postgres'

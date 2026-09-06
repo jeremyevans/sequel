@@ -15,41 +15,21 @@
 #
 #   Sequel.extension :symbol_aref
 #
-# If you are using Ruby 2+, and you would like to use refinements, there
-# is a refinement version of this in the symbol_aref_refinement extension.
+# There is a refinement version of this in the symbol_aref_refinement extension.
 #
 # Related module: Sequel::SymbolAref
 
-if RUBY_VERSION >= '2.0'
-  module Sequel::SymbolAref
-    def [](v)
-      case v
-      when Symbol, Sequel::SQL::Identifier, Sequel::SQL::QualifiedIdentifier
-        Sequel::SQL::QualifiedIdentifier.new(self, v)
-      else
-        super
-      end
-    end
-  end
-
-  class Symbol
-    prepend Sequel::SymbolAref
-  end
-# simplecov:disable
-else
-  class Symbol
-    if method_defined?(:[])
-      alias_method :aref_before_sequel, :[] 
-    end
-
-    def [](v)
-      case v
-      when Symbol, Sequel::SQL::Identifier, Sequel::SQL::QualifiedIdentifier
-        Sequel::SQL::QualifiedIdentifier.new(self, v)
-      else
-        aref_before_sequel(v)
-      end
+module Sequel::SymbolAref
+  def [](v)
+    case v
+    when Symbol, Sequel::SQL::Identifier, Sequel::SQL::QualifiedIdentifier
+      Sequel::SQL::QualifiedIdentifier.new(self, v)
+    else
+      super
     end
   end
 end
-# simplecov:enable
+
+class Symbol
+  prepend Sequel::SymbolAref
+end

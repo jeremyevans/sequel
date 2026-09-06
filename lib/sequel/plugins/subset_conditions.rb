@@ -105,22 +105,11 @@ module Sequel
 
         private
 
-        if RUBY_VERSION >= '2'
-          # Backbone of #where_any and #where_all
-          def _where_any_all(meth, name, args)
-            ds = model.dataset
-            # #bind used here because the dataset module may not yet be included in the model's dataset
-            where(name, Sequel.send(meth, *args.map{|a| self.instance_method(:"#{a}_conditions").bind(ds).call}))
-          end
-        else
-          # Cannot bind module method to arbitrary objects in Ruby 1.9.
-          # simplecov:disable
-          def _where_any_all(meth, name, args)
-            ds = model.dataset.clone
-            ds.extend(self)
-            where(name, Sequel.send(meth, *args.map{|a| ds.send(:"#{a}_conditions")}))
-          end
-          # simplecov:enable
+        # Backbone of #where_any and #where_all
+        def _where_any_all(meth, name, args)
+          ds = model.dataset
+          # #bind used here because the dataset module may not yet be included in the model's dataset
+          where(name, Sequel.send(meth, *args.map{|a| self.instance_method(:"#{a}_conditions").bind(ds).call}))
         end
       end
     end

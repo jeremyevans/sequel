@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require_relative "spec_helper"
 
-if (RUBY_VERSION >= '2.0.0' && RUBY_ENGINE == 'ruby') || (RUBY_VERSION >= '2.3.0' && RUBY_ENGINE == 'jruby')
+if RUBY_ENGINE == 'ruby' || (RUBY_VERSION >= '2.3.0' && RUBY_ENGINE == 'jruby')
 Sequel.extension :symbol_aref_refinement
 using Sequel::SymbolAref
 

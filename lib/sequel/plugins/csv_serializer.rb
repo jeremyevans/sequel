@@ -73,23 +73,12 @@ module Sequel
         end
       end
 
-      # Avoid keyword argument separation warnings on Ruby 2.7, while still
-      # being compatible with 1.9.
-      if RUBY_VERSION >= "2.0"
-        instance_eval(<<-END, __FILE__, __LINE__+1)
-          def self.csv_call(*args, opts, &block)
-            CSV.send(*args, **opts, &block)
-          end
-        END
-      else
-        # simplecov:disable
-        # :nodoc:
-        def self.csv_call(*args, opts, &block)
-          CSV.send(*args, opts, &block)
-        end
-        # :nodoc:
-        # simplecov:enable
+      # simplecov:disable
+      def self.csv_call(*args, opts, &block)
+        Sequel::Deprecation.deprecate("Sequel::Plugins::CsvSerializer.csv_call will be removed in Sequel 6.")
+        CSV.send(*args, **opts, &block)
       end
+      # simplecov:enable
 
       module ClassMethods
         # The default opts to use when serializing model objects to CSV
@@ -97,7 +86,7 @@ module Sequel
 
         # Attempt to parse an array of instances from the given CSV string
         def array_from_csv(csv, opts = OPTS)
-          CsvSerializer.csv_call(:parse, csv, process_csv_serializer_opts(opts)).map do |row|
+          CSV.parse(csv, **process_csv_serializer_opts(opts)).map do |row|
             row = row.to_hash
             row.delete(nil)
             new(row)
@@ -147,7 +136,7 @@ module Sequel
         # :headers :: The headers to use for the CSV line. Use nil for a header
         #             to specify the column should be ignored.
         def from_csv(csv, opts = OPTS)
-          row = CsvSerializer.csv_call(:parse_line, csv, model.process_csv_serializer_opts(opts)).to_hash
+          row = CSV.parse_line(csv, **model.process_csv_serializer_opts(opts)).to_hash
           row.delete(nil)
           set(row)
         end
@@ -165,7 +154,7 @@ module Sequel
           opts = model.process_csv_serializer_opts(opts)
           headers = opts[:headers]
 
-          CsvSerializer.csv_call(:generate, model.process_csv_serializer_opts(opts)) do |csv|
+          CSV.generate(**model.process_csv_serializer_opts(opts)) do |csv|
             csv << headers.map{|k| public_send(k)}
           end
         end
@@ -184,7 +173,7 @@ module Sequel
           items = opts.delete(:array) || self
           headers = opts[:headers]
 
-          CsvSerializer.csv_call(:generate, opts) do |csv|
+          CSV.generate(**opts) do |csv|
             items.each do |object|
               csv << headers.map{|header| object.public_send(header)}
             end
