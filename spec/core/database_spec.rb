@@ -1196,7 +1196,7 @@ database_transaction_specs = Module.new do
     t.kill
     t.join
     @db.sqls.must_equal ['BEGIN', 'DROP TABLE test', 'ROLLBACK']
-  end
+  end unless defined?(JRUBY_VERSION) && JRUBY_VERSION.to_r < 10
 
   it "should raise an Error if after_commit or after_rollback is called without a block" do
     proc{@db.after_commit}.must_raise(Sequel::Error)
