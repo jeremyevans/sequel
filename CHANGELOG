@@ -1,5 +1,7 @@
 === master
 
+* Recognize an additional lock timeout error in the trilogy adapter (jeremyevans)
+
 * Work with json gem version 3 (jeremyevans)
 
 * Drop support for Ruby 1.9, minimum is now 2.0 (jeremyevans)

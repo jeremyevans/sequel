@@ -62,7 +62,8 @@ module Sequel
       private
 
       def database_specific_error_class(exception, opts)
-        if exception.error_code == 1205
+        case exception.error_code
+        when 1205, 3572
           DatabaseLockTimeout
         else
           super
