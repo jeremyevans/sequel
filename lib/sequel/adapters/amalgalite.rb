@@ -7,13 +7,39 @@ module Sequel
   module Amalgalite
     # Type conversion map class for Sequel's use of Amalgamite
     class SequelTypeMap < ::Amalgalite::TypeMaps::DefaultMap
-      methods_handling_sql_types.delete('string')
-      methods_handling_sql_types.merge!(
-        'datetime' => %w'datetime timestamp',
-        'time' => %w'time',
-        'float' => ['float', 'double', 'real', 'double precision'],
-        'decimal' => %w'numeric decimal money'
-      )
+      if respond_to?(:methods_handling_sql_types, true)
+        # Amalgalite < 2 support
+        methods_handling_sql_types.delete('string')
+        methods_handling_sql_types.merge!(
+          'datetime' => %w'datetime timestamp',
+          'time' => %w'time',
+          'float' => ['float', 'double', 'real', 'double precision'],
+          'decimal' => %w'numeric decimal money'
+
+        )
+
+        def result_value_method(type)
+          self.class.sql_to_method(type)
+        end
+      else
+        # Amalgalite 2 support
+        SQL_TO_METHOD = superclass::SQL_TO_METHOD.merge(
+          'datetime' => :datetime,
+          'timestamp' => :datetime,
+          'time' => :time,
+          'float' => :float,
+          'double' => :float,
+          'real' => :float,
+          'double precision' => :float,
+          'decimal' => :decimal,
+          'numeric' => :decimal,
+          'money' => :decimal
+        )
+
+        def result_value_method(type)
+          SQL_TO_METHOD[type]
+        end
+      end
 
       # Store the related database object, in order to be able to correctly
       # handle the database timezone.
@@ -48,7 +74,7 @@ module Sequel
         if value.is_a?(::Amalgalite::Blob)
           SQL::Blob.new(value.to_s)
         elsif value.is_a?(String) && declared_type
-          (meth = self.class.sql_to_method(declared_type.downcase)) ? public_send(meth, value) : value
+          (meth = result_value_method(declared_type.downcase)) ? public_send(meth, value) : value
         else
           super
         end

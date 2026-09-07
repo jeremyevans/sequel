@@ -1,5 +1,7 @@
 === master
 
+* Support amalgalite 2 in the amalgalite adapter (jeremyevans)
+
 * Recognize an additional lock timeout error in the trilogy adapter (jeremyevans)
 
 * Work with json gem version 3 (jeremyevans)
