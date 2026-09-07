@@ -1347,7 +1347,7 @@ module Sequel
     alias update_returning_sql insert_returning_sql
 
     JOIN_TYPE_SQL = {}
-    (CONDITIONED_JOIN_TYPES + UNCONDITIONED_JOIN_TYPES).each do |join_type|
+    (CONDITIONED_JOIN_TYPES + UNCONDITIONED_JOIN_TYPES + %i[natural_inner natural_left_outer natural_right_outer natural_full_outer]).each do |join_type|
       JOIN_TYPE_SQL[join_type] = "#{join_type.to_s.tr('_', ' ').upcase} JOIN".freeze
     end
     JOIN_TYPE_SQL[nil] = "JOIN"
