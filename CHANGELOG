@@ -1,5 +1,7 @@
 === master
 
+* Work with json gem version 3 (jeremyevans)
+
 * Drop support for Ruby 1.9, minimum is now 2.0 (jeremyevans)
 
 * Make DateTime bound variable usage in the jdbc/postgresql adapter work correctly when timezone offset is different than local (jeremyevans)

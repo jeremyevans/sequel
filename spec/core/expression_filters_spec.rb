@@ -1495,6 +1495,7 @@ end
 describe Sequel do
   before do
     Sequel::JSON = Class.new do
+      self::VERSION = '2'
       self::ParserError = Sequel
       def self.parse(json, opts={})
         [json, opts]
@@ -1507,6 +1508,9 @@ describe Sequel do
 
   it ".parse_json should parse json correctly" do
     Sequel.parse_json('[]').must_equal ['[]', {:create_additions=>false}]
+    Sequel::JSON.send(:remove_const, :VERSION)
+    Sequel::JSON.send(:const_set, :VERSION, '3')
+    Sequel.parse_json('[]').must_equal ['[]', {}]
   end
 
   it ".json_parser_error_class should return the related parser error class" do

@@ -211,7 +211,11 @@ module Sequel
     # Parse the string as JSON and return the result.
     # This can be overridden to use an alternative json implementation.
     def parse_json(json)
-      JSON.parse(json, :create_additions=>false)
+      if JSON::VERSION >= '3'
+        JSON.parse(json)
+      else
+        JSON.parse(json, :create_additions=>false)
+      end
     end
 
     # If a mutex is given, synchronize access using it.  If nil is given, just
