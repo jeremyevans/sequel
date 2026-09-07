@@ -672,7 +672,7 @@ describe "Serialization plugin" do
 end
 
 [true, false].each do |prevent_increase|
-  describe "optimistic_locking plugin#{" with prevent_lock_column_increase!" if prevent_increase}" do 
+  describe "optimistic_locking plugin#{" with prevent_increase" if prevent_increase}" do 
     before(:all) do
       @db = DB
       @db.create_table!(:people) do
@@ -683,8 +683,7 @@ end
       class ::Person < Sequel::Model(@db)
       end
       Person.class_eval do
-        plugin :optimistic_locking
-        prevent_lock_column_increase! if prevent_increase
+        plugin :optimistic_locking, prevent_increase: prevent_increase
       end
     end
     before do

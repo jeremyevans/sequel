@@ -28,7 +28,7 @@
 
 * Clear parameters after prepared statement execution in jdbc and sqlite3 adapters (jeremyevans)
 
-* Support prevent_lock_column_increase! class method in the optimistic locking plugins (jeremyevans)
+* Support prevent_increase option/argument in the optimistic locking plugins (jeremyevans)
 
 * Allow the caching plugin to support composite primary keys where multiple columns can contain "," by adding composite_cache_key class method (jeremyevans)
 

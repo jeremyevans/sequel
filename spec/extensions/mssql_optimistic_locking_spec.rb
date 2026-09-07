@@ -39,8 +39,8 @@ describe "MSSSQL optimistic locking plugin" do
     @o.timestamp.must_equal lv
   end
 
-  it "should not allow increasing the timestamp if prevent_lock_column_increase! is used" do
-    @c.prevent_lock_column_increase!
+  it "should not allow increasing the lock version if :prevent_increase option is used" do
+    @c.plugin :mssql_optimistic_locking, prevent_increase: true
     lv = @o.timestamp
     nlv = @o.timestamp = @o.timestamp.succ
     @o.timestamp.must_equal lv

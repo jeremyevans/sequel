@@ -21,11 +21,13 @@ module Sequel
     # optimistic locking.  The disadvantage is that testing can be
     # more difficult if you are modifying the underlying row between
     # when a model is retrieved and when it is saved.
-    #
-    # By default, the plugin allows using the lock column setter method to
-    # either increase or decrease the lock column value. To prevent increases,
+
+    # By default, the plugin allows using the +xmin=+ setter method to
+    # either increase or decrease the lock value. To prevent increases,
     # which could potentially be used to skip an update when it update should
-    # be made, you can use the +prevent_lock_column_increase!+ class method.
+    # be made, you can use the +:prevent_increase+ plugin argument:
+    #
+    #     plugin :pg_xmin_optimistic_locking, prevent_increase: true
     #
     # This plugin may not work with the class_table_inheritance plugin.
     #
@@ -34,7 +36,7 @@ module Sequel
       WILDCARD = LiteralString.new('*').freeze
       
       # Define the xmin column accessor
-      def self.apply(model)
+      def self.apply(model, prevent_increase: false)
         model.instance_exec do
           plugin(:optimistic_locking_base)
           @lock_column = :xmin
@@ -44,9 +46,11 @@ module Sequel
 
       # Update the dataset to append the xmin column if it is usable
       # and there is a dataset for the model.
-      def self.configure(model)
+      def self.configure(model, prevent_increase: false)
         model.instance_exec do
           set_dataset(@dataset) if @dataset
+          # SEQUEL6: Make prevent_increase true by default
+          prevent_lock_column_increase! if prevent_increase
         end
       end
 

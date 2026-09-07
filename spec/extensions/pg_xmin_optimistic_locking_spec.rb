@@ -47,8 +47,8 @@ pg_xmin_optimistic_locking_specs = Module.new do
     @o.xmin.must_equal lv
   end
 
-  it "should not allow increasing the xmin if prevent_lock_column_increase! is used" do
-    @c.prevent_lock_column_increase!
+  it "should not allow increasing the xmin if prevent_increase plugin argument is used" do
+    @c.plugin :pg_xmin_optimistic_locking, prevent_increase: true
     lv = @o.xmin
     nlv = @o.xmin += 1
     @o.xmin.must_equal lv

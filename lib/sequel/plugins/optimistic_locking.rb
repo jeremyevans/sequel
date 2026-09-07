@@ -23,7 +23,9 @@ module Sequel
     # By default, the plugin allows using the lock column setter method to
     # either increase or decrease the lock column value. To prevent increases,
     # which could potentially be used to skip an update when it update should
-    # be made, you can use the +prevent_lock_column_increase!+ class method.
+    # be made, you can use the +:prevent_increase+ plugin option:
+    #
+    #     plugin :optimistic_locking, prevent_increase: true
     #
     # This plugin relies on the instance_filters plugin.
     module OptimisticLocking
@@ -37,6 +39,8 @@ module Sequel
       # Set the lock column
       def self.configure(model, opts=OPTS)
         model.lock_column = opts[:lock_column] || model.lock_column || :lock_version
+        # SEQUEL6: Make prevent_increase true by default
+        model.send(:prevent_lock_column_increase!) if opts[:prevent_increase]
       end
 
       module InstanceMethods

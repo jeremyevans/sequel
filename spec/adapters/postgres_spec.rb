@@ -7072,7 +7072,7 @@ SQL
 end if DB.server_version >= 150000
 
 [true, false].each do |prevent_increase|
-  describe "pg_xmin_optimistic_locking plugin#{" with prevent_lock_column_increase!" if prevent_increase}" do
+  describe "pg_xmin_optimistic_locking plugin#{" with prevent_increase" if prevent_increase}" do
     before do
       @db = DB
       @db.create_table! :items do
@@ -7086,8 +7086,7 @@ end if DB.server_version >= 150000
 
     it "should not allow stale updates" do
       c = Class.new(Sequel::Model(:items))
-      c.plugin :pg_xmin_optimistic_locking
-      c.prevent_lock_column_increase! if prevent_increase
+      c.plugin :pg_xmin_optimistic_locking, prevent_increase: prevent_increase
       o = c.create(:name=>'test')
       o2 = c.first
       xmin = c.dataset.naked.get(:xmin)
@@ -7104,8 +7103,7 @@ end if DB.server_version >= 150000
 
     it "should work with subclasses" do
       c = Class.new(Sequel::Model)
-      c.plugin :pg_xmin_optimistic_locking
-      c.prevent_lock_column_increase! if prevent_increase
+      c.plugin :pg_xmin_optimistic_locking, prevent_increase: prevent_increase
       sc = c::Model(:items)
       o = sc.create(:name=>'test')
       o2 = sc.first
@@ -7122,8 +7120,7 @@ end if DB.server_version >= 150000
 
     it "should allow updates when xmin is not selected" do
       c = Class.new(Sequel::Model(:items))
-      c.plugin :pg_xmin_optimistic_locking
-      c.prevent_lock_column_increase! if prevent_increase
+      c.plugin :pg_xmin_optimistic_locking, prevent_increase: prevent_increase
       c.create(:name=>'test')
       o = c.select_all(:items).first
       o2 = c.first
@@ -7137,8 +7134,7 @@ end if DB.server_version >= 150000
 
     it "should not select xmin when selecting from subquery" do
       c = Class.new(Sequel::Model(@db[:items].from_self))
-      c.plugin :pg_xmin_optimistic_locking
-      c.prevent_lock_column_increase! if prevent_increase
+      c.plugin :pg_xmin_optimistic_locking, prevent_increase: prevent_increase
       @db[:items].insert(:name=>'test')
       c.first.values[:xmin].must_be_nil
     end
@@ -7147,8 +7143,7 @@ end if DB.server_version >= 150000
       begin
         @db.create_view(:items_view, @db[:items])
         c = Class.new(Sequel::Model(:items_view))
-        c.plugin :pg_xmin_optimistic_locking
-        c.prevent_lock_column_increase! if prevent_increase
+        c.plugin :pg_xmin_optimistic_locking, prevent_increase: prevent_increase
         @db[:items].insert(:name=>'test')
         c.first.values[:xmin].must_be_nil
       ensure

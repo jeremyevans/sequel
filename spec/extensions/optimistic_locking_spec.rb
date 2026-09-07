@@ -71,8 +71,8 @@ describe "optimistic_locking plugin" do
     p.lock_version.must_equal lv
   end
 
-  it "should not allow increasing the lock version if prevent_lock_column_increase! is used" do
-    @c.prevent_lock_column_increase!
+  it "should not allow increasing the lock version if :prevent_increase option is used" do
+    @c.plugin :optimistic_locking, prevent_increase: true
     p = @c[1]
     lv = p.lock_version
     nlv = p.lock_version += 1

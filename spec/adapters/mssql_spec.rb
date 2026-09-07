@@ -847,10 +847,9 @@ describe "MSSQL optimistic locking plugin" do
   end
 
   [true, false].each do |prevent_increase|
-    it "should not allow stale updates#{" with prevent_lock_column_increase!" if prevent_increase}" do
+    it "should not allow stale updates#{" with prevent_increase" if prevent_increase}" do
       c = Class.new(Sequel::Model(:items))
-      c.plugin :mssql_optimistic_locking
-      c.prevent_lock_column_increase! if prevent_increase
+      c.plugin :mssql_optimistic_locking, prevent_increase: prevent_increase
       o = c.create(:name=>'test')
       o2 = c.first
       ts = o.timestamp
