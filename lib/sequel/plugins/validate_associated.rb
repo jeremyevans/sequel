@@ -43,6 +43,12 @@ module Sequel
       module InstanceMethods
         private
 
+        # Whether the associated object is valid. By default, the same as calling
+        # +valid?+ on the object, but exists so it can be overridden.
+        def associated_object_valid?(obj)
+          obj.valid?
+        end
+
         # Delay validating the associated object until validating the current object.
         def delay_validate_associated_object(reflection, obj)
           after_validation_hook{validate_associated_object(reflection, obj)}
@@ -62,7 +68,7 @@ module Sequel
             end
           end
 
-          unless obj.valid?
+          unless associated_object_valid?(obj)
             if ignore_key_errors
               # Ignore errors on the key column in the associated object. This column
               # will be set when saving to a presumably valid value using a column

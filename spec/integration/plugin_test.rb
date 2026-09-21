@@ -3506,3 +3506,51 @@ describe "select_on_skipped_update plugin" do
     proc{@p.save_changes}.must_raise Sequel::NoMatchingRow
   end 
 end
+
+describe "validate_associated_context plugin" do
+  before(:all) do
+    @db = DB
+    @db.drop_table?(:vac_albums, :vac_artists)
+    @db.create_table(:vac_artists) do
+      primary_key :id
+      String :name
+    end
+    @db.create_table(:vac_albums) do
+      primary_key :id
+      foreign_key :artist_id, :vac_artists
+      String :name
+    end
+  end
+  before do
+    @Album = Class.new(Sequel::Model(@db[:vac_albums])) do
+      plugin :validation_contexts
+
+      def validate
+        super
+        errors.add(:name, 'is b') if name == 'b' && validation_context == :foo
+      end
+    end
+    @Artist = Class.new(Sequel::Model(@db[:vac_artists]))
+    @Artist.plugin :validate_associated_context
+    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
+  end
+  after do
+    @db[:vac_albums].delete
+    @db[:vac_artists].delete
+  end
+  after(:all) do
+    @db.drop_table?(:vac_albums, :vac_artists)
+  end
+
+  it "should use the validation context of the current object when validating associated objects" do
+    artist = @Artist.new(:name=>'a')
+    artist.send(:delay_validate_associated_object, @Artist.association_reflection(:albums), @Album.new(:name=>'b'))
+    proc{artist.save(:validation_context=>:foo)}.must_raise Sequel::ValidationFailed
+    @db[:vac_artists].count.must_equal 0
+
+    artist = @Artist.new(:name=>'a')
+    artist.send(:delay_validate_associated_object, @Artist.association_reflection(:albums), @Album.new(:name=>'b'))
+    artist.save(:validation_context=>:bar)
+    @db[:vac_artists].count.must_equal 1
+  end
+end
