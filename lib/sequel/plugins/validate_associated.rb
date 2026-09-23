@@ -45,7 +45,7 @@ module Sequel
 
         # Whether the associated object is valid. By default, the same as calling
         # +valid?+ on the object, but exists so it can be overridden.
-        def associated_object_valid?(obj)
+        def associated_object_valid?(reflection, obj)
           obj.valid?
         end
 
@@ -68,7 +68,7 @@ module Sequel
             end
           end
 
-          unless associated_object_valid?(obj)
+          unless associated_object_valid?(reflection, obj)
             if ignore_key_errors
               # Ignore errors on the key column in the associated object. This column
               # will be set when saving to a presumably valid value using a column

@@ -33,6 +33,7 @@ describe "validate_associated_context plugin" do
     artist = @Artist.new(:name=>'a')
     album = @Album.new(:name=>'b')
     artist.send(:delay_validate_associated_object, @reflection, album)
+    artist.valid?.must_equal true
     artist.valid?(:validation_context=>:foo).must_equal false
     artist.errors[:albums].must_equal ["name is b"]
   end
@@ -56,5 +57,30 @@ describe "validate_associated_context plugin" do
     @album.valid?.must_equal true
     @album.valid?(:validation_context=>:foo).must_equal false
     @album.errors[:artist].must_equal ["name is a"]
+  end
+
+  it "should work if the associated object does not use validation_contexts plugin" do
+    _Album = Class.new(@c) do
+      set_dataset(:albums)
+      columns :id, :name, :artist_id
+      def validate
+        super
+        errors.add(:name, 'is b') if name == 'b'
+      end
+    end
+    @Artist.one_to_many :albums, :class=>_Album, :key=>:artist_id
+    reflection = @Artist.association_reflection(:albums)
+
+    album = _Album.load(:id=>2, :name=>'b', :artist_id=>1)
+    @artist.send(:delay_validate_associated_object, @Artist.association_reflection(:albums), album)
+    @artist.valid?.must_equal false
+    @artist.errors[:albums].must_equal ["name is b"]
+    @artist.valid?(:validation_context=>:foo).must_equal false
+    @artist.errors[:albums].must_equal ["name is b"]
+
+    album.name = 'c'
+    @artist.send(:delay_validate_associated_object, @Artist.association_reflection(:albums), album)
+    @artist.valid?.must_equal true
+    @artist.valid?(:validation_context=>:foo).must_equal true
   end
 end

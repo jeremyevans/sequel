@@ -1,5 +1,7 @@
 === master
 
+* Add validate_associated_context plugin for integrating validate_associated and validation_contexts plugins (sterlzbd, jeremyevans) (#2392)
+
 * Support amalgalite 2 in the amalgalite adapter (jeremyevans)
 
 * Recognize an additional lock timeout error in the trilogy adapter (jeremyevans)

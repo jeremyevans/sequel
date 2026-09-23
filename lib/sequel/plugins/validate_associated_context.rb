@@ -43,7 +43,7 @@ module Sequel
 
         # Whether the associated object is valid, using the validation context
         # of the current object.
-        def associated_object_valid?(obj)
+        def associated_object_valid?(reflection, obj)
           obj.valid?(:validation_context=>validation_context)
         end
       end
