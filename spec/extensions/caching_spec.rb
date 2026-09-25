@@ -43,7 +43,6 @@ describe Sequel::Model, "caching" do
       
       columns :name, :id
     end
-   
     
     @c2 = Class.new(@c) do
       def self.name; 'SubItem' end
@@ -143,6 +142,11 @@ describe Sequel::Model, "caching" do
     proc {m.cache_key}.must_raise(Sequel::Error)
     m.values[:id] = 1
     m.cache_key
+
+    @c.set_primary_key [:a, :b]
+    m = @c.new
+    m.values[:a] = 123
+    proc {m.cache_key}.must_raise(Sequel::Error)
   end
   
   it "should not raise error if trying to save a new record" do
