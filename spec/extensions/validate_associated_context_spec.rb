@@ -41,6 +41,7 @@ describe "validate_associated_context plugin" do
   it "should use the validation context when validate_associated_object is called in validate" do
     @Album.many_to_one :artist, :class=>@Artist, :key=>:artist_id
     @Album.class_eval do
+      remove_method :validate
       def validate
         super
         validate_associated_object(model.association_reflection(:artist), artist) if artist
@@ -69,7 +70,6 @@ describe "validate_associated_context plugin" do
       end
     end
     @Artist.one_to_many :albums, :class=>_Album, :key=>:artist_id
-    reflection = @Artist.association_reflection(:albums)
 
     album = _Album.load(:id=>2, :name=>'b', :artist_id=>1)
     @artist.send(:delay_validate_associated_object, @Artist.association_reflection(:albums), album)
