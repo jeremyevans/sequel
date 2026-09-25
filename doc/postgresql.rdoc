@@ -268,36 +268,48 @@ Sequel has built in support for creating and dropping PostgreSQL schemas, proced
 
 However, you may want to consider just use <tt>Database#run</tt> with the necessary SQL code, at least for functions and triggers.
 
-=== Creating/Altering/Dropping Property Graphs (PostgreSQL 19+)
+=== Parsing Check Constraints
 
-Sequel supports +create_property_graph+, +alter_property_graph+, +rename_property_graph+, +set_property_graph_schema+, and +drop_property_graph+ for creating, altering, and dropping property graphs:
+Sequel has support for parsing CHECK constraints on PostgreSQL using <tt>Sequel::Database#check_constraints</tt>:
 
-  DB.create_property_graph(:g) do
-    vertex :people
-    vertex :companies
-
-    edge :employment do
-      source :people
-      destination :companies
-    end
+  DB.create_table(:foo) do
+    Integer :i
+    Integer :j
+    constraint(:ic, Sequel[:i] > 2)
+    constraint(:jc, Sequel[:j] > 2)
+    constraint(:ijc, Sequel[:i] - Sequel[:j] > 2)
   end
-  # CREATE PROPERTY GRAPH g
-  #   VERTEX TABLES (people, companies)
-  #   EDGE TABLES (employment SOURCE people DESTINATION companies)
+  DB.check_constraints(:foo)
+  # => {
+  #  :ic=>{:definition=>"CHECK ((i > 2))", :columns=>[:i]},
+  #  :jc=>{:definition=>"CHECK ((j > 2))", :columns=>[:j]},
+  #  :ijc=>{:definition=>"CHECK (((i - j) > 2))", :columns=>[:i, :j]}
+  # }
 
-  DB.alter_property_graph(:g) do
-    add_vertex :v
+=== Parsing Foreign Key Constraints Referencing A Given Table
+
+Sequel has support for parsing FOREIGN KEY constraints that reference a given table, using the +:reverse+
+option to +foreign_key_list+:
+
+  DB.create_table!(:a) do
+    primary_key :id
+    Integer :i
+    Integer :j
+    foreign_key :a_id, :a, foreign_key_constraint_name: :a_a
+    unique [:i, :j]
   end
-  # ALTER PROPERTY GRAPH g ADD VERTEX TABLES (v)
-
-  DB.rename_property_graph(:g, :g2)
-  # ALTER PROPERTY GRAPH g RENAME TO g2
-
-  DB.set_property_graph_schema(:g2, :other_schema, if_exists: true)
-  # ALTER PROPERTY GRAPH IF EXISTS g2 SET SCHEMA other_schema
-
-  DB.drop_property_graph(Sequel[:other_schema][:g2])
-  # DROP PROPERTY GRAPH other_schema.g2
+  DB.create_table!(:b) do
+    foreign_key :a_id, :a, foreign_key_constraint_name: :a_a
+    Integer :c
+    Integer :d
+    foreign_key [:c, :d], :a, key: [:j, :i], name: :a_c_d
+  end
+  DB.foreign_key_list(:a, reverse: true)
+  # => [
+  #  {:name=>:a_a, :columns=>[:a_id], :key=>[:id], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:a, :schema=>:public},
+  #  {:name=>:a_a, :columns=>[:a_id], :key=>[:id], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:b, :schema=>:public},
+  #  {:name=>:a_c_d, :columns=>[:c, :d], :key=>[:j, :i], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:b, :schema=>:public}
+  # ]
 
 == PostgreSQL-specific DML Support
 
@@ -541,23 +553,6 @@ handle locking:
   # INSERT INTO "table" ("id") VALUES (2) RETURNING NULL;
   # COMMIT;
 
-=== GRAPH_TABLE support (PostgreSQL 19+)
-
-+graph_table+ is supported on PostgreSQL Database objects. It returns a
-Sequel::PropertyGraph::Table object that uses a method chaining approach to
-build the GRAPH_TABLE expression, similarly to how Datasets are created via
-method chaining:
-
-  gt = DB.graph_table(:graph, :companies, var: :c).
-    from(:works_at, var: :w).
-    link(:people, var: :p, where: {Sequel[:p][:name] => 'Alice'}).
-    columns(Sequel[:p][:name].as(:person_name), Sequel[:w][:role].as(:role))
-  DB.from(gt).sql
-  # SELECT * FROM GRAPH_TABLE (graph
-  #   MATCH (c IS companies)<-[w IS works_at]-(p IS people WHERE (p.name = 'Alice'))
-  #   COLUMNS (p.name AS person_name, w.role AS role)
-  # )
-
 == PostgreSQL-specific reflection Support
 
 === Additional Index Support
@@ -610,13 +605,6 @@ option to +foreign_key_list+:
   #  {:name=>:a_a, :columns=>[:a_id], :key=>[:id], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:b, :schema=>:public},
   #  {:name=>:a_c_d, :columns=>[:c, :d], :key=>[:j, :i], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:b, :schema=>:public}
   # ]
-
-=== Listing Property Graphs
-
-You can get a array of the Database's property graphs using the +property_graphs+ method:
-
-  DB.property_graphs
-  # => [:property_graph_name_1, :property_graph_name_2]
 
 == Extended Error Info (<tt>postgres/pg only</tt>)
 
