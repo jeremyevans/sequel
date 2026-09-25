@@ -1,5 +1,9 @@
 === master
 
+* Revert support for PostgreSQL 19 property graphs (jeremyevans)
+
+* Revert support for PostgreSQL 19 UPDATE/DELETE FOR PORTION OF (jeremyevans)
+
 * Add validate_associated_context plugin for integrating validate_associated and validation_contexts plugins (sterlzbd, jeremyevans) (#2392)
 
 * Support amalgalite 2 in the amalgalite adapter (jeremyevans)
