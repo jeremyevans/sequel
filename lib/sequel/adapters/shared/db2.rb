@@ -190,6 +190,9 @@ module Sequel
       # creating the table, since it is not possible to do it in one step.
       def create_table_as(name, sql, options)
         super
+        if options[:temp]
+          name = Sequel.qualify(:session, name)
+        end
         from(name).insert(sql.is_a?(Dataset) ? sql : dataset.with_sql(sql))
       end
 

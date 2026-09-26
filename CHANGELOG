@@ -1,6 +1,6 @@
 === master
 
-* Make create_table with :temp and :as options create temporary table on Microsoft SQL Server (jeremyevans) (#2393)
+* Make create_table with :temp and :as options create temporary table on Microsoft SQL Server and DB2 (jeremyevans) (#2393)
 
 * Revert support for PostgreSQL 19 property graphs (jeremyevans)
 
