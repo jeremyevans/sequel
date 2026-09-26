@@ -400,6 +400,9 @@ module Sequel
       # Error if a string is given.
       def create_table_as(name, ds, options)
         raise(Error, "must provide dataset instance as value of create_table :as option on MSSQL") unless ds.is_a?(Sequel::Dataset)
+        if options[:temp]
+          name = create_table_temp_table_name_sql(name, options)
+        end
         run(ds.into(name).sql.freeze)
       end
     

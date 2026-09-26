@@ -393,17 +393,27 @@ describe "Database" do
   end
 
   it "should allow creation and use of temporary tables" do
+    table_name = lambda do |name|
+      case DB.database_type
+      when :mssql
+        Sequel.lit("##{name}")
+      when :derby, :db2
+        Sequel[:session][name]
+      else
+        name
+      end
+    end
+
     DB.synchronize do
       DB.create_table!(:items_temp, :temp=>true){Integer :number}
-      table = case DB.database_type
-      when :mssql
-        Sequel.lit("#items_temp")
-      when :derby, :db2
-        Sequel[:session][:items_temp]
-      else
-        :items_temp
+      ds = DB.from(table_name.call(:items_temp))
+      ds.all.must_equal []
+
+      # Derby does not support creating temporary tables from a query
+      if DB.database_type != :derby
+        DB.create_table!(:items_temp2, :temp=>true, as: ds)
+        DB.from(table_name.call(:items_temp2)).all.must_equal []
       end
-      DB.from(table).all.must_equal []
     end
   end
 

@@ -1,5 +1,7 @@
 === master
 
+* Make create_table with :temp and :as options create temporary table on Microsoft SQL Server (jeremyevans) (#2393)
+
 * Revert support for PostgreSQL 19 property graphs (jeremyevans)
 
 * Revert support for PostgreSQL 19 UPDATE/DELETE FOR PORTION OF (jeremyevans)
