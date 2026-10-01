@@ -182,29 +182,36 @@ Sequel::JDBC::Postgres::DatabaseMethods
 <span class="line-num"> 75</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">copy_table</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
 <span class="line-num"> 76</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>
 <span class="line-num"> 77</span>     <span class="ruby-identifier">copy_manager</span> = <span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">OrgPostgresqlCopy</span><span class="ruby-operator">::</span><span class="ruby-constant">CopyManager</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">conn</span>)
-<span class="line-num"> 78</span>     <span class="ruby-identifier">copier</span> = <span class="ruby-identifier">copy_manager</span>.<span class="ruby-identifier">copy_out</span>(<span class="ruby-identifier">copy_table_sql</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>))
-<span class="line-num"> 79</span>     <span class="ruby-keyword">begin</span>
-<span class="line-num"> 80</span>       <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
-<span class="line-num"> 81</span>         <span class="ruby-keyword">while</span> <span class="ruby-identifier">buf</span> = <span class="ruby-identifier">copier</span>.<span class="ruby-identifier">readFromCopy</span>
-<span class="line-num"> 82</span>           <span class="ruby-keyword">yield</span>(<span class="ruby-constant">String</span>.<span class="ruby-identifier">from_java_bytes</span>(<span class="ruby-identifier">buf</span>))
-<span class="line-num"> 83</span>         <span class="ruby-keyword">end</span>
-<span class="line-num"> 84</span>         <span class="ruby-keyword">nil</span>
-<span class="line-num"> 85</span>       <span class="ruby-keyword">else</span>
-<span class="line-num"> 86</span>         <span class="ruby-identifier">b</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>
-<span class="line-num"> 87</span>         <span class="ruby-keyword">while</span> <span class="ruby-identifier">buf</span> = <span class="ruby-identifier">copier</span>.<span class="ruby-identifier">readFromCopy</span>
-<span class="line-num"> 88</span>           <span class="ruby-identifier">b</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">String</span>.<span class="ruby-identifier">from_java_bytes</span>(<span class="ruby-identifier">buf</span>)
-<span class="line-num"> 89</span>         <span class="ruby-keyword">end</span>
-<span class="line-num"> 90</span>         <span class="ruby-identifier">b</span>
-<span class="line-num"> 91</span>       <span class="ruby-keyword">end</span>
-<span class="line-num"> 92</span>     <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
-<span class="line-num"> 93</span>       <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>, <span class="ruby-value">:disconnect</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
-<span class="line-num"> 94</span>     <span class="ruby-keyword">ensure</span>
-<span class="line-num"> 95</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">buf</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">e</span>
-<span class="line-num"> 96</span>         <span class="ruby-identifier">raise</span> <span class="ruby-constant">DatabaseDisconnectError</span>, <span class="ruby-string">&quot;disconnecting as a partial COPY may leave the connection in an unusable state&quot;</span>
-<span class="line-num"> 97</span>       <span class="ruby-keyword">end</span>
-<span class="line-num"> 98</span>     <span class="ruby-keyword">end</span>
-<span class="line-num"> 99</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">100</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num"> 78</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">copy_table_sql</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num"> 79</span> 
+<span class="line-num"> 80</span>     <span class="ruby-keyword">begin</span>
+<span class="line-num"> 81</span>       <span class="ruby-identifier">copier</span> = <span class="ruby-identifier">copy_manager</span>.<span class="ruby-identifier">copy_out</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num"> 82</span>     <span class="ruby-keyword">rescue</span> <span class="ruby-operator">*</span><span class="ruby-constant">DATABASE_ERROR_CLASSES</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+<span class="line-num"> 83</span>       <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>)
+<span class="line-num"> 84</span>     <span class="ruby-keyword">end</span>
+<span class="line-num"> 85</span>       
+<span class="line-num"> 86</span>     <span class="ruby-keyword">begin</span>
+<span class="line-num"> 87</span>       <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
+<span class="line-num"> 88</span>         <span class="ruby-keyword">while</span> <span class="ruby-identifier">buf</span> = <span class="ruby-identifier">copier</span>.<span class="ruby-identifier">readFromCopy</span>
+<span class="line-num"> 89</span>           <span class="ruby-keyword">yield</span>(<span class="ruby-constant">String</span>.<span class="ruby-identifier">from_java_bytes</span>(<span class="ruby-identifier">buf</span>))
+<span class="line-num"> 90</span>         <span class="ruby-keyword">end</span>
+<span class="line-num"> 91</span>         <span class="ruby-keyword">nil</span>
+<span class="line-num"> 92</span>       <span class="ruby-keyword">else</span>
+<span class="line-num"> 93</span>         <span class="ruby-identifier">b</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>
+<span class="line-num"> 94</span>         <span class="ruby-keyword">while</span> <span class="ruby-identifier">buf</span> = <span class="ruby-identifier">copier</span>.<span class="ruby-identifier">readFromCopy</span>
+<span class="line-num"> 95</span>           <span class="ruby-identifier">b</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">String</span>.<span class="ruby-identifier">from_java_bytes</span>(<span class="ruby-identifier">buf</span>)
+<span class="line-num"> 96</span>         <span class="ruby-keyword">end</span>
+<span class="line-num"> 97</span>         <span class="ruby-identifier">b</span>
+<span class="line-num"> 98</span>       <span class="ruby-keyword">end</span>
+<span class="line-num"> 99</span>     <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+<span class="line-num">100</span>       <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>, <span class="ruby-value">:disconnect</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">101</span>     <span class="ruby-keyword">ensure</span>
+<span class="line-num">102</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">buf</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">e</span>
+<span class="line-num">103</span>         <span class="ruby-identifier">raise</span> <span class="ruby-constant">DatabaseDisconnectError</span>, <span class="ruby-string">&quot;disconnecting as a partial COPY may leave the connection in an unusable state&quot;</span>
+<span class="line-num">104</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">105</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">106</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">107</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-oid_convertor_proc'>
@@ -221,21 +228,21 @@ Sequel::JDBC::Postgres::DatabaseMethods
 [show source]
 </a>
 <pre id='method-i-oid_convertor_proc-source'>    <span class="ruby-comment"># File lib/sequel/adapters/jdbc/postgresql.rb</span>
-<span class="line-num">102</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">oid_convertor_proc</span>(<span class="ruby-identifier">oid</span>)
-<span class="line-num">103</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">conv</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@oid_convertor_map</span>[<span class="ruby-identifier">oid</span>]}).<span class="ruby-identifier">nil?</span>
-<span class="line-num">104</span>     <span class="ruby-identifier">conv</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">conversion_procs</span>[<span class="ruby-identifier">oid</span>]
-<span class="line-num">105</span>       <span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span><span class="ruby-operator">|</span>
-<span class="line-num">106</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getString</span>(<span class="ruby-identifier">i</span>)
-<span class="line-num">107</span>           <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">108</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">109</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">110</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">111</span>       <span class="ruby-keyword">false</span>
-<span class="line-num">112</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">113</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@oid_convertor_map</span>[<span class="ruby-identifier">oid</span>] = <span class="ruby-identifier">conv</span>}
-<span class="line-num">114</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">115</span>   <span class="ruby-identifier">conv</span>
-<span class="line-num">116</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">109</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">oid_convertor_proc</span>(<span class="ruby-identifier">oid</span>)
+<span class="line-num">110</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">conv</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@oid_convertor_map</span>[<span class="ruby-identifier">oid</span>]}).<span class="ruby-identifier">nil?</span>
+<span class="line-num">111</span>     <span class="ruby-identifier">conv</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">conversion_procs</span>[<span class="ruby-identifier">oid</span>]
+<span class="line-num">112</span>       <span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span><span class="ruby-operator">|</span>
+<span class="line-num">113</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getString</span>(<span class="ruby-identifier">i</span>)
+<span class="line-num">114</span>           <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">115</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">116</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">117</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">118</span>       <span class="ruby-keyword">false</span>
+<span class="line-num">119</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">120</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@oid_convertor_map</span>[<span class="ruby-identifier">oid</span>] = <span class="ruby-identifier">conv</span>}
+<span class="line-num">121</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">122</span>   <span class="ruby-identifier">conv</span>
+<span class="line-num">123</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -42,7 +42,24 @@ Sequel::SymbolAref
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>simplecov:enable</p>
+<p>The <a href="../../files/lib/sequel/extensions/symbol_aref_rb.html">symbol_aref</a> extension makes Symbol#[] support <a href="../Symbol.html"><code>Symbol</code></a>, Sequel::SQL::Identifier, and Sequel::SQL::QualifiedIdentifier instances, returning appropriate Sequel::SQL::QualifiedIdentifier instances.  It’s designed as a shortcut so that instead of:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>] <span class="ruby-comment"># table.column</span>
+</pre>
+
+<p>you can just write:</p>
+
+<pre class="ruby"><span class="ruby-value">:table</span>[<span class="ruby-value">:column</span>] <span class="ruby-comment"># table.column</span>
+</pre>
+
+<p>To load the extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:symbol_aref</span>
+</pre>
+
+<p>There is a refinement version of this in the <a href="../../files/lib/sequel/extensions/symbol_aref_refinement_rb.html">symbol_aref_refinement</a> extension.</p>
+
+<p>Related module: <a href="SymbolAref.html"><code>Sequel::SymbolAref</code></a></p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -70,14 +87,14 @@ Sequel::SymbolAref
 [show source]
 </a>
 <pre id='method-i-5B-5D-source'>   <span class="ruby-comment"># File lib/sequel/extensions/symbol_aref.rb</span>
-<span class="line-num">25</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">26</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
-<span class="line-num">27</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>
-<span class="line-num">28</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">v</span>)
-<span class="line-num">29</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">30</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">31</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">32</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">23</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">24</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
+<span class="line-num">25</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>
+<span class="line-num">26</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">v</span>)
+<span class="line-num">27</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">28</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">29</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

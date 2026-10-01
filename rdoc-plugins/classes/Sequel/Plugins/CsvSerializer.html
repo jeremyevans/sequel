@@ -100,6 +100,7 @@ Sequel::Plugins::CsvSerializer
 <h3>Public Class</h3>
 <ol>
 <li><a href="#method-c-configure">configure</a></li>
+<li><a href="#method-c-csv_call">csv_call</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -136,6 +137,28 @@ Sequel::Plugins::CsvSerializer
 <span class="line-num">72</span>     <span class="ruby-ivar">@csv_serializer_opts</span> = (<span class="ruby-ivar">@csv_serializer_opts</span> <span class="ruby-operator">||</span> <span class="ruby-constant">OPTS</span>).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)
 <span class="line-num">73</span>   <span class="ruby-keyword">end</span>
 <span class="line-num">74</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-class' id='method-method-c-csv_call'>
+<a name='method-c-csv_call'></a>
+<div class='synopsis'>
+<span class='name'>csv_call</span><span class='arguments'>(*args, opts, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>simplecov:disable</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-csv_call-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-csv_call-source'>   <span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb</span>
+<span class="line-num">77</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">csv_call</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">78</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Plugins::CsvSerializer.csv_call will be removed in Sequel 6.&quot;</span>)
+<span class="line-num">79</span>   <span class="ruby-constant">CSV</span>.<span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">**</span><span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">80</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

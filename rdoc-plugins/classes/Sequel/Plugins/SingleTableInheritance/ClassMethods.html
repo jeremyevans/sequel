@@ -134,13 +134,13 @@ Sequel::Plugins::SingleTableInheritance::ClassMethods
 [show source]
 </a>
 <pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb</span>
-<span class="line-num">158</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
-<span class="line-num">159</span>   <span class="ruby-ivar">@sti_key_array</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@sti_key_array</span>
-<span class="line-num">160</span>   <span class="ruby-ivar">@sti_key_map</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@sti_key_map</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)
-<span class="line-num">161</span>   <span class="ruby-ivar">@sti_model_map</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@sti_model_map</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)
-<span class="line-num">162</span> 
-<span class="line-num">163</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">164</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">164</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">165</span>   <span class="ruby-ivar">@sti_key_array</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@sti_key_array</span>
+<span class="line-num">166</span>   <span class="ruby-ivar">@sti_key_map</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@sti_key_map</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)
+<span class="line-num">167</span>   <span class="ruby-ivar">@sti_model_map</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@sti_model_map</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)
+<span class="line-num">168</span> 
+<span class="line-num">169</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">170</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sti_class_from_sti_key'>
@@ -159,9 +159,9 @@ Sequel::Plugins::SingleTableInheritance::ClassMethods
 [show source]
 </a>
 <pre id='method-i-sti_class_from_sti_key-source'>    <span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb</span>
-<span class="line-num">173</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sti_class_from_sti_key</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">174</span>   <span class="ruby-identifier">sti_class</span>(<span class="ruby-identifier">sti_model_map</span>[<span class="ruby-identifier">key</span>])
-<span class="line-num">175</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">179</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sti_class_from_sti_key</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">180</span>   <span class="ruby-identifier">sti_class</span>(<span class="ruby-identifier">sti_model_map</span>[<span class="ruby-identifier">key</span>])
+<span class="line-num">181</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sti_load'>
@@ -180,9 +180,9 @@ Sequel::Plugins::SingleTableInheritance::ClassMethods
 [show source]
 </a>
 <pre id='method-i-sti_load-source'>    <span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb</span>
-<span class="line-num">168</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sti_load</span>(<span class="ruby-identifier">r</span>)
-<span class="line-num">169</span>   <span class="ruby-identifier">sti_class_from_sti_key</span>(<span class="ruby-identifier">r</span>[<span class="ruby-identifier">sti_key</span>]).<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>)
-<span class="line-num">170</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">174</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sti_load</span>(<span class="ruby-identifier">r</span>)
+<span class="line-num">175</span>   <span class="ruby-identifier">sti_class_from_sti_key</span>(<span class="ruby-identifier">r</span>[<span class="ruby-identifier">sti_key</span>]).<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>)
+<span class="line-num">176</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sti_subclass_added'>
@@ -201,13 +201,13 @@ Sequel::Plugins::SingleTableInheritance::ClassMethods
 [show source]
 </a>
 <pre id='method-i-sti_subclass_added-source'>    <span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb</span>
-<span class="line-num">179</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sti_subclass_added</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">180</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sti_key_array</span>
-<span class="line-num">181</span>     <span class="ruby-identifier">key_array</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">182</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">sti_key_array</span>.<span class="ruby-identifier">push</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_array</span>)}
-<span class="line-num">183</span>     <span class="ruby-identifier">superclass</span>.<span class="ruby-identifier">sti_subclass_added</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">184</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">185</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">185</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sti_subclass_added</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">186</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sti_key_array</span>
+<span class="line-num">187</span>     <span class="ruby-identifier">key_array</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">188</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">sti_key_array</span>.<span class="ruby-identifier">push</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_array</span>)}
+<span class="line-num">189</span>     <span class="ruby-identifier">superclass</span>.<span class="ruby-identifier">sti_subclass_added</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">190</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">191</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

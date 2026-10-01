@@ -59,7 +59,7 @@ Sequel::NamedTimezones
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>BROKEN_TIME_AT_WITH_NSEC</td>
 <td>=</td>
-<td class='context-item-value'>defined?(JRUBY_VERSION) && (JRUBY_VERSION < '9.3' || (JRUBY_VERSION < '9.4' && JRUBY_VERSION.split('.')[2].to_i < 9))</td>
+<td class='context-item-value'>defined?(JRUBY_VERSION) && (JRUBY_VERSION.to_r < Rational('9.3') || (JRUBY_VERSION.to_r < Rational('9.4') && JRUBY_VERSION.split('.')[2].to_i < 9))</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
 <p>Whether Time.at with :nsec and :in is broken.  True on JRuby &lt; 9.3.9.0.</p>

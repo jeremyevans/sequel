@@ -44,6 +44,7 @@ Sequel::Plugins::InstanceFilters::InstanceMethods
 <li><a href="#method-i-after_update">after_update</a></li>
 <li><a href="#method-i-freeze">freeze</a></li>
 <li><a href="#method-i-instance_filter">instance_filter</a></li>
+<li><a href="#method-i-save_changes">save_changes</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -136,6 +137,29 @@ Sequel::Plugins::InstanceFilters::InstanceMethods
 <span class="line-num">79</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">instance_filter</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
 <span class="line-num">80</span>   <span class="ruby-identifier">instance_filters</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">args</span>, <span class="ruby-identifier">block</span>]
 <span class="line-num">81</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-save_changes'>
+<a name='method-i-save_changes'></a>
+<div class='synopsis'>
+<span class='name'>save_changes</span><span class='arguments'>(opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Clear instance filters when saving changes even if the object wasn’t modified.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-save_changes-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-save_changes-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb</span>
+<span class="line-num">85</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">save_changes</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">86</span>   <span class="ruby-identifier">ret</span> = <span class="ruby-keyword">super</span>
+<span class="line-num">87</span>   <span class="ruby-identifier">clear_instance_filters</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">ret</span>.<span class="ruby-identifier">nil?</span>
+<span class="line-num">88</span>   <span class="ruby-identifier">ret</span>
+<span class="line-num">89</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

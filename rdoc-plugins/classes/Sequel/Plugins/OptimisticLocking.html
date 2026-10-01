@@ -52,6 +52,11 @@ Sequel::Plugins::OptimisticLocking
 <pre class="ruby"><span class="ruby-identifier">plugin</span> <span class="ruby-value">:optimistic_locking</span>, <span class="ruby-value">lock_column:</span> <span class="ruby-value">:version</span>
 </pre>
 
+<p>By default, the plugin allows using the lock column setter method to either increase or decrease the lock column value. To prevent increases, which could potentially be used to skip an update when it update should be made, you can use the <code>:prevent_increase</code> plugin option:</p>
+
+<pre class="ruby"><span class="ruby-identifier">plugin</span> <span class="ruby-value">:optimistic_locking</span>, <span class="ruby-value">prevent_increase:</span> <span class="ruby-keyword">true</span>
+</pre>
+
 <p>This plugin relies on the <a href="../../../files/lib/sequel/plugins/instance_filters_rb.html">instance_filters</a> plugin.</p>
 </div>
 <div id='method-list'>
@@ -103,9 +108,9 @@ Sequel::Plugins::OptimisticLocking
 [show source]
 </a>
 <pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/optimistic_locking.rb</span>
-<span class="line-num">28</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">29</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:optimistic_locking_base</span>)
-<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">35</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">36</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:optimistic_locking_base</span>)
+<span class="line-num">37</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-configure'>
@@ -124,9 +129,11 @@ Sequel::Plugins::OptimisticLocking
 [show source]
 </a>
 <pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/optimistic_locking.rb</span>
-<span class="line-num">33</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">34</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lock_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:lock_column</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lock_column</span> <span class="ruby-operator">||</span> <span class="ruby-value">:lock_version</span>
-<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">40</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">41</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lock_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:lock_column</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lock_column</span> <span class="ruby-operator">||</span> <span class="ruby-value">:lock_version</span>
+<span class="line-num">42</span>   <span class="ruby-comment"># SEQUEL6: Make prevent_increase true by default</span>
+<span class="line-num">43</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:prevent_lock_column_increase!</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:prevent_increase</span>]
+<span class="line-num">44</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

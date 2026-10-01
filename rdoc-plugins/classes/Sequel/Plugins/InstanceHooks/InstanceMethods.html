@@ -45,6 +45,7 @@ Sequel::Plugins::InstanceHooks::InstanceMethods
 <li><a href="#method-i-after_validation">after_validation</a></li>
 <li><a href="#method-i-before_destroy">before_destroy</a></li>
 <li><a href="#method-i-before_save">before_save</a></li>
+<li><a href="#method-i-save_changes">save_changes</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -171,6 +172,40 @@ Sequel::Plugins::InstanceHooks::InstanceMethods
 <span class="line-num">92</span>   <span class="ruby-identifier">run_before_instance_hooks</span>(<span class="ruby-value">:before_save</span>)
 <span class="line-num">93</span>   <span class="ruby-keyword">super</span>
 <span class="line-num">94</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-save_changes'>
+<a name='method-i-save_changes'></a>
+<div class='synopsis'>
+<span class='name'>save_changes</span><span class='arguments'>(opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Run and clear save/update/validation hooks when saving changes even if the object wasn’t modified.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-save_changes-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-save_changes-source'>    <span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb</span>
+<span class="line-num"> 98</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">save_changes</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num"> 99</span>   <span class="ruby-identifier">ret</span> = <span class="ruby-keyword">super</span>
+<span class="line-num">100</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">ret</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@instance_hooks</span>
+<span class="line-num">101</span>     <span class="ruby-identifier">run_before_instance_hooks</span>(<span class="ruby-value">:before_validation</span>)
+<span class="line-num">102</span>     <span class="ruby-identifier">run_before_instance_hooks</span>(<span class="ruby-value">:after_validation</span>)
+<span class="line-num">103</span>     <span class="ruby-identifier">run_before_instance_hooks</span>(<span class="ruby-value">:before_save</span>)
+<span class="line-num">104</span>     <span class="ruby-identifier">run_before_instance_hooks</span>(<span class="ruby-value">:before_update</span>)
+<span class="line-num">105</span>     <span class="ruby-identifier">ret</span> = <span class="ruby-keyword">super</span>
+<span class="line-num">106</span>     <span class="ruby-identifier">run_before_instance_hooks</span>(<span class="ruby-value">:after_update</span>)
+<span class="line-num">107</span>     <span class="ruby-identifier">run_before_instance_hooks</span>(<span class="ruby-value">:after_save</span>)
+<span class="line-num">108</span>     [<span class="ruby-value">:before_validation</span>, <span class="ruby-value">:after_validation</span>, <span class="ruby-value">:before_save</span>, <span class="ruby-value">:before_update</span>, <span class="ruby-value">:after_update</span>, <span class="ruby-value">:after_save</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">type</span><span class="ruby-operator">|</span>
+<span class="line-num">109</span>       <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">type</span>)
+<span class="line-num">110</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">111</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">112</span>   <span class="ruby-identifier">ret</span>
+<span class="line-num">113</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

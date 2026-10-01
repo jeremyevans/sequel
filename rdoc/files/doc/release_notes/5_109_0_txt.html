@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.109.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.109.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.109.0.txt
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
+<ul><li>
+<p>All optimistic locking plugins now support a prevent_increase plugin argument or option. If given, this prevents increasing the lock column value. In typical use (such as with HTML forms), it is desired to decrease the lock column value from the value when the request was submitted to the value when the form was generated. However, there is not a good reason for increasing the lock column value. For backwards compatibility, the option will default to false in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5. However, it will default to true in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 6.</p>
+</li><li>
+<p>A select_on_skipped_update plugin has been added, which runs a SELECT query to check for object existance if an UPDATE statement is skipped when saving an existing object. This can catch cases where the object was deleted between when it was retrieved and when it was saved.</p>
+</li><li>
+<p>A validate_associated_context plugin has been added, which integrates the validate_associated and validation_contexts plugins, passing the current validation context when validating associated objects.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now works with json gem version 3.</p>
+</li><li>
+<p>Dataset#first now avoids using an optimized code path if passed a negative integer as an argument, so it raises an error before attempting to execute a query. Previously, most adapters would have raised a DatabaseError, but SQLite would have interpreted the query as having no limit.</p>
+</li><li>
+<p>Sequel.extension now rejects ../ in extension names for security reasons. Previously, Sequel.extension could be abused to load arbitary Ruby files from anywhere in the file system.</p>
+</li><li>
+<p>The instance_filters and instance_hooks plugins now clear the instance filters/hooks if Model#save_changes skips an update as the object was not modified.  This makes behavior consistent. If Model#save_changes doesn’t raise or return a failure, the instance filters/hooks are cleared, regardless of whether a query was issued or it was skipped as it was unnecessary.</p>
+</li><li>
+<p>In the single_table_inheritance plugin, the sti_class class method now returns the root class of the inheritance hierarchy if the specified constant exists but it is not a descendant of the root class.</p>
+</li><li>
+<p>The caching plugin now supports a composite_cache_key class method that returns a string to use as the cache key. This should be overridden if you have a model class with a composite primary key where multiple columns in the primary key can contain a comma (since the default is to join all primary key column values with a comma).</p>
+</li><li>
+<p>The lit_require_frozen extension now treats a LiteralString as unsafe if it was based on a frozen literal string, but has been modified since.</p>
+</li><li>
+<p>The lit_require_frozen extension now modifies BooleanExpression.from_value_pair to not create a frozen copy of a string, to catch cases where a LiteralString based on a non-frozen string is used as the value of a hash filter.</p>
+</li><li>
+<p>The jdbc adapter now avoids a verbose mode warning about ::NativeException being deprecated on JRuby 10+. Additionally, the named_timezones extension and throw_failures plugin have been modified to work better on JRuby 10+.</p>
+</li><li>
+<p>The jdbc/postgresql adapter now correctly parses offsets in timestamptz values. It also includes the offset when using a DateTime instance as a bound variable value, fixing cases where the database timezone offset differs from the application’s.</p>
+</li><li>
+<p>The jdbc/sqlserver and jdbc/jtds adapters now use RETURN_GENERATED_KEYS for prepared statement inserts, instead of using @@IDENTITY, which fixes potential issues with trigger use (and possibly other cases).</p>
+</li><li>
+<p>Database exception classes are now converted to <a href="../../../classes/Sequel.html"><code>Sequel</code></a> exception classes when executing the COPY statement in Database#copy_table.</p>
+</li><li>
+<p>On Microsoft SQL Server, when Dataset#full_text_search is passed a terms argument that is an array or set, the elements of the terms argument are now quoted. Previously, if the terms argument contained user-provided data, the query could be modified to execute arbitrary full text search expressions (but not arbitary SQL).</p>
+</li><li>
+<p>On Microsoft SQL Server and DB2, calling Database#create_table with :temp and :as options now correctly creates a temporary table based on an existing dataset.</p>
+</li><li>
+<p>An additional lock timeout error is now recognized in the trilogy adapter.</p>
+</li><li>
+<p>The amalgalite adapter now suppots amalgalite 2.</p>
+</li><li>
+<p>In the pg_json_ops extension, identifiers used in PASSING clauses are now quoted. This fixes behavior with identifiers where quoting is required.</p>
+</li><li>
+<p>When using the schema_dumper extension to dump schema with the :same_db option on SQLite, database types will be quoted. This fixes an issue where running a migration dumped from a malicious SQLite database could result in SQL injection in the restored database.</p>
+</li><li>
+<p>The sqlite and jdbc adapters now clear prepared statement argument values after prepared statement execution.  On SQLite, the previous behavior could result in a prepared statement argument value being used in a subsequent execution if an argument value was not passed for that execution. This case is unlikely as you need to have a prepared statement that is called from multiple places with different sets of arguments (almost certainly a bug in the program).</p>
+</li><li>
+<p>The PostgreSQL array parser now raises an error if attempting to parse a PostgreSQL array with more than 6 dimensions. PostgreSQL limits array dimensions to a maximum of 6, so an attempt to parse more dimensions is indicative of an attack attempt.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
+<ul><li>
+<p>As announced in the <a href="5_108_0_txt.html">5.108.0</a> release notes, this version drops support for Ruby 1.9. The minimum supported Ruby version is now 2.0.</p>
+</li><li>
+<p>Support for arbitrary join types is now deprecated in Dataset#join_table. <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now warn when an unsupported join type is used. In <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 6, use of an unsupported join type will result in an error.</p>
+</li><li>
+<p>All support for PostgreSQL 19 property graphs has been removed, This includes the following methods:</p>
+<ul><li>
+<p>Database#create_property_graph</p>
+</li><li>
+<p>Database#alter_property_graph</p>
+</li><li>
+<p>Database#drop_property_graph</p>
+</li><li>
+<p>Database#rename_property_graph</p>
+</li><li>
+<p>Database#set_property_graph_schema</p>
+</li><li>
+<p>Database#property_graphs</p>
+</li><li>
+<p>Database#graph_table</p>
+</li></ul>
+
+<p>Additionally, Dataset#for_portion_of for UPDATE/DELETE FOR PORTION OF has also been removed.</p>
+
+<p>Support for both features was removed from PostgreSQL 19 beta 4. Support for both features will be reinstated during the PostgreSQL 20 beta release cycle, assuming that PostgreSQL 20 beta 1 supports the features.</p>
+</li><li>
+<p>The :format option value of Database#copy_table on PostgreSQL is now limited to supported formats (:text, :csv, :binary, or :json). Attempts to use other values will result in an error.</p>
+</li><li>
+<p>Using an unsupported :synchronous option value to Database#transaction on PostgreSQL now results in a warning. Starting in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 6, this will result in an error. The supported option values are now: true, :on, false, :off, :local, :remote_apply, and :remote_write.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer emulates LIKE with REGEXP on SQLAnywhere. This was previously done to emulate case sensitive LIKE behavior. However, the emulation was buggy, and it was considered better to remove it than attempt to fix it. So Sequel.like on SQLAnywhere is now case insensitive, instead of being case sensitive as it is on other databases (Sequel.ilike is case insensitive on all supported databases).</p>
+</li></ul>
+
+<h1 id="label-Acknowledgements"><a href="#label-Acknowledgements">Acknowledgements</a></h1>
+<ul><li>
+<p>Thank you to Joshua Rogers (<a target="_top" href="https://joshua.hu">joshua.hu</a>) of AISLE Research (<a target="_top" href="https://aisle.com">aisle.com</a>) for reporting the vast majority of the issues fixed in this release.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

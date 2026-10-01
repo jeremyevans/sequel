@@ -45,7 +45,7 @@
     <div class="main__container">
       <section class="plugins">
 
-<h1 class="h1">Sequel::Model Plugins for v5.108.0</h1>
+<h1 class="h1">Sequel::Model Plugins for v5.109.0</h1>
 
 <div class="plugins__sidebar">
 <aside class="plugins__sidebar-aside">
@@ -181,10 +181,6 @@
 <li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/classes/Sequel/Plugins/UnusedAssociations.html">unused_associations </a>
 <span class="ul__span">Determines which associations and association methods you can skip defining to save on memory.</span>
-</li>
-<li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ValidateAssociated.html">validate_associated </a>
-<span class="ul__span">Supports validating associated objects at the same time as the current object.</span>
 </li>
 </ul>
 
@@ -347,6 +343,10 @@
 <span class="ul__span">Uses the xmin system column on PostgreSQL to prevent concurrent updates overwriting changes.</span>
 </li>
 <li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/SelectOnSkippedUpdate.html">select_on_skipped_update </a>
+<span class="ul__span">When skipping a UPDATE query during model saving, issue a SELECT query to check the object still exists.</span>
+</li>
+<li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/classes/Sequel/Plugins/Sharding.html">sharding </a>
 <span class="ul__span">Additional model support for Sequel's sharding support.</span>
 </li>
@@ -489,6 +489,14 @@
 <li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ThrowFailures.html">throw_failures </a>
 <span class="ul__span">Throws ValidationFailed and HookFailed exceptions instead of raising them, if a matching catch block is used.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ValidateAssociated.html">validate_associated </a>
+<span class="ul__span">Supports validating associated objects at the same time as the current object.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ValidateAssociatedContext.html">validate_associated_context </a>
+<span class="ul__span">Integrates validate_associated and validation_contexts plugins, using current validation context when validating associated objects.</span>
 </li>
 <li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ValidationClassMethods.html">validation_class_methods </a>

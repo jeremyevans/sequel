@@ -66,10 +66,10 @@ Sequel::Plugins::Caching::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-before_update-source'>    <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>
-<span class="line-num">137</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_update</span>
-<span class="line-num">138</span>   <span class="ruby-identifier">cache_delete</span>
-<span class="line-num">139</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">140</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">162</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_update</span>
+<span class="line-num">163</span>   <span class="ruby-identifier">cache_delete</span>
+<span class="line-num">164</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">165</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cache_key'>
@@ -88,9 +88,9 @@ Sequel::Plugins::Caching::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-cache_key-source'>    <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>
-<span class="line-num">145</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_key</span>
-<span class="line-num">146</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>)
-<span class="line-num">147</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">170</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_key</span>
+<span class="line-num">171</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>)
+<span class="line-num">172</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-delete'>
@@ -109,10 +109,10 @@ Sequel::Plugins::Caching::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-delete-source'>    <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>
-<span class="line-num">150</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">delete</span>
-<span class="line-num">151</span>   <span class="ruby-identifier">cache_delete</span>
-<span class="line-num">152</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">153</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">175</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">delete</span>
+<span class="line-num">176</span>   <span class="ruby-identifier">cache_delete</span>
+<span class="line-num">177</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">178</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

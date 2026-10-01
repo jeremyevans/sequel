@@ -65,10 +65,10 @@ Sequel::Plugins::OptimisticLockingBase::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-before_destroy-source'>   <span class="ruby-comment"># File lib/sequel/plugins/optimistic_locking_base.rb</span>
-<span class="line-num">21</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_destroy</span>
-<span class="line-num">22</span>   <span class="ruby-identifier">lock_column_instance_filter</span>
-<span class="line-num">23</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">24</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">35</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_destroy</span>
+<span class="line-num">36</span>   <span class="ruby-identifier">lock_column_instance_filter</span>
+<span class="line-num">37</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">38</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-before_update'>
@@ -87,10 +87,10 @@ Sequel::Plugins::OptimisticLockingBase::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-before_update-source'>   <span class="ruby-comment"># File lib/sequel/plugins/optimistic_locking_base.rb</span>
-<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_update</span>
-<span class="line-num">28</span>   <span class="ruby-identifier">lock_column_instance_filter</span>
-<span class="line-num">29</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">41</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_update</span>
+<span class="line-num">42</span>   <span class="ruby-identifier">lock_column_instance_filter</span>
+<span class="line-num">43</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">44</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

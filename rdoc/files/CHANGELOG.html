@@ -33,6 +33,73 @@ CHANGELOG
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.109.0+-282026-10-01-29"><a href="#label-5.109.0+-282026-10-01-29"><a href="doc/release_notes/5_109_0_txt.html">5.109.0</a> (2026-10-01)</a></h3>
+<ul><li>
+<p>Make create_table with :temp and :as options create temporary table on Microsoft SQL Server and DB2 (jeremyevans) (#2393)</p>
+</li><li>
+<p>Revert support for PostgreSQL 19 property graphs (jeremyevans)</p>
+</li><li>
+<p>Revert support for PostgreSQL 19 UPDATE/DELETE FOR PORTION OF (jeremyevans)</p>
+</li><li>
+<p>Add validate_associated_context plugin for integrating validate_associated and validation_contexts plugins (sterlzbd, jeremyevans) (#2392)</p>
+</li><li>
+<p>Support amalgalite 2 in the amalgalite adapter (jeremyevans)</p>
+</li><li>
+<p>Recognize an additional lock timeout error in the trilogy adapter (jeremyevans)</p>
+</li><li>
+<p>Work with json gem version 3 (jeremyevans)</p>
+</li><li>
+<p>Drop support for Ruby 1.9, minimum is now 2.0 (jeremyevans)</p>
+</li><li>
+<p>Make DateTime bound variable usage in the jdbc/postgresql adapter work correctly when timezone offset is different than local (jeremyevans)</p>
+</li><li>
+<p>Fix JRUBY_VERSION checks to handle JRuby 10+ (jeremyevans)</p>
+</li><li>
+<p>Correctly parse offset of timestamptz value in jdbc/postgresql adapter (jeremyevans)</p>
+</li><li>
+<p>Raise if attempting to parse a PostgreSQL array with more than 6 dimensions (jeremyevans)</p>
+</li><li>
+<p>Do not allow Sequel.extension to load extensions with ../ or ..\ for security reasons (jeremyevans)</p>
+</li><li>
+<p>Deprecate support for arbitrary join types in Dataset#join_table (jeremyevans)</p>
+</li><li>
+<p>Use RETURN_GENERATED_KEYS for prepared statement inserts in the jdbc adapter for Microsoft SQL Server (jeremyevans)</p>
+</li><li>
+<p>Do not emulate LIKE with REGEXP on SQLAnywhere (jeremyevans)</p>
+</li><li>
+<p>Add select_on_skipped_update plugin for running SELECT query to check for object existance if an UPDATE statement is skipped (jeremyevans)</p>
+</li><li>
+<p>Run and clear instance hooks if Model#save_changes skips update due to the object being unmodified (jeremyevans)</p>
+</li><li>
+<p>Clear instance filters if Model#save_changes skips update due to the object being unmodified (jeremyevans)</p>
+</li><li>
+<p>Quote elements of terms array/set argument given to Dataset#full_text_search on Microsoft SQL Server (jeremyevans)</p>
+</li><li>
+<p>Clear parameters after prepared statement execution in jdbc and sqlite3 adapters (jeremyevans)</p>
+</li><li>
+<p>Support prevent_increase option/argument in the optimistic locking plugins (jeremyevans)</p>
+</li><li>
+<p>Allow the caching plugin to support composite primary keys where multiple columns can contain “,” by adding composite_cache_key class method (jeremyevans)</p>
+</li><li>
+<p>Make lit_require_frozen extension not freeze literal strings in BooleanExpression.from_value_pair, avoiding safety issues (jeremyevans)</p>
+</li><li>
+<p>Treat literal string as unsafe in lit_require_frozen extension if it differs from its frozen source (jeremyevans)</p>
+</li><li>
+<p>Don’t use a placeholder loader in Dataset#first when passed a negative limit (jeremyevans)</p>
+</li><li>
+<p>Quote identifiers used in PASSING clauses in the pg_json_ops extension (jeremyevans)</p>
+</li><li>
+<p>Make Model.sti_class in single_table_inheritance plugin return root class if specified constant exists but is not a descendant of the root class (jeremyevans)</p>
+</li><li>
+<p>Limit the :synchronous option value to Database#transaction on Postgresql to supported values (jeremyevans)</p>
+</li><li>
+<p>Quote SQLite database types when dumping schema with :same_db option in the schema_dumper extension (jeremyevans)</p>
+</li><li>
+<p>Convert database exception class to <a href="../classes/Sequel.html"><code>Sequel</code></a> exception class for failures in Database#copy_table query (jeremyevans)</p>
+</li><li>
+<p>Limit the :format option value to Database#copy_table on PostgreSQL to supported formats (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.108.0+-282026-09-01-29"><a href="#label-5.108.0+-282026-09-01-29"><a href="doc/release_notes/5_108_0_txt.html">5.108.0</a> (2026-09-01)</a></h3>
 <ul><li>
 <p>Support :allow_migration_number option for TimestampMigrator (jeremyevans)</p>

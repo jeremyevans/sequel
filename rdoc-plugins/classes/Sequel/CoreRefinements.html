@@ -77,9 +77,7 @@ Sequel::CoreRefinements
 </div>
 <div id='content'>
 <div id='text'>
-<div id='description'>
-<p>simplecov:enable</p>
-</div>
+<div id='description'></div>
 <div id='method-list'>
 <h2>Methods</h2>
 <h3>Public Instance</h3>
@@ -131,9 +129,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-26-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>
-<span class="line-num">108</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">&amp;</span>(<span class="ruby-identifier">ce</span>)
-<span class="line-num">109</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:AND</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)
-<span class="line-num">110</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">105</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">&amp;</span>(<span class="ruby-identifier">ce</span>)
+<span class="line-num">106</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:AND</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)
+<span class="line-num">107</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-2A'>
@@ -150,13 +148,13 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-2A-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>
-<span class="line-num">216</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">*</span>(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))
-<span class="line-num">217</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>
-<span class="line-num">218</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">219</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">220</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:*</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)
-<span class="line-num">221</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">222</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">213</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">*</span>(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))
+<span class="line-num">214</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>
+<span class="line-num">215</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">216</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">217</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:*</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)
+<span class="line-num">218</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">219</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-7C'>
@@ -179,9 +177,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-7C-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>
-<span class="line-num">118</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">|</span>(<span class="ruby-identifier">ce</span>)
-<span class="line-num">119</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)
-<span class="line-num">120</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">115</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">|</span>(<span class="ruby-identifier">ce</span>)
+<span class="line-num">116</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)
+<span class="line-num">117</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-~'>
@@ -204,9 +202,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-~-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>
-<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>
-<span class="line-num">31</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">32</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>
+<span class="line-num">28</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">29</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-case'>
@@ -229,9 +227,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-case-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>
-<span class="line-num">39</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">case</span>(<span class="ruby-operator">*</span><span class="ruby-identifier ruby-title">args</span>)
-<span class="line-num">40</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">CaseExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">41</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">36</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">case</span>(<span class="ruby-operator">*</span><span class="ruby-identifier ruby-title">args</span>)
+<span class="line-num">37</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">CaseExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">38</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-hstore'>
@@ -272,9 +270,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-identifier-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>
-<span class="line-num">230</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">identifier</span>
-<span class="line-num">231</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">232</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">227</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">identifier</span>
+<span class="line-num">228</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">229</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-lit'>
@@ -306,9 +304,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-lit-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>
-<span class="line-num">186</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">187</span>   <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)
-<span class="line-num">188</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">183</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">184</span>   <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">185</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_array'>
@@ -325,9 +323,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-pg_array-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>
-<span class="line-num">551</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>(<span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">552</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">type</span>)
-<span class="line-num">553</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">552</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>(<span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">553</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">type</span>)
+<span class="line-num">554</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_json'>
@@ -426,9 +424,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-sql_expr-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>
-<span class="line-num">65</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_expr</span>
-<span class="line-num">66</span>   <span class="ruby-constant">Sequel</span>[<span class="ruby-keyword">self</span>]
-<span class="line-num">67</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">62</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_expr</span>
+<span class="line-num">63</span>   <span class="ruby-constant">Sequel</span>[<span class="ruby-keyword">self</span>]
+<span class="line-num">64</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_function'>
@@ -452,9 +450,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-sql_function-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>
-<span class="line-num">240</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_function</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">241</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">242</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">237</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_function</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">238</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">239</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_negate'>
@@ -477,9 +475,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-sql_negate-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>
-<span class="line-num">74</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_negate</span>
-<span class="line-num">75</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">76</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">71</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_negate</span>
+<span class="line-num">72</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">73</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_or'>
@@ -502,9 +500,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-sql_or-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>
-<span class="line-num">83</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_or</span>
-<span class="line-num">84</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">85</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">80</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_or</span>
+<span class="line-num">81</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">82</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_string_join'>
@@ -529,9 +527,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-sql_string_join-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>
-<span class="line-num">96</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_string_join</span>(<span class="ruby-identifier">joiner</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">97</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">joiner</span>)
-<span class="line-num">98</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">93</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_string_join</span>(<span class="ruby-identifier">joiner</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">94</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">joiner</span>)
+<span class="line-num">95</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_value_list'>
@@ -555,9 +553,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-sql_value_list-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>
-<span class="line-num">52</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_value_list</span>
-<span class="line-num">53</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ValueList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">54</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">49</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_value_list</span>
+<span class="line-num">50</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ValueList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_sequel_blob'>
@@ -576,9 +574,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-to_sequel_blob-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>
-<span class="line-num">192</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_blob</span>
-<span class="line-num">193</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">194</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">189</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_blob</span>
+<span class="line-num">190</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">191</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

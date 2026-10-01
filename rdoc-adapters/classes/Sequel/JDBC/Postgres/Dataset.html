@@ -86,7 +86,7 @@ Superclass:
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>PG_SPECIFIC_TYPES</td>
 <td>=</td>
-<td class='context-item-value'>[Java::JavaSQL::Types::ARRAY, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT, Java::JavaSQL::Types::TIME_WITH_TIMEZONE, Java::JavaSQL::Types::TIME].freeze</td>
+<td class='context-item-value'>[Java::JavaSQL::Types::ARRAY, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT, Java::JavaSQL::Types::TIME_WITH_TIMEZONE, Java::JavaSQL::Types::TIME, Java::JavaSQL::Types::TIMESTAMP_WITH_TIMEZONE, Java::JavaSQL::Types::TIMESTAMP].freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'></td>
 </tr>
@@ -118,10 +118,10 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-with_fetch_size-source'>    <span class="ruby-comment"># File lib/sequel/adapters/jdbc/postgresql.rb</span>
-<span class="line-num">185</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_fetch_size</span>(<span class="ruby-identifier">size</span>)
-<span class="line-num">186</span>   <span class="ruby-identifier">warn</span>(<span class="ruby-string">&quot;Sequel::JDBC::Postgres::Dataset#with_fetch_size does not currently have an effect.&quot;</span>, <span class="ruby-value">:uplevel</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
-<span class="line-num">187</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">188</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">196</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_fetch_size</span>(<span class="ruby-identifier">size</span>)
+<span class="line-num">197</span>   <span class="ruby-identifier">warn</span>(<span class="ruby-string">&quot;Sequel::JDBC::Postgres::Dataset#with_fetch_size does not currently have an effect.&quot;</span>, <span class="ruby-value">:uplevel</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+<span class="line-num">198</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">199</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -69,6 +69,8 @@ doc/mass_assignment.rdoc
 <pre class="ruby"><span class="ruby-constant">Post</span>.<span class="ruby-identifier">unrestrict_primary_key</span>
 </pre>
 
+<p>Note that if you alias a primary key setter method, or define a setter method that calls the primary key setter method, you can still set the primary key value via mass assignment. It’s probably best not do to that.</p>
+
 <p>If you want to change mass assignment so it ignores attempts to access restricted setter methods, you can do:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Global default</span>

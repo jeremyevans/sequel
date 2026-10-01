@@ -64,12 +64,12 @@ Sequel::Plugins::SingleTableInheritance::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-before_validation-source'>    <span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb</span>
-<span class="line-num">247</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_validation</span>
-<span class="line-num">248</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">new?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_key</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>[<span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_key</span>]
-<span class="line-num">249</span>     <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{model.sti_key}=&quot;</span>, <span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_key_chooser</span>.<span class="ruby-identifier">call</span>(<span class="ruby-keyword">self</span>))
-<span class="line-num">250</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">251</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">252</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">265</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_validation</span>
+<span class="line-num">266</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">new?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_key</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>[<span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_key</span>]
+<span class="line-num">267</span>     <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{model.sti_key}=&quot;</span>, <span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_key_chooser</span>.<span class="ruby-identifier">call</span>(<span class="ruby-keyword">self</span>))
+<span class="line-num">268</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">269</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">270</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

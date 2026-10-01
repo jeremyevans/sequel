@@ -89,50 +89,18 @@ Sequel::SqlAnywhere::DatasetMethods
 <span class="line-num">305</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-value">:+</span>, <span class="ruby-identifier">args</span>)
 <span class="line-num">306</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:&lt;&lt;</span>, <span class="ruby-value">:&gt;&gt;</span>
 <span class="line-num">307</span>     <span class="ruby-identifier">complex_expression_emulate_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
-<span class="line-num">308</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:LIKE</span>, <span class="ruby-value">:&quot;NOT LIKE&quot;</span>
-<span class="line-num">309</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;(&#39;</span>
-<span class="line-num">310</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>])
-<span class="line-num">311</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:LIKE</span> <span class="ruby-operator">?</span> <span class="ruby-string">&#39; REGEXP &#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39; NOT REGEXP &#39;</span>)
-<span class="line-num">312</span>     <span class="ruby-identifier">pattern</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>
-<span class="line-num">313</span>     <span class="ruby-identifier">last_c</span> = <span class="ruby-string">&#39;&#39;</span>
-<span class="line-num">314</span>     <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">each_char</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
-<span class="line-num">315</span>       <span class="ruby-keyword">if</span>  <span class="ruby-identifier">c</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;_&#39;</span> <span class="ruby-keyword">and</span> <span class="ruby-keyword">not</span> <span class="ruby-identifier">pattern</span>.<span class="ruby-identifier">end_with?</span>(<span class="ruby-string">&#39;\\&#39;</span>) <span class="ruby-keyword">and</span> <span class="ruby-identifier">last_c</span> <span class="ruby-operator">!=</span> <span class="ruby-string">&#39;\\&#39;</span>
-<span class="line-num">316</span>         <span class="ruby-identifier">pattern</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;.&#39;</span>
-<span class="line-num">317</span>       <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">c</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;%&#39;</span> <span class="ruby-keyword">and</span> <span class="ruby-keyword">not</span> <span class="ruby-identifier">pattern</span>.<span class="ruby-identifier">end_with?</span>(<span class="ruby-string">&#39;\\&#39;</span>) <span class="ruby-keyword">and</span> <span class="ruby-identifier">last_c</span> <span class="ruby-operator">!=</span> <span class="ruby-string">&#39;\\&#39;</span>
-<span class="line-num">318</span>         <span class="ruby-identifier">pattern</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;.*&#39;</span>
-<span class="line-num">319</span>       <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">c</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;[&#39;</span> <span class="ruby-keyword">and</span> <span class="ruby-keyword">not</span> <span class="ruby-identifier">pattern</span>.<span class="ruby-identifier">end_with?</span>(<span class="ruby-string">&#39;\\&#39;</span>) <span class="ruby-keyword">and</span> <span class="ruby-identifier">last_c</span> <span class="ruby-operator">!=</span> <span class="ruby-string">&#39;\\&#39;</span>
-<span class="line-num">320</span>         <span class="ruby-identifier">pattern</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;\[&#39;</span>
-<span class="line-num">321</span>       <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">c</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;]&#39;</span> <span class="ruby-keyword">and</span> <span class="ruby-keyword">not</span> <span class="ruby-identifier">pattern</span>.<span class="ruby-identifier">end_with?</span>(<span class="ruby-string">&#39;\\&#39;</span>) <span class="ruby-keyword">and</span> <span class="ruby-identifier">last_c</span> <span class="ruby-operator">!=</span> <span class="ruby-string">&#39;\\&#39;</span>
-<span class="line-num">322</span>         <span class="ruby-identifier">pattern</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;\]&#39;</span>
-<span class="line-num">323</span>       <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">c</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;*&#39;</span> <span class="ruby-keyword">and</span> <span class="ruby-keyword">not</span> <span class="ruby-identifier">pattern</span>.<span class="ruby-identifier">end_with?</span>(<span class="ruby-string">&#39;\\&#39;</span>) <span class="ruby-keyword">and</span> <span class="ruby-identifier">last_c</span> <span class="ruby-operator">!=</span> <span class="ruby-string">&#39;\\&#39;</span>
-<span class="line-num">324</span>         <span class="ruby-identifier">pattern</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;\*&#39;</span>
-<span class="line-num">325</span>       <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">c</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;?&#39;</span> <span class="ruby-keyword">and</span> <span class="ruby-keyword">not</span> <span class="ruby-identifier">pattern</span>.<span class="ruby-identifier">end_with?</span>(<span class="ruby-string">&#39;\\&#39;</span>) <span class="ruby-keyword">and</span> <span class="ruby-identifier">last_c</span> <span class="ruby-operator">!=</span> <span class="ruby-string">&#39;\\&#39;</span>
-<span class="line-num">326</span>         <span class="ruby-identifier">pattern</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;\?&#39;</span>
-<span class="line-num">327</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">328</span>         <span class="ruby-identifier">pattern</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">c</span>
-<span class="line-num">329</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">330</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;\\&#39;</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">last_c</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;\\&#39;</span>
-<span class="line-num">331</span>         <span class="ruby-identifier">last_c</span> = <span class="ruby-string">&#39;&#39;</span>
-<span class="line-num">332</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">333</span>         <span class="ruby-identifier">last_c</span> = <span class="ruby-identifier">c</span>
-<span class="line-num">334</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">335</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">336</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">pattern</span>)
-<span class="line-num">337</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; ESCAPE &quot;</span>
-<span class="line-num">338</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-string">&quot;\\&quot;</span>)
-<span class="line-num">339</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
-<span class="line-num">340</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:ILIKE</span>, <span class="ruby-value">:&quot;NOT ILIKE&quot;</span>
-<span class="line-num">341</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>, (<span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:ILIKE</span> <span class="ruby-operator">?</span> <span class="ruby-value">:LIKE</span> <span class="ruby-operator">:</span> <span class="ruby-value">:&quot;NOT LIKE&quot;</span>), <span class="ruby-identifier">args</span>)
-<span class="line-num">342</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:extract</span>
-<span class="line-num">343</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;datepart(&#39;</span>
-<span class="line-num">344</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>])
-<span class="line-num">345</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;,&#39;</span>
-<span class="line-num">346</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>])
-<span class="line-num">347</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
-<span class="line-num">348</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">349</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">350</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">351</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">308</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:ILIKE</span>, <span class="ruby-value">:&quot;NOT ILIKE&quot;</span>
+<span class="line-num">309</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>, (<span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:ILIKE</span> <span class="ruby-operator">?</span> <span class="ruby-value">:LIKE</span> <span class="ruby-operator">:</span> <span class="ruby-value">:&quot;NOT LIKE&quot;</span>), <span class="ruby-identifier">args</span>)
+<span class="line-num">310</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:extract</span>
+<span class="line-num">311</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;datepart(&#39;</span>
+<span class="line-num">312</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>])
+<span class="line-num">313</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;,&#39;</span>
+<span class="line-num">314</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>])
+<span class="line-num">315</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
+<span class="line-num">316</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">317</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">318</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">319</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-constant_sql_append'>
@@ -151,16 +119,16 @@ Sequel::SqlAnywhere::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-constant_sql_append-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlanywhere.rb</span>
-<span class="line-num">359</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">constant_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">constant</span>)
-<span class="line-num">360</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">constant</span>
-<span class="line-num">361</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:CURRENT_DATE</span>
-<span class="line-num">362</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;today()&#39;</span>
-<span class="line-num">363</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:CURRENT_TIMESTAMP</span>, <span class="ruby-value">:CURRENT_TIME</span>
-<span class="line-num">364</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;now()&#39;</span>
-<span class="line-num">365</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">366</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">367</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">368</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">327</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">constant_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">constant</span>)
+<span class="line-num">328</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">constant</span>
+<span class="line-num">329</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:CURRENT_DATE</span>
+<span class="line-num">330</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;today()&#39;</span>
+<span class="line-num">331</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:CURRENT_TIMESTAMP</span>, <span class="ruby-value">:CURRENT_TIME</span>
+<span class="line-num">332</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;now()&#39;</span>
+<span class="line-num">333</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">334</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">335</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">336</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-convert_smallint_to_bool'>
@@ -221,9 +189,9 @@ Sequel::SqlAnywhere::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-escape_like-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlanywhere.rb</span>
-<span class="line-num">354</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">escape_like</span>(<span class="ruby-identifier">string</span>)
-<span class="line-num">355</span>   <span class="ruby-identifier">string</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/[\\%_\[]/</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;\\#{m}&quot;</span>}
-<span class="line-num">356</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">322</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">escape_like</span>(<span class="ruby-identifier">string</span>)
+<span class="line-num">323</span>   <span class="ruby-identifier">string</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/[\\%_\[]/</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;\\#{m}&quot;</span>}
+<span class="line-num">324</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-into'>
@@ -242,9 +210,9 @@ Sequel::SqlAnywhere::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-into-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlanywhere.rb</span>
-<span class="line-num">371</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">into</span>(<span class="ruby-identifier">table</span>)
-<span class="line-num">372</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:into</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">table</span>)
-<span class="line-num">373</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">339</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">into</span>(<span class="ruby-identifier">table</span>)
+<span class="line-num">340</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:into</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">table</span>)
+<span class="line-num">341</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-recursive_cte_requires_column_aliases-3F'>
