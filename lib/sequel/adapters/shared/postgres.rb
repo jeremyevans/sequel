@@ -154,6 +154,14 @@ module Sequel
         @operations << {:op => :alter_constraint, :name => name}.merge!(opts)
       end
 
+      # Attach an existing table as a partition of the altered table. This
+      # is preferable to using create_table with :partition_of for a number of
+      # reasons. Accepts the same block that you would pass to create_table with
+      # the :partition_of option.
+      def attach_partition(name, &block)
+        @operations << {:op => :attach_partition, :name => name, :generator => CreatePartitionOfTableGenerator.new(&block)}
+      end
+
       # :inherit :: Set true to use INHERIT, or false to use NO INHERIT (PostgreSQL 18+)
       def rename_constraint(name, new_name)
         @operations << {:op => :rename_constraint, :name => name, :new_name => new_name}
@@ -1208,6 +1216,13 @@ module Sequel
         "ADD COLUMN#{' IF NOT EXISTS' if op[:if_not_exists]} #{column_definition_sql(op)}"
       end
 
+      def alter_table_attach_partition_sql(table, op)
+        sql = String.new
+        sql << "ATTACH PARTITION #{quote_identifier(op[:name])}"
+        partition_bound_spec_sql_append(sql, op[:generator])
+        sql
+      end
+
       def alter_table_alter_constraint_sql(table, op)
         sql = String.new
         sql << "ALTER CONSTRAINT #{quote_identifier(op[:name])}"
@@ -1588,25 +1603,25 @@ module Sequel
       # SQL for creating a partition of another table.
       def create_partition_of_table_sql(name, generator, options)
         sql = create_table_prefix_sql(name, options).dup
-
         sql << " PARTITION OF #{quote_schema_table(options[:partition_of])}"
+        partition_bound_spec_sql_append(sql, generator)
+        sql << create_table_suffix_sql(name, options)
+        sql
+      end
 
-        case generator.partition_type
+      def partition_bound_spec_sql_append(sql, generator)
+        sql << case generator.partition_type
         when :range
           from, to = generator.range
-          sql << " FOR VALUES FROM #{literal(from)} TO #{literal(to)}"
+          " FOR VALUES FROM #{literal(from)} TO #{literal(to)}"
         when :list
-          sql << " FOR VALUES IN #{literal(generator.list)}"
+          " FOR VALUES IN #{literal(generator.list)}"
         when :hash
           mod, remainder = generator.hash_values
-          sql << " FOR VALUES WITH (MODULUS #{literal(mod)}, REMAINDER #{literal(remainder)})"
+          " FOR VALUES WITH (MODULUS #{literal(mod)}, REMAINDER #{literal(remainder)})"
         else # when :default
-          sql << " DEFAULT"
+          " DEFAULT"
         end
-
-        sql << create_table_suffix_sql(name, options)
-
-        sql
       end
 
       # SQL for creating a schema.

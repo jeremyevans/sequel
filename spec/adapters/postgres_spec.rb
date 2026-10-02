@@ -368,7 +368,8 @@ describe "PostgreSQL", '#create_table' do
   it "should support range partitioned tables for single columns with :partition_* options" do
     @db.create_table(:tmp_dolls, :partition_by => :id, :partition_type=>:range){Integer :id}
     @db.create_table(:tmp_dolls_1, :partition_of => :tmp_dolls){from 1; to 3}
-    @db.create_table(:tmp_dolls_2, :partition_of => :tmp_dolls){from 3; to 4}
+    @db.create_table(:tmp_dolls_2){Integer :id}
+    @db.alter_table(:tmp_dolls){attach_partition(:tmp_dolls_2){from 3; to 4}}
     @db[:tmp_dolls].insert(1)
     @db[:tmp_dolls].insert(2)
     @db[:tmp_dolls].insert(3)
@@ -416,7 +417,8 @@ describe "PostgreSQL", '#create_table' do
   it "should support list partitioned tables for single column with :partition_* options" do
     @db.create_table(:tmp_dolls, :partition_by => :id, :partition_type=>:list){Integer :id}
     @db.create_table(:tmp_dolls_1, :partition_of => :tmp_dolls){values_in 1, 2}
-    @db.create_table(:tmp_dolls_2, :partition_of => :tmp_dolls){values_in 3}
+    @db.create_table(:tmp_dolls_2){Integer :id}
+    @db.alter_table(:tmp_dolls){attach_partition(:tmp_dolls_2){values_in 3}}
     @db[:tmp_dolls].insert(1)
     @db[:tmp_dolls].insert(2)
     @db[:tmp_dolls].insert(3)
@@ -442,7 +444,8 @@ describe "PostgreSQL", '#create_table' do
     @db.create_table(:tmp_dolls_0, :partition_of => :tmp_dolls){modulus 4; remainder 0}
     @db.create_table(:tmp_dolls_1, :partition_of => :tmp_dolls){modulus 4; remainder 1}
     @db.create_table(:tmp_dolls_2, :partition_of => :tmp_dolls){modulus 4; remainder 2}
-    @db.create_table(:tmp_dolls_3, :partition_of => :tmp_dolls){modulus 4; remainder 3}
+    @db.create_table(:tmp_dolls_3){Integer :id}
+    @db.alter_table(:tmp_dolls){attach_partition(:tmp_dolls_3){modulus 4; remainder 3}}
     @db[:tmp_dolls].insert(1)
     @db[:tmp_dolls].insert(2)
     @db[:tmp_dolls].insert(3)
