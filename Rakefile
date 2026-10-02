@@ -81,7 +81,7 @@ rdoc_task(:website_rdoc_adapters, "www/public/rdoc-adapters", 'Sequel',
 desc "Generate rdoc for plugins/extensions for Sequel website"
 rdoc_task(:website_rdoc_plugins, "www/public/rdoc-plugins", 'Sequel',
     Dir["lib/sequel/{extensions,plugins}/**/*.rb"] +
-    Dir["doc/{advanced_associations,association_basics,core_extensions,reflection,schema_modification}.rdoc"]
+    Dir["doc/{advanced_associations,association_basics,core_extensions,mass_assignment,reflection,schema_modification}.rdoc"]
   )
 
 desc "Generate the guides for the website from the rdoc pages"
