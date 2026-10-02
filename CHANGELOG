@@ -1,3 +1,7 @@
+=== master
+
+* Add Database#loose_counts to pg_loose_count extension, getting loose counts for all tables in a schema (jeremyevans)
+
 === 5.109.0 (2026-10-01)
 
 * Make create_table with :temp and :as options create temporary table on Microsoft SQL Server and DB2 (jeremyevans) (#2393)

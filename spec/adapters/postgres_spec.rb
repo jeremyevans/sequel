@@ -779,10 +779,12 @@ describe "PostgreSQL", '#create_table' do
     @db.loose_count(:tmp_dolls).must_be_kind_of(Integer)
     [0, -1].must_include @db.loose_count(:tmp_dolls)
     [0, -1].must_include @db.loose_count(Sequel[:public][:tmp_dolls])
+    [0, -1].must_include @db.loose_counts(:public)[:tmp_dolls]
     @db[:tmp_dolls].insert('a')
     @db << 'VACUUM ANALYZE tmp_dolls'
     @db.loose_count(:tmp_dolls).must_equal 1
     @db.loose_count(Sequel[:public][:tmp_dolls]).must_equal 1
+    @db.loose_counts(:public)[:tmp_dolls].must_equal 1
   end
 end
 
