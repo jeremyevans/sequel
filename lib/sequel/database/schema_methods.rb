@@ -170,18 +170,18 @@ module Sequel
     # :engine :: The table engine to use for the table.
     #
     # PostgreSQL specific options:
-    # :on_commit :: Either :preserve_rows (default), :drop or :delete_rows. Should
-    #               only be specified when creating a temporary table.
     # :foreign :: Create a foreign table.  The value should be the name of the
     #             foreign server that was specified in CREATE SERVER.
     # :inherits :: Inherit from a different table.  An array can be
     #              specified to inherit from multiple tables.
-    # :unlogged :: Create the table as an unlogged table.
+    # :on_commit :: Either :preserve_rows (default), :drop or :delete_rows. Should
+    #               only be specified when creating a temporary table.
     # :options :: The OPTIONS clause to use for foreign tables.  Should be a hash
     #             where keys are option names and values are option values.  Note
     #             that option names are unquoted, so you should not use untrusted
     #             keys.
     # :tablespace :: The tablespace to use for the table.
+    # :unlogged :: Create the table as an unlogged table.
     #
     # SQLite specific options:
     # :strict :: Create a STRICT table, which checks that the values for the columns
