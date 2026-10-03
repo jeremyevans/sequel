@@ -534,6 +534,11 @@ describe "PostgreSQL support" do
     @db.sqls.must_equal ['CREATE UNLOGGED TABLE "unlogged_dolls" ("name" text)']
   end
 
+  it "should detach a partition with FINALIZE" do
+    @db.alter_table(:x){detach_partition :y, finalize: true}
+    @db.sqls.must_equal ['ALTER TABLE "x" DETACH PARTITION "y" FINALIZE']
+  end
+
   it "should respect :unlogged_tables_default Database option when creating a table" do
     @db.opts[:unlogged_tables_default] = true
     @db.create_table(:unlogged_dolls, :unlogged => true){text :name}

@@ -162,7 +162,17 @@ module Sequel
         @operations << {:op => :attach_partition, :name => name, :generator => CreatePartitionOfTableGenerator.new(&block)}
       end
 
-      # :inherit :: Set true to use INHERIT, or false to use NO INHERIT (PostgreSQL 18+)
+      # Detach a partition from a partitioned table. The detached partition becomes
+      # a separate table. Arguments:
+      # name: Name of partitioned table
+      # concurrently: Use CONCURRENTLY when detaching, which reduces the locking required.
+      # finalize: Use FINALIZE when detaching, to complete a case where CONCURRENTLY was
+      #           used but could not complete the detach.
+      def detach_partition(name, concurrently: false, finalize: false)
+        @operations << {:op => :detach_partition, :name => name, :concurrently => concurrently, :finalize => finalize}
+      end
+
+      # Rename an constraint.
       def rename_constraint(name, new_name)
         @operations << {:op => :rename_constraint, :name => name, :new_name => new_name}
       end
@@ -1264,6 +1274,10 @@ module Sequel
           s << literal(using)
         end
         s
+      end
+
+      def alter_table_detach_partition_sql(table, op)
+        "DETACH PARTITION #{quote_identifier(op[:name])}#{' CONCURRENTLY' if op[:concurrently]}#{' FINALIZE' if op[:finalize]}"
       end
 
       def alter_table_drop_column_sql(table, op)

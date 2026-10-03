@@ -388,6 +388,14 @@ describe "PostgreSQL", '#create_table' do
     @db[:tmp_dolls_1].order(:id).select_order_map(:id).must_equal [1,2]
     @db[:tmp_dolls_2].order(:id).select_order_map(:id).must_equal [3]
     @db[:tmp_dolls_3].order(:id).select_order_map(:id).must_equal [5]
+
+    @db.alter_table(:tmp_dolls){detach_partition(:tmp_dolls_2)}
+    @db.drop_table(:tmp_dolls_2)
+
+    if DB.server_version >= 140000
+      @db.alter_table(:tmp_dolls){detach_partition(:tmp_dolls_3, concurrently: true)}
+      @db.drop_table(:tmp_dolls_3)
+    end
   end if DB.server_version >= 100000 
 
   it "should support range partitioned tables for multiple columns with :partition_* options" do

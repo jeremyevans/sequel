@@ -1,5 +1,7 @@
 === master
 
+* Add alter_table detach_partition method on PostgreSQL 10+, for detaching a partition to a separate table (jeremyevans)
+
 * Add alter_table attach_partition method on PostgreSQL 10+, for attaching an existing table as a partition (jeremyevans)
 
 * Add Database#loose_counts to pg_loose_count extension, getting loose counts for all tables in a schema (jeremyevans)
