@@ -139,7 +139,19 @@ conversion via a USING clause, and Sequel supports this using the <tt>:using</tt
   # ALTER TABLE "table" ALTER COLUMN "unix_time" TYPE timestamp
   #   USING (CAST('epoch' AS timestamp) + (CAST('1 second' AS interval) * "unix_time"))
 
-=== Creating Partitioned Tables
+=== CREATE TABLE LIKE
+
+You can use the +like+ option in +create_table+ for <tt>CREATE TABLE LIKE</tt>:
+
+  DB.create_table(:a){like :b, including: :all}
+  # CREATE TABLE "a" LIKE "b" INCLUDING ALL
+
++like+ supports both an +including+ and +excluding+ argument, which can be passed symbols
+for all +INCLUDING+ and +EXCLUDING+ options that PostgreSQL supports.
+
+=== Partitioned Tables
+
+==== Creating
 
 PostgreSQL allows marking tables as partitioned tables, and adding partitions to such tables. Sequel
 offers support for this.  You can create a partitioned table using the +:partition_by+ option and
@@ -209,6 +221,23 @@ For hash partitioning, you use the +modulus+ and +remainder+ methods:
 
 There is currently no support for using custom column or table constraints in partitions of
 other tables.  Support may be added in the future.
+
+==== Attaching/Detaching Partitions
+
+You can use +attach_partition+ and +detach_partition+ in +alter_table+ to attach or detach partitions.
++attach_partition+ takes the same block as +create_table+ when using the :partition_of option.
+You can combine this with the +create_table+ +like+ method to make a copy of an existing table schema,
+and then attach it as a new partition. This is generally better than using the +create_table+
++:partition_of+ option if you need concurrent access to the tables.
+
+  DB.create_table(:table1a){like :table1, including :all}
+
+  DB.alter_table(:table1) do
+    attach_partition(:table1) do
+      from minvalue
+      to 0
+    end
+  end
 
 === Creating Unlogged Tables
 
