@@ -1,5 +1,7 @@
 === master
 
+* Add create_table like method on PostgreSQL, allowing you to copy all columns from another table (jeremyevans)
+
 * Add alter_table detach_partition method on PostgreSQL 10+, for detaching a partition to a separate table (jeremyevans)
 
 * Add alter_table attach_partition method on PostgreSQL 10+, for attaching an existing table as a partition (jeremyevans)

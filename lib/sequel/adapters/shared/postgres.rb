@@ -134,6 +134,17 @@ module Sequel
       def exclude(elements, opts=OPTS)
         constraints << {:type => :exclude, :elements => elements}.merge!(opts)
       end
+
+      # Copies the column names, data types, and not null constraints from
+      # the specified table using LIKE. Arguments:
+      # table: Name of table to copy from
+      # excluding: LIKE options to exclude, can be a symbol or array of symbols
+      #            (options: :comments, :compression:, :constraints, :defaults,
+      #            :generated, :identity, :indexes, :statistics, :storage, :all)
+      # including: LIKE options to include (same values supported as excluding)
+      def like(table, excluding: nil, including: nil)
+        columns << {like_table: table, excluding: Array(excluding), including: Array(including)}
+      end
     end
 
     class AlterTableGenerator < Sequel::Schema::AlterTableGenerator
@@ -1319,6 +1330,33 @@ module Sequel
 
         unless (read_only = opts[:read_only]).nil?
           log_connection_execute(conn, "SET TRANSACTION READ #{read_only ? 'ONLY' : 'WRITE'}")
+        end
+      end
+
+      def column_definition_sql(column)
+        if table = column[:like_table]
+          sql = String.new
+          sql << "LIKE #{quote_schema_table(table)}"
+          allowed_options = %i[comments compression constraints defaults generated identity indexes statistics storage all].freeze
+
+          %i[including excluding].freeze.each do |type|
+            options = column[type]
+            next if options.empty?
+
+            unallowed_options = options - allowed_options
+            if unallowed_options.empty?
+              type = type.to_s.upcase
+              options.each do |opt|
+                sql << " #{type} #{opt.to_s.upcase}"
+              end
+            else
+              raise Error, "unsupported like :#{type} options: #{unallowed_options.inspect}"
+            end
+          end
+
+          sql
+        else
+          super
         end
       end
 

@@ -365,6 +365,40 @@ describe "PostgreSQL", '#create_table' do
     @db.schema(:tmp_dolls).map{|k, v| v[:max_length]}.must_equal [nil, 10, 50, 10, 50, 10, nil]
   end
 
+  it "should support CREATE TABLE LIKE" do
+    @db.create_table!(:unlogged_dolls){Integer :a}
+    @db.create_table!(:tmp_dolls){like :unlogged_dolls}
+    @db[:tmp_dolls].columns.must_equal [:a]
+    @db.create_table!(:tmp_dolls){Integer :b; like :unlogged_dolls}
+    @db[:tmp_dolls].columns.must_equal [:b, :a]
+    @db.create_table!(:tmp_dolls){like :unlogged_dolls; Integer :b}
+    @db[:tmp_dolls].columns.must_equal [:a, :b]
+
+    opts = if @db.server_version >= 140000
+      %i[comments compression constraints defaults generated identity indexes statistics storage]
+    elsif @db.server_version >= 120000
+      %i[comments constraints defaults generated identity indexes statistics storage]
+    elsif @db.server_version >= 100000
+      %i[comments constraints defaults identity indexes statistics storage]
+    elsif @db.server_version >= 90000
+      %i[comments constraints defaults indexes storage]
+    else
+      %i[constraints defaults indexes]
+    end
+    @db.create_table!(:tmp_dolls){like :unlogged_dolls, including: opts}
+    @db[:tmp_dolls].columns.must_equal [:a]
+    @db.create_table!(:tmp_dolls){like :unlogged_dolls, excluding: opts}
+    @db[:tmp_dolls].columns.must_equal [:a]
+
+    opt = @db.server_version >= 90000 ? :all : :defaults
+    @db.create_table!(:tmp_dolls){like :unlogged_dolls, including: opt}
+    @db[:tmp_dolls].columns.must_equal [:a]
+    @db.create_table!(:tmp_dolls){like :unlogged_dolls, excluding: opt}
+    @db[:tmp_dolls].columns.must_equal [:a]
+
+    proc{@db.create_table!(:tmp_dolls){like :unlogged_dolls, excluding: :bad}}.must_raise Sequel::Error
+  end
+
   it "should support range partitioned tables for single columns with :partition_* options" do
     @db.create_table(:tmp_dolls, :partition_by => :id, :partition_type=>:range){Integer :id}
     @db.create_table(:tmp_dolls_1, :partition_of => :tmp_dolls){from 1; to 3}
