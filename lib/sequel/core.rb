@@ -64,9 +64,16 @@ module Sequel
     # Note that +Time+ and +DateTime+ objects have a different API, and in
     # cases where they implement the same methods, they often implement them
     # differently (e.g. + using seconds on +Time+ and days on +DateTime+).
-    attr_accessor :datetime_class
-    # SEQUEL6: Remove datetime_class=
-    # SEQUEL6.1: Remove datetime_class
+    #
+    # The setter method is deprecated and will be removed in Sequel 6.
+    # The reader method will be deprecated in Sequel 6.0 and removed in
+    # Sequel 6.1.
+    attr_reader :datetime_class # SEQUEL6.1: Remove
+
+    def datetime_class=(v)
+      Sequel::Deprecation.deprecate("Sequel.datetime_class= is deprecated and will be removed in Sequel 6.")
+      @datetime_class = v
+    end
 
     # Set whether Sequel is being used in single threaded mode. By default,
     # Sequel uses a thread-safe connection pool, which isn't as fast as the
@@ -345,7 +352,9 @@ module Sequel
     # value of <tt>Sequel.datetime_class</tt>.
     #
     #   Sequel.string_to_datetime('2010-09-10 10:20:30') # Time.local(2010, 09, 10, 10, 20, 30)
-    def string_to_datetime(string)
+    #
+    # This method is deprecated and will be removed in Sequel 6.1.
+    def string_to_datetime(string) # SEQUEL6.1: Remove
       if datetime_class == DateTime
         DateTime.parse(string, convert_two_digit_years)
       else

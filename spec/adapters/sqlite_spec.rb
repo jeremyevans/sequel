@@ -10,7 +10,6 @@ describe "An SQLite database" do
   after do
     @db.drop_table?(:fk)
     @db.use_timestamp_timezones = false
-    Sequel.datetime_class = Time
   end
 
   it "should unescape escaped paths in URI for database file" do
@@ -152,10 +151,11 @@ describe "An SQLite database" do
     @db[:fk].insert(:t => t1, :d => t1)
     @db[:fk].map(:t).must_equal [t1]
     @db[:fk].map(:d).must_equal [t1]
-    Sequel.datetime_class = DateTime
-    t2 = Sequel.string_to_datetime(t1.iso8601)
-    @db[:fk].map(:t).must_equal [t2]
-    @db[:fk].map(:d).must_equal [t2]
+    with_datetime_class_datetime do
+      t2 = Sequel.string_to_datetime(t1.iso8601)
+      @db[:fk].map(:t).must_equal [t2]
+      @db[:fk].map(:d).must_equal [t2]
+    end
   end
   
   it "should support sequential primary keys" do
@@ -301,7 +301,6 @@ describe "SQLite type conversion" do
   end
   after do
     @db.integer_booleans = @integer_booleans
-    Sequel.datetime_class = Time
     @db.drop_table?(:items)
   end
   
@@ -356,8 +355,9 @@ describe "SQLite type conversion" do
     i = 1329860756
     @db[:items].insert(i)
     @db[:items].first.must_equal(:a=>Time.at(i))
-    Sequel.datetime_class = DateTime
-    @db[:items].first.must_equal(:a=>DateTime.strptime(i.to_s, '%s'))
+    with_datetime_class_datetime do
+      @db[:items].first.must_equal(:a=>DateTime.strptime(i.to_s, '%s'))
+    end
   end
 
   it "should handle float datetime columns as julian date" do
@@ -365,8 +365,9 @@ describe "SQLite type conversion" do
     i = 2455979.5
     @db[:items].insert(i)
     @db[:items].first.must_equal(:a=>Time.at(1329825600))
-    Sequel.datetime_class = DateTime
-    @db[:items].first.must_equal(:a=>DateTime.jd(2455979.5))
+    with_datetime_class_datetime do
+      @db[:items].first.must_equal(:a=>DateTime.jd(2455979.5))
+    end
   end
 
   it "should handle integer/float blob columns" do

@@ -79,7 +79,6 @@ describe 'A PostgreSQL database' do
   after do
     @db.drop_table?(:test)
     @db.timezone = nil
-    Sequel.datetime_class = Time
   end
 
   it "should return true for table_exists? if table exists but is locked" do
@@ -293,8 +292,7 @@ describe 'A PostgreSQL database' do
     end
 
     if klass == Time
-      it "should not provide maximum and minimum values for #{type} columns when Sequel.datetime_class is DateTime" do
-        Sequel.datetime_class = DateTime
+      with_datetime_class_datetime "should not provide maximum and minimum values for #{type} columns" do
         @db.create_table!(:test){column :a, type}
         sch = @db.schema(:test).first.last
         sch[:max_value].must_be_nil
@@ -1886,7 +1884,6 @@ describe "A PostgreSQL dataset with a timestamp field" do
   end
   after do
     @db.convert_infinite_timestamps = false
-    Sequel.datetime_class = Time
     Sequel::SQLTime.date = nil
     Sequel.default_timezone = nil
   end
@@ -1937,11 +1934,11 @@ describe "A PostgreSQL dataset with a timestamp field" do
         Sequel.default_timezone = :utc
         d = Time.utc(year, 2, 3, 10, 11, 12)
         @db.get(Sequel.cast(d, Time)).must_equal d
-        Sequel.datetime_class = DateTime
-        d = DateTime.new(year, 2, 3, 10, 11, 12)
-        @db.get(Sequel.cast(d, Time)).must_equal d
+        with_datetime_class_datetime do
+          d = DateTime.new(year, 2, 3, 10, 11, 12)
+          @db.get(Sequel.cast(d, Time)).must_equal d
+        end
       ensure
-        Sequel.datetime_class = Time
         Sequel.default_timezone = nil
       end
     end
@@ -1954,9 +1951,10 @@ describe "A PostgreSQL dataset with a timestamp field" do
     d = Time.local(294275, 2, 3, 10, 11, 12)
     @db.get(Sequel.cast(d, Time)).must_equal d
 
-    Sequel.datetime_class = DateTime
-    d = DateTime.new(294275, 2, 3, 10, 11, 12)
-    @db.get(Sequel.cast(d, Time)).must_equal d
+    with_datetime_class_datetime do
+      d = DateTime.new(294275, 2, 3, 10, 11, 12)
+      @db.get(Sequel.cast(d, Time)).must_equal d
+    end
   end
 
   it "should handle BC times and dates" do
@@ -1968,10 +1966,11 @@ describe "A PostgreSQL dataset with a timestamp field" do
     @db.get(Sequel.cast(t, Time)).must_equal t
     @db.dataset.extension(:pg_timestamptz).get(Sequel.cast(t, :timestamptz)).must_equal t
 
-    Sequel.datetime_class = DateTime
-    dt = DateTime.new(-1234, 2, 3, 10, 20, Rational(30, 20))
-    @db.get(Sequel.cast(dt, DateTime)).must_equal dt
-    @db.dataset.extension(:pg_timestamptz).get(Sequel.cast(dt, :timestamptz)).must_equal dt
+    with_datetime_class_datetime do
+      dt = DateTime.new(-1234, 2, 3, 10, 20, Rational(30, 20))
+      @db.get(Sequel.cast(dt, DateTime)).must_equal dt
+      @db.dataset.extension(:pg_timestamptz).get(Sequel.cast(dt, :timestamptz)).must_equal dt
+    end
   end
 
   it "should handle BC times and dates in bound variables" do
@@ -1983,10 +1982,11 @@ describe "A PostgreSQL dataset with a timestamp field" do
     @db.select(Sequel.cast(:$t, Time)).call(:single_value, :t=>t).must_equal t
     @db.select(Sequel.cast(:$t, :timestamptz)).call(:single_value, :t=>t).must_equal t
 
-    Sequel.datetime_class = DateTime
-    dt = DateTime.new(-1234, 2, 3, 10, 20, Rational(30, 20))
-    @db.select(Sequel.cast(:$dt, DateTime)).call(:single_value, :dt=>dt).must_equal dt
-    @db.select(Sequel.cast(:$dt, :timestamptz)).call(:single_value, :dt=>dt).must_equal dt
+    with_datetime_class_datetime do
+      dt = DateTime.new(-1234, 2, 3, 10, 20, Rational(30, 20))
+      @db.select(Sequel.cast(:$dt, DateTime)).call(:single_value, :dt=>dt).must_equal dt
+      @db.select(Sequel.cast(:$dt, :timestamptz)).call(:single_value, :dt=>dt).must_equal dt
+    end
   end if uses_pg_or_jdbc 
 
   it "should handle infinite timestamps if convert_infinite_timestamps is set" do

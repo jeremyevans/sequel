@@ -19,9 +19,6 @@ describe "Sequel::Plugins::DefaultsSetter" do
       c.dataset = c.dataset; c
     end
   end
-  after do
-    Sequel.datetime_class = Time
-  end
 
   it "should set default value upon initialization" do
     @pr.call(2).new.a.must_equal 2
@@ -98,8 +95,7 @@ describe "Sequel::Plugins::DefaultsSetter" do
     @c.new.a.must_equal Date.today
   end
 
-  it "should handle Sequel::CURRENT_TIMESTAMP default by using the current DateTime if Sequel.datetime_class is DateTime" do
-    Sequel.datetime_class = DateTime
+  with_datetime_class_datetime "should handle Sequel::CURRENT_TIMESTAMP default by using the current DateTime if Sequel.datetime_class is DateTime" do
     t = @pr.call(Sequel::CURRENT_TIMESTAMP).new.a
     t.must_be_kind_of(DateTime)
     (t - DateTime.now).must_be :<,  1/86400.0

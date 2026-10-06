@@ -3,7 +3,6 @@ require_relative "../adapters/spec_helper"
 
 describe "Sequel timezone support" do
   def _test_timezone(timezone=Sequel.application_timezone)
-    Sequel.datetime_class = Time
     # Tests should cover both DST and non-DST times.
     [Time.now, Time.local(2010,1,1,12), Time.local(2010,6,1,12)].each do |t|
       @db[:t].insert(t)
@@ -15,17 +14,18 @@ describe "Sequel timezone support" do
       @db[:t].delete
     end
 
-    Sequel.datetime_class = DateTime
-    local_dst_offset = Time.local(2010, 6).utc_offset/86400.0
-    local_std_offset = Time.local(2010, 1).utc_offset/86400.0
-    [DateTime.now, DateTime.civil(2010,1,1,12,0,0,local_std_offset), DateTime.civil(2010,6,1,12,0,0,local_dst_offset)].each do |dt|
-      @db[:t].insert(dt)
-      dt2 = @db[:t].single_value
-      dt2 = @db.to_application_timestamp(dt2.to_s) unless dt2.is_a?(DateTime)
-      (dt2 - dt).must_be_close_to 0, 0.00002
-      dt2.offset.must_equal 0 if timezone == :utc
-      dt2.offset.must_equal dt.offset if timezone == :local
-      @db[:t].delete
+    with_datetime_class_datetime do
+      local_dst_offset = Time.local(2010, 6).utc_offset/86400.0
+      local_std_offset = Time.local(2010, 1).utc_offset/86400.0
+      [DateTime.now, DateTime.civil(2010,1,1,12,0,0,local_std_offset), DateTime.civil(2010,6,1,12,0,0,local_dst_offset)].each do |dt|
+        @db[:t].insert(dt)
+        dt2 = @db[:t].single_value
+        dt2 = @db.to_application_timestamp(dt2.to_s) unless dt2.is_a?(DateTime)
+        (dt2 - dt).must_be_close_to 0, 0.00002
+        dt2.offset.must_equal 0 if timezone == :utc
+        dt2.offset.must_equal dt.offset if timezone == :local
+        @db[:t].delete
+      end
     end
   end
 
@@ -36,7 +36,6 @@ describe "Sequel timezone support" do
   after do
     @db.timezone = nil
     Sequel.default_timezone = nil
-    Sequel.datetime_class = Time
     @db.drop_table(:t)
   end
 

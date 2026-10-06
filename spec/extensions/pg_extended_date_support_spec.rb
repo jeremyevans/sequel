@@ -9,7 +9,6 @@ describe "pg_extended_date_support extension" do
     @db.extend_datasets{def quote_identifiers?; false end}
   end
   after do
-    Sequel.datetime_class = Time
     Sequel.default_timezone = nil
   end
 
@@ -89,8 +88,7 @@ describe "pg_extended_date_support extension" do
     Sequel.default_timezone = nil
   end
 
-  it "should handle parsing BC timestamps as DateTime values" do
-    Sequel.datetime_class = DateTime
+  with_datetime_class_datetime "should handle parsing BC timestamps as DateTime values" do
     @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00 BC").must_equal DateTime.new(-1199, 2, 15, 14, 13, 20)
     @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00:00 BC").must_equal DateTime.new(-1199, 2, 15, 14, 13, 20)
     Sequel.default_timezone = :utc
@@ -99,8 +97,9 @@ describe "pg_extended_date_support extension" do
 
   it "should handle parsing AD timestamps with offset seconds" do
     @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00:00").must_equal Time.utc(1200, 2, 15, 14, 13, 20)
-    Sequel.datetime_class = DateTime
-    @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00:00").must_equal DateTime.new(1200, 2, 15, 14, 13, 20)
+    with_datetime_class_datetime do
+      @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00:00").must_equal DateTime.new(1200, 2, 15, 14, 13, 20)
+    end
   end
 
   it "should format Date::Infinity values" do

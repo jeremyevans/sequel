@@ -4,6 +4,7 @@ if ENV['COVERAGE']
   SimpleCov.sequel_coverage(:filter=>%r{lib/sequel/(extensions|plugins)/\w+\.rb\z})
 end
 
+ENV["SEQUEL_NAMED_TIMEZONES_USE_TIME"] = "1" # SEQUEL6: Remove
 ENV['MT_NO_PLUGINS'] = '1' # Work around stupid autoloading of plugins
 gem 'minitest'
 require 'minitest/global_expectations/autorun'

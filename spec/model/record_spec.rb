@@ -1778,10 +1778,6 @@ describe Sequel::Model, "typecasting" do
     DB.reset
   end
 
-  after do
-    Sequel.datetime_class = Time
-  end
-
   it "should not convert if typecasting is turned off" do
     @c.typecast_on_assignment = false
     m = @c.new
@@ -2077,16 +2073,18 @@ describe Sequel::Model, "typecasting" do
     m.x.must_equal y
     m.x = Date.parse('2007-10-21')
     m.x.must_equal Time.parse('2007-10-21')
-    Sequel.datetime_class = DateTime
-    y = DateTime.parse(x)
-    m.x = x
-    m.x.must_equal y
-    m.x = DateTime.parse(x)
-    m.x.must_equal y
-    m.x = Time.parse(x)
-    m.x.must_equal y
-    m.x = Date.parse('2007-10-21')
-    m.x.must_equal DateTime.parse('2007-10-21')
+
+    with_datetime_class_datetime do
+      y = DateTime.parse(x)
+      m.x = x
+      m.x.must_equal y
+      m.x = DateTime.parse(x)
+      m.x.must_equal y
+      m.x = Time.parse(x)
+      m.x.must_equal y
+      m.x = Date.parse('2007-10-21')
+      m.x.must_equal DateTime.parse('2007-10-21')
+    end
   end
 
   it "should accept a hash with symbol or string keys for a datetime field" do
@@ -2097,20 +2095,24 @@ describe Sequel::Model, "typecasting" do
     m.x.must_equal y
     m.x = {'year'=>'2007', 'month'=>'10', 'day'=>'21', 'hour'=>'10', 'minute'=>'20', 'second'=>'30'}
     m.x.must_equal y
-    Sequel.datetime_class = DateTime
-    y = DateTime.parse('2007-10-21 10:20:30')
-    m.x = {:year=>2007, :month=>10, :day=>21, :hour=>10, :minute=>20, :second=>30}
-    m.x.must_equal y
-    m.x = {'year'=>'2007', 'month'=>'10', 'day'=>'21', 'hour'=>'10', 'minute'=>'20', 'second'=>'30'}
-    m.x.must_equal y
+
+    with_datetime_class_datetime do
+      y = DateTime.parse('2007-10-21 10:20:30')
+      m.x = {:year=>2007, :month=>10, :day=>21, :hour=>10, :minute=>20, :second=>30}
+      m.x.must_equal y
+      m.x = {'year'=>'2007', 'month'=>'10', 'day'=>'21', 'hour'=>'10', 'minute'=>'20', 'second'=>'30'}
+      m.x.must_equal y
+    end
   end
 
   it "should raise an error if invalid data is used in a datetime field" do
     @c.db_schema = {:x=>{:type=>:datetime}}
     proc{@c.new.x = '0000'}.must_raise(Sequel::InvalidValue)
-    Sequel.datetime_class = DateTime
-    proc{@c.new.x = '0000'}.must_raise(Sequel::InvalidValue)
-    proc{@c.new.x = 'a'}.must_raise(Sequel::InvalidValue)
+
+    with_datetime_class_datetime do
+      proc{@c.new.x = '0000'}.must_raise(Sequel::InvalidValue)
+      proc{@c.new.x = 'a'}.must_raise(Sequel::InvalidValue)
+    end
   end
 
   it "should assign value if raise_on_typecast_failure is off and assigning invalid datetime" do
@@ -2119,12 +2121,14 @@ describe Sequel::Model, "typecasting" do
     model = @c.new
     model.x = '0000'
     model.x.must_equal '0000'
-    Sequel.datetime_class = DateTime
-    model = @c.new
-    model.x = '0000'
-    model.x.must_equal '0000'
-    model.x = 'a'
-    model.x.must_equal 'a'
+
+    with_datetime_class_datetime do
+      model = @c.new
+      model.x = '0000'
+      model.x.must_equal '0000'
+      model.x = 'a'
+      model.x.must_equal 'a'
+    end
   end
 end
 

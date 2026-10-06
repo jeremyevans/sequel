@@ -38,7 +38,7 @@ module Sequel
       private
 
       # Literalize custom DateTime subclass objects as CURRENT_TIMESTAMP.
-      def literal_datetime_append(sql, v)
+      def literal_datetime_append(sql, v) # SEQUEL6: Remove
         v.is_a?(DateTime) ? literal_append(sql, Sequel::CURRENT_TIMESTAMP) : super
       end
 
@@ -52,7 +52,7 @@ module Sequel
     class Time < ::Time; end
 
     # DateTime subclass literalized as CURRENT_TIMESTAMP
-    class DateTime < ::DateTime; end
+    class DateTime < ::DateTime; end # SEQUEL6.1: Remove
   end
 
   Dataset.register_extension(:current_datetime_timestamp, CurrentDateTimeTimestamp::DatasetMethods)

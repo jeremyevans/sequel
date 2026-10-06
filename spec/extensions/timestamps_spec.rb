@@ -2,15 +2,16 @@
 require_relative "spec_helper"
 
 describe "Sequel::Plugins::Timestamps" do
+  before(:all) do
+    @time_prepend = Module.new
+    Time.singleton_class.send(:prepend, @time_prepend)
+  end
   before do
-    dc = Object.new
-    dc.instance_eval do
+    @time_prepend.class_eval do
       def now
         '2009-08-01'
       end
-      singleton_class.send(:alias_method, :now, :now)
     end
-    Sequel.datetime_class = dc
     @c = Class.new(Sequel::Model(:t))
     @c.class_eval do
       columns :id, :created_at, :updated_at
@@ -21,7 +22,7 @@ describe "Sequel::Plugins::Timestamps" do
     end
   end 
   after do
-    Sequel.datetime_class = Time
+    @time_prepend.send(:remove_method, :now)
   end
   
   it "should handle validations on the timestamp fields for new objects" do
@@ -64,12 +65,13 @@ describe "Sequel::Plugins::Timestamps" do
   end
 
   it "should work with current_datetime_timestamp extension" do
-    Sequel.datetime_class = Time
+    @time_prepend.class_eval{remove_method :now}
     @c.dataset = @c.dataset.extension(:current_datetime_timestamp)
     @c.create
     @c.db.sqls.must_equal ["INSERT INTO t (created_at) VALUES (CURRENT_TIMESTAMP)"]
     @c.load(:id=>1).save
     @c.db.sqls.must_equal ["UPDATE t SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
+    @time_prepend.class_eval{define_method(:now){"2009-08-01"}}
   end
 
   it "should not update the update timestamp on creation" do
@@ -137,7 +139,10 @@ describe "Sequel::Plugins::Timestamps" do
 
   it "should set update timestamp to same timestamp as create timestamp when setting creating timestamp" do
     i = 1
-    Sequel.datetime_class.define_singleton_method(:now){"2009-08-0#{i+=1}"}
+    @time_prepend.class_eval do
+      remove_method :now
+      define_method(:now){"2009-08-0#{i+=1}"}
+    end
     @c.plugin :timestamps, :update_on_create=>true
     o = @c.create
     sqls = @c.db.sqls
@@ -150,7 +155,10 @@ describe "Sequel::Plugins::Timestamps" do
 
   it "should set update timestamp when using not overriding create timestamp" do
     i = 1
-    Sequel.datetime_class.define_singleton_method(:now){"2009-08-0#{i+=1}"}
+    @time_prepend.class_eval do
+      remove_method :now
+      define_method(:now){"2009-08-0#{i+=1}"}
+    end
     @c.plugin :timestamps, :update_on_create=>true
     o = @c.create(:created_at=>'2009-08-10')
     sqls = @c.db.sqls

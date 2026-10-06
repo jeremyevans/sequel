@@ -13,6 +13,7 @@ rescue LoadError
 end
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_(spec|test)\.rb/}
 
+ENV["SEQUEL_NAMED_TIMEZONES_USE_TIME"] = "1" # SEQUEL6: Remove
 Sequel.extension :fiber_concurrency if ENV['SEQUEL_FIBER_CONCURRENCY']
 
 # Set so that internal use of DB constant inside Sequel code is caught by tests.

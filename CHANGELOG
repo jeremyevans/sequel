@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Sequel.datetime_class= (jeremyevans)
+
 * Deprecate Sequel.convert_two_digit_years= (jeremyevans)
 
 * Add create_table like method on PostgreSQL, allowing you to copy all columns from another table (jeremyevans)

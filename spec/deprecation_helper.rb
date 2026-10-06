@@ -28,4 +28,21 @@ class Minitest::HooksSpec
   ensure
     Sequel.split_symbols = false
   end
+
+  def self.with_datetime_class_datetime(a, &block)
+    it("#{a}, with Sequel.datetime_class = DateTime") do
+      with_datetime_class_datetime{instance_exec(&block)}
+    end
+  end
+
+  def with_datetime_class_datetime
+    deprecated do
+      begin
+        Sequel.datetime_class = DateTime
+        yield
+      ensure
+        Sequel.datetime_class = Time
+      end
+    end
+  end
 end

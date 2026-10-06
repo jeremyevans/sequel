@@ -4965,7 +4965,6 @@ describe "Sequel timezone support" do
   end
   after do
     Sequel.default_timezone = nil
-    Sequel.datetime_class = Time
   end
   
   it "should handle an database timezone of :utc when literalizing values" do
@@ -5000,24 +4999,25 @@ describe "Sequel timezone support" do
     Sequel.database_to_application_timestamp(t.to_s).to_s.must_equal t.getlocal.to_s
     Sequel.database_to_application_timestamp(t.strftime('%Y-%m-%d %H:%M:%S')).to_s.must_equal t.getlocal.to_s
     
-    Sequel.datetime_class = DateTime
     dt = DateTime.now
     dt2 = dt.new_offset(0)
-    Sequel.database_to_application_timestamp(dt2).to_s.must_equal dt.to_s
-    Sequel.database_to_application_timestamp(dt2.to_s).to_s.must_equal dt.to_s
-    Sequel.database_to_application_timestamp(dt2.strftime('%Y-%m-%d %H:%M:%S')).to_s.must_equal dt.to_s
+    with_datetime_class_datetime do
+      Sequel.database_to_application_timestamp(dt2).to_s.must_equal dt.to_s
+      Sequel.database_to_application_timestamp(dt2.to_s).to_s.must_equal dt.to_s
+      Sequel.database_to_application_timestamp(dt2.strftime('%Y-%m-%d %H:%M:%S')).to_s.must_equal dt.to_s
+    end
     
-    Sequel.datetime_class = Time
     Sequel.database_timezone = :local
     Sequel.application_timezone = :utc
     Sequel.database_to_application_timestamp(t.getlocal).to_s.must_equal t.to_s
     Sequel.database_to_application_timestamp(t.getlocal.to_s).to_s.must_equal t.to_s
     Sequel.database_to_application_timestamp(t.getlocal.strftime('%Y-%m-%d %H:%M:%S')).to_s.must_equal t.to_s
     
-    Sequel.datetime_class = DateTime
-    Sequel.database_to_application_timestamp(dt).to_s.must_equal dt2.to_s
-    Sequel.database_to_application_timestamp(dt.to_s).to_s.must_equal dt2.to_s
-    Sequel.database_to_application_timestamp(dt.strftime('%Y-%m-%d %H:%M:%S')).to_s.must_equal dt2.to_s
+    with_datetime_class_datetime do
+      Sequel.database_to_application_timestamp(dt).to_s.must_equal dt2.to_s
+      Sequel.database_to_application_timestamp(dt.to_s).to_s.must_equal dt2.to_s
+      Sequel.database_to_application_timestamp(dt.strftime('%Y-%m-%d %H:%M:%S')).to_s.must_equal dt2.to_s
+    end
   end
   
   it "should handle typecasting timestamp columns" do
@@ -5028,24 +5028,25 @@ describe "Sequel timezone support" do
     @db.typecast_value(:datetime, t.to_s).to_s.must_equal t.getlocal.to_s
     @db.typecast_value(:datetime, t.strftime('%Y-%m-%d %H:%M:%S')).to_s.must_equal t.getlocal.to_s
     
-    Sequel.datetime_class = DateTime
     dt = DateTime.now
     dt2 = dt.new_offset(0)
-    @db.typecast_value(:datetime, dt2).to_s.must_equal dt.to_s
-    @db.typecast_value(:datetime, dt2.to_s).to_s.must_equal dt.to_s
-    @db.typecast_value(:datetime, dt2.strftime('%Y-%m-%d %H:%M:%S')).to_s.must_equal dt.to_s
+    with_datetime_class_datetime do
+      @db.typecast_value(:datetime, dt2).to_s.must_equal dt.to_s
+      @db.typecast_value(:datetime, dt2.to_s).to_s.must_equal dt.to_s
+      @db.typecast_value(:datetime, dt2.strftime('%Y-%m-%d %H:%M:%S')).to_s.must_equal dt.to_s
+    end
     
-    Sequel.datetime_class = Time
     Sequel.typecast_timezone = :local
     Sequel.application_timezone = :utc
     @db.typecast_value(:datetime, t.getlocal).to_s.must_equal t.to_s
     @db.typecast_value(:datetime, t.getlocal.to_s).to_s.must_equal t.to_s
     @db.typecast_value(:datetime, t.getlocal.strftime('%Y-%m-%d %H:%M:%S')).to_s.must_equal t.to_s
     
-    Sequel.datetime_class = DateTime
-    @db.typecast_value(:datetime, dt).to_s.must_equal dt2.to_s
-    @db.typecast_value(:datetime, dt.to_s).to_s.must_equal dt2.to_s
-    @db.typecast_value(:datetime, dt.strftime('%Y-%m-%d %H:%M:%S')).to_s.must_equal dt2.to_s
+    with_datetime_class_datetime do
+      @db.typecast_value(:datetime, dt).to_s.must_equal dt2.to_s
+      @db.typecast_value(:datetime, dt.to_s).to_s.must_equal dt2.to_s
+      @db.typecast_value(:datetime, dt.strftime('%Y-%m-%d %H:%M:%S')).to_s.must_equal dt2.to_s
+    end
   end
   
   it "should handle converting database timestamp columns from an array of values" do
@@ -5054,19 +5055,20 @@ describe "Sequel timezone support" do
     t = Time.now.utc
     Sequel.database_to_application_timestamp([t.year, t.mon, t.day, t.hour, t.min, t.sec]).to_s.must_equal t.getlocal.to_s
     
-    Sequel.datetime_class = DateTime
     dt = DateTime.now
     dt2 = dt.new_offset(0)
-    Sequel.database_to_application_timestamp([dt2.year, dt2.mon, dt2.day, dt2.hour, dt2.min, dt2.sec]).to_s.must_equal dt.to_s
+    with_datetime_class_datetime do
+      Sequel.database_to_application_timestamp([dt2.year, dt2.mon, dt2.day, dt2.hour, dt2.min, dt2.sec]).to_s.must_equal dt.to_s
+    end
     
-    Sequel.datetime_class = Time
     Sequel.database_timezone = :local
     Sequel.application_timezone = :utc
     t = t.getlocal
     Sequel.database_to_application_timestamp([t.year, t.mon, t.day, t.hour, t.min, t.sec]).to_s.must_equal t.getutc.to_s
     
-    Sequel.datetime_class = DateTime
-    Sequel.database_to_application_timestamp([dt.year, dt.mon, dt.day, dt.hour, dt.min, dt.sec]).to_s.must_equal dt2.to_s
+    with_datetime_class_datetime do
+      Sequel.database_to_application_timestamp([dt.year, dt.mon, dt.day, dt.hour, dt.min, dt.sec]).to_s.must_equal dt2.to_s
+    end
   end
   
   it "should raise an InvalidValue error when an error occurs while converting a timestamp" do
@@ -5089,14 +5091,16 @@ describe "Sequel timezone support" do
 
   it "should raise an InvalidValue error when the DateTime class is used and when a bad application timezone is used when attempting to convert timestamps" do
     Sequel.application_timezone = :blah
-    Sequel.datetime_class = DateTime
-    proc{Sequel.database_to_application_timestamp('2009-06-01 10:20:30')}.must_raise(Sequel::InvalidValue)
+    with_datetime_class_datetime do
+      proc{Sequel.database_to_application_timestamp('2009-06-01 10:20:30')}.must_raise(Sequel::InvalidValue)
+    end
   end
   
   it "should raise an InvalidValue error when the DateTime class is used and when a bad database timezone is used when attempting to convert timestamps" do
     Sequel.database_timezone = :blah
-    Sequel.datetime_class = DateTime
-    proc{Sequel.database_to_application_timestamp('2009-06-01 10:20:30')}.must_raise(Sequel::InvalidValue)
+    with_datetime_class_datetime do
+      proc{Sequel.database_to_application_timestamp('2009-06-01 10:20:30')}.must_raise(Sequel::InvalidValue)
+    end
   end
 
   it "should have Sequel.default_timezone= should set all other timezones" do
@@ -6052,19 +6056,16 @@ describe "Dataset#paged_each" do
 end
 
 describe "Dataset#current_datetime" do
-  after do
-    Sequel.datetime_class = Time
-  end
-
   it "should return an instance of Sequel.datetime_class for the current datetime" do
     t = Sequel::Dataset.new(nil).current_datetime 
     t.must_be_kind_of(Time)
     (Time.now - t < 0.1).must_equal true
 
-    Sequel.datetime_class = DateTime
-    t = Sequel::Dataset.new(nil).current_datetime 
-    t.must_be_kind_of(DateTime)
-    (DateTime.now - t < (0.1/86400)).must_equal true
+    with_datetime_class_datetime do
+      t = Sequel::Dataset.new(nil).current_datetime 
+      t.must_be_kind_of(DateTime)
+      (DateTime.now - t < (0.1/86400)).must_equal true
+    end
   end
 end
 
