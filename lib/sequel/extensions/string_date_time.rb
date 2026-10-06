@@ -22,14 +22,17 @@ class String
 
   # Converts a string into a DateTime object.
   def to_datetime
-    DateTime.parse(self, Sequel.convert_two_digit_years)
-  rescue => e
-    raise Sequel.convert_exception_class(e, Sequel::InvalidValue)
+    Sequel::Deprecation.deprecate("String#to_datetime is deprecated and will be removed in Sequel 6.")
+    begin
+      DateTime.parse(self, Sequel.convert_two_digit_years)
+    rescue => e
+      raise Sequel.convert_exception_class(e, Sequel::InvalidValue)
+    end
   end
 
   # Converts a string into a Time or DateTime object, depending on the
   # value of Sequel.datetime_class
-  def to_sequel_time
+  def to_sequel_time # SEQUEL6: Simplify making an alias to to_time
     if Sequel.datetime_class == DateTime
       DateTime.parse(self, Sequel.convert_two_digit_years)
     else
