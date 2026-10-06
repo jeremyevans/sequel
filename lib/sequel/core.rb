@@ -328,7 +328,7 @@ module Sequel
     #   Sequel.expr{table__column}  # table__column
     #   Sequel.expr{table[:column]} # table.column
     def split_symbols=(v)
-      # SEQUEL6: Remove
+      Sequel::Deprecation.deprecate("Sequel.split_symbols= is deprecated and will be removed in Sequel 6.")
       Sequel.synchronize{SPLIT_SYMBOL_CACHE.clear}
       @split_symbols = v
     end

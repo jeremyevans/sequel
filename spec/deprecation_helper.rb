@@ -23,10 +23,14 @@ class Minitest::HooksSpec
   end
 
   def with_symbol_splitting
-    Sequel.split_symbols = true
-    yield
-  ensure
-    Sequel.split_symbols = false
+    deprecated do
+      begin
+        Sequel.split_symbols = true
+        yield
+      ensure
+        Sequel.split_symbols = false
+      end
+    end
   end
 
   def self.with_datetime_class_datetime(a, &block)

@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Sequel.split_symbols= (jeremyevans)
+
 * Deprecate String#to_datetime in the string_date_time extension (jeremyevans)
 
 * Support SEQUEL_NAMED_TIMEZONES_USE_TIME environment variable for not having named_timezones extension set datetime_class (jeremyevans)
