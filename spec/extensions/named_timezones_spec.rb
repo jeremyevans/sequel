@@ -8,7 +8,6 @@ rescue LoadError
 else
 Sequel.extension :thread_local_timezones
 Sequel.extension :named_timezones
-Sequel.datetime_class = Time
 
 describe "Sequel named_timezones extension with DateTime class" do
   before do
@@ -18,33 +17,31 @@ describe "Sequel named_timezones extension with DateTime class" do
     @dt = DateTime.civil(2009,6,1,10,20,30,0)
     Sequel.application_timezone = 'America/Los_Angeles'
     Sequel.database_timezone = 'America/New_York'
-    Sequel.datetime_class = DateTime
   end
   after do
     Sequel.tzinfo_disambiguator = nil
     Sequel.default_timezone = nil
-    Sequel.datetime_class = Time
   end
   
-  it "should convert string arguments to *_timezone= to TZInfo::Timezone instances" do
+  with_datetime_class_datetime "should convert string arguments to *_timezone= to TZInfo::Timezone instances" do
     Sequel.application_timezone.must_equal @tz_in
     Sequel.database_timezone.must_equal @tz_out
   end
     
-  it "should convert string arguments for Database#timezone= to TZInfo::Timezone instances for database-specific timezones" do
+  with_datetime_class_datetime "should convert string arguments for Database#timezone= to TZInfo::Timezone instances for database-specific timezones" do
     @db.extension :named_timezones
     @db.timezone = 'America/Los_Angeles'
     @db.timezone.must_equal @tz_in
   end
     
-  it "should accept TZInfo::Timezone instances in *_timezone=" do
+  with_datetime_class_datetime "should accept TZInfo::Timezone instances in *_timezone=" do
     Sequel.application_timezone = @tz_in
     Sequel.database_timezone = @tz_out
     Sequel.application_timezone.must_equal @tz_in
     Sequel.database_timezone.must_equal @tz_out
   end
     
-  it "should convert datetimes going into the database to named database_timezone" do
+  with_datetime_class_datetime "should convert datetimes going into the database to named database_timezone" do
     ds = @db[:a].with_extend do
       def default_timestamp_format
         "'%Y-%m-%d %H:%M:%S%z'"
@@ -54,7 +51,7 @@ describe "Sequel named_timezones extension with DateTime class" do
     @db.sqls.must_equal ["INSERT INTO a VALUES ('2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400')"]
   end
   
-  it "should convert datetimes going into the database to named database_timezone" do
+  with_datetime_class_datetime "should convert datetimes going into the database to named database_timezone" do
     ds = @db[:a].with_extend do
       def default_timestamp_format
         "'%Y-%m-%d %H:%M:%S.%6N%z'"
@@ -65,7 +62,7 @@ describe "Sequel named_timezones extension with DateTime class" do
     @db.sqls.must_equal ["INSERT INTO a VALUES ('2009-06-01 06:20:30.555555-0400', '2009-06-01 06:20:30.555555-0400', '2009-06-01 06:20:30.555555-0400')"]
   end unless defined?(JRUBY_VERSION) && JRUBY_VERSION.to_r < Rational("9.2")
   
-  it "should convert datetimes coming out of the database from database_timezone to application_timezone" do
+  with_datetime_class_datetime "should convert datetimes coming out of the database from database_timezone to application_timezone" do
     dt = Sequel.database_to_application_timestamp('2009-06-01 06:20:30-0400')
     dt.must_be_instance_of DateTime
     dt.must_equal @dt
@@ -77,18 +74,18 @@ describe "Sequel named_timezones extension with DateTime class" do
     dt.offset.must_equal(-7/24.0)
   end
     
-  it "should raise an error for ambiguous timezones by default" do
+  with_datetime_class_datetime "should raise an error for ambiguous timezones by default" do
     proc{Sequel.database_to_application_timestamp('2004-10-31T01:30:00')}.must_raise(Sequel::InvalidValue)
   end
 
-  it "should support tzinfo_disambiguator= to handle ambiguous timezones automatically" do
+  with_datetime_class_datetime "should support tzinfo_disambiguator= to handle ambiguous timezones automatically" do
     Sequel.tzinfo_disambiguator = proc{|datetime, periods| periods.first}
     dt = Sequel.database_to_application_timestamp('2004-10-31T01:30:00')
     dt.must_equal DateTime.parse('2004-10-30T22:30:00-07:00')
     dt.offset.must_equal(-7/24.0)
   end
 
-  it "should assume datetimes coming out of the database that don't have an offset as coming from database_timezone" do
+  with_datetime_class_datetime "should assume datetimes coming out of the database that don't have an offset as coming from database_timezone" do
     dt = Sequel.database_to_application_timestamp('2009-06-01 06:20:30')
     dt.must_be_instance_of DateTime
     dt.must_equal @dt
@@ -100,7 +97,7 @@ describe "Sequel named_timezones extension with DateTime class" do
     dt.offset.must_equal(-7/24.0)
   end
   
-  it "should work with the thread_local_timezones extension" do
+  with_datetime_class_datetime "should work with the thread_local_timezones extension" do
     q, q1, q2 = Queue.new, Queue.new, Queue.new
     tz1, tz2 = nil, nil
     t1 = Thread.new do
@@ -137,7 +134,6 @@ describe "Sequel named_timezones extension with Time class" do
   after do
     Sequel.tzinfo_disambiguator = nil
     Sequel.default_timezone = nil
-    Sequel.datetime_class = Time
   end
   
   it "should convert string arguments to *_timezone= to TZInfo::Timezone instances" do

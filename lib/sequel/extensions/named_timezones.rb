@@ -1,16 +1,16 @@
 # frozen-string-literal: true
 #
 # Allows the use of named timezones via TZInfo (requires tzinfo).
-# Forces the use of DateTime as Sequel's datetime_class, since
+# Forces the use of DateTime as Sequel's datetime_class by default, since
 # historically, Ruby's Time class doesn't support timezones other
 # than local and UTC. To continue using Ruby's Time class when using
-# the named_timezones extension:
+# the named_timezones extension, set the
+# +SEQUEL_NAMED_TIMEZONES_USE_TIME+ environment variable before
+# loading the extension:
 #
 #   # Load the extension
+#   ENV['SEQUEL_NAMED_TIMEZONES_USE_TIME'] = "1"
 #   Sequel.extension :named_timezones
-#
-#   # Set Sequel.datetime_class back to Time
-#   Sequel.datetime_class = Time
 #
 # This allows you to either pass strings or TZInfo::Timezone
 # instance to Sequel.database_timezone=, application_timezone=, and
@@ -49,7 +49,9 @@ require 'tzinfo'
 
 #
 module Sequel
-  self.datetime_class = DateTime
+  # simplecov:disable
+  self.datetime_class = DateTime unless ENV["SEQUEL_NAMED_TIMEZONES_USE_TIME"]
+  # simplecov:enable
   
   module NamedTimezones
     module DatabaseMethods
