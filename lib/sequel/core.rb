@@ -110,7 +110,7 @@ module Sequel
       end
     end
 
-    # Creates a new database object based on the supplied connection string
+    # Creates a new Database object based on the supplied connection string
     # and optional arguments.  The specified scheme determines the database
     # class used, and the rest of the string specifies the connection options.
     # For example:
@@ -185,15 +185,19 @@ module Sequel
       end
     end
     
-    # The exception classed raised if there is an error parsing JSON.
+    # The exception class raised if there is an error parsing JSON.
     # This can be overridden to use an alternative json implementation.
-    def json_parser_error_class
+    #
+    # This method is deprecated and will be removed in Sequel 6.1.
+    def json_parser_error_class # SEQUEL6.1: Remove
       JSON::ParserError
     end
 
     if RUBY_VERSION >= '3'
       # Join the array or set.
-      def array_or_set_join(obj, arg)
+      #
+      # This method is deprecated and will be removed in Sequel 6.1.
+      def array_or_set_join(obj, arg) # SEQUEL6.1: Remove
         obj.join(arg)
       end
     # simplecov:disable
@@ -222,13 +226,17 @@ module Sequel
 
     # Convert given object to json and return the result.
     # This can be overridden to use an alternative json implementation.
-    def object_to_json(obj, *args, &block)
+    #
+    # This method is deprecated and will be removed in Sequel 6.1.
+    def object_to_json(obj, *args, &block) # SEQUEL6.1: Remove
       obj.to_json(*args, &block)
     end
 
     # Parse the string as JSON and return the result.
     # This can be overridden to use an alternative json implementation.
-    def parse_json(json)
+    #
+    # This method is deprecated and will be removed in Sequel 6.1.
+    def parse_json(json) # SEQUEL6.1: Remove
       if JSON::VERSION >= '3'
         JSON.parse(json)
       else
@@ -388,7 +396,10 @@ module Sequel
     if RUBY_VERSION >= '2.1'
       # A timer object that can be passed to Sequel.elapsed_seconds_since
       # to return the number of seconds elapsed.
-      def start_timer
+      #
+      # This method is deprecated and will be removed in Sequel 6.1 (or
+      # potentially in 6.0 if Ruby 2.1 support is dropped before 6.0).
+      def start_timer # SEQUEL6.1: Remove
         Process.clock_gettime(Process::CLOCK_MONOTONIC)
       end
     else
@@ -401,7 +412,10 @@ module Sequel
 
     # The elapsed seconds since the given timer object was created.  The
     # timer object should have been created via Sequel.start_timer.
-    def elapsed_seconds_since(timer)
+    #
+    # This method is deprecated and will be removed in Sequel 6.1 (or
+    # potentially in 6.0 if Ruby 2.1 support is dropped before 6.0).
+    def elapsed_seconds_since(timer) # SEQUEL6.1: Remove
       start_timer - timer
     end
 
