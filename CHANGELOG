@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Sequel::SPLIT_SYMBOL_CACHE constant (jeremyevans)
+
 * Deprecate Sequel.split_symbols= (jeremyevans)
 
 * Deprecate String#to_datetime in the string_date_time extension (jeremyevans)

@@ -37,6 +37,8 @@ module Sequel
   OPTS = {}.freeze
 
   SPLIT_SYMBOL_CACHE = {}  # SEQUEL6: Remove
+  SPLIT_SYMBOL_CACHE_ = SPLIT_SYMBOL_CACHE
+  private_constant :SPLIT_SYMBOL_CACHE_
 
   module SequelMethods
     # Sequel converts two digit years in <tt>Date</tt>s and <tt>DateTime</tt>s by default,
@@ -277,7 +279,7 @@ module Sequel
     # For tables, these parts are the schema, table, and alias.
     def split_symbol(sym)
       # SEQUEL6.1: Remove
-      unless v = Sequel.synchronize{SPLIT_SYMBOL_CACHE[sym]}
+      unless v = Sequel.synchronize{SPLIT_SYMBOL_CACHE_[sym]}
         if split_symbols?
           v = case s = sym.to_s
           when /\A((?:(?!__).)+)__((?:(?!___).)+)___(.+)\z/
@@ -292,7 +294,7 @@ module Sequel
         else
           v = [nil,sym.to_s.freeze,nil].freeze
         end
-        Sequel.synchronize{SPLIT_SYMBOL_CACHE[sym] = v}
+        Sequel.synchronize{SPLIT_SYMBOL_CACHE_[sym] = v}
       end
       v
     end
@@ -329,7 +331,7 @@ module Sequel
     #   Sequel.expr{table[:column]} # table.column
     def split_symbols=(v)
       Sequel::Deprecation.deprecate("Sequel.split_symbols= is deprecated and will be removed in Sequel 6.")
-      Sequel.synchronize{SPLIT_SYMBOL_CACHE.clear}
+      Sequel.synchronize{SPLIT_SYMBOL_CACHE_.clear}
       @split_symbols = v
     end
 
@@ -511,4 +513,6 @@ module Sequel
 
   # Add the database adapter class methods to Sequel via metaprogramming
   def_adapter_method(*Database::ADAPTERS)
+
+  Deprecation.deprecate_constant(self, :SPLIT_SYMBOL_CACHE)
 end
