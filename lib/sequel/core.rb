@@ -10,7 +10,7 @@
 #   DB = Sequel.sqlite # Memory database
 #   DB = Sequel.sqlite('blog.db')
 #   DB = Sequel.postgres('database_name',
-#          user:'user', 
+#          user: 'user', 
 #          password: 'password',
 #          host: 'host'
 #          port: 5432, 
@@ -25,7 +25,7 @@
 # For a more expanded introduction, see the {README}[rdoc-ref:README.rdoc].
 # For a quicker introduction, see the {cheat sheet}[rdoc-ref:doc/cheat_sheet.rdoc].
 module Sequel
-  @convert_two_digit_years = true
+  @convert_two_digit_years = true # SEQUEL6: Remove
   @datetime_class = Time # SEQUEL6: Remove
   @split_symbols = false # SEQUEL6: Remove
   @single_threaded = false
@@ -45,7 +45,16 @@ module Sequel
     # January 2nd, 0003 and December 13, 0099, respectively, by:
     #
     #   Sequel.convert_two_digit_years = false
-    attr_accessor :convert_two_digit_years
+    #
+    # The setter method is deprecated and will be removed in Sequel 6.
+    # The reader method will be deprecated in Sequel 6.0 and removed in
+    # Sequel 6.1.
+    attr_reader :convert_two_digit_years # SEQUEL6.1: Remove
+
+    def convert_two_digit_years=(v)
+      Sequel::Deprecation.deprecate("Sequel.convert_two_digit_years= is deprecated and will be removed in Sequel 6.")
+      @convert_two_digit_years = v
+    end
 
     # Sequel can use either +Time+ or +DateTime+ for times returned from the
     # database.  It defaults to +Time+.  To change it to +DateTime+:

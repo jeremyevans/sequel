@@ -15,10 +15,6 @@ describe "String#to_time" do
 end
 
 describe "String#to_date" do
-  after do
-    Sequel.convert_two_digit_years = true
-  end
-
   it "should convert the string into a Date object" do
     "2007-07-11".to_date.must_equal Date.parse("2007-07-11")
   end
@@ -27,9 +23,10 @@ describe "String#to_date" do
     "July 11, 07".to_date.must_equal Date.parse("2007-07-11")
   end
 
-  it "should not convert 2 digit years if set not to" do
+  deprecated "should not convert 2 digit years if set not to" do
     Sequel.convert_two_digit_years = false
     "July 11, 07".to_date.must_equal Date.parse("0007-07-11")
+    Sequel.convert_two_digit_years = true
   end
 
   it "should raise InvalidValue for an invalid date" do
@@ -38,10 +35,6 @@ describe "String#to_date" do
 end
 
 describe "String#to_datetime" do
-  after do
-    Sequel.convert_two_digit_years = true
-  end
-
   it "should convert the string into a DateTime object" do
     "2007-07-11 10:11:12a".to_datetime.must_equal DateTime.parse("2007-07-11 10:11:12a")
   end
@@ -50,9 +43,10 @@ describe "String#to_datetime" do
     "July 11, 07 10:11:12a".to_datetime.must_equal DateTime.parse("2007-07-11 10:11:12a")
   end
 
-  it "should not convert 2 digit years if set not to" do
+  deprecated "should not convert 2 digit years if set not to" do
     Sequel.convert_two_digit_years = false
     "July 11, 07 10:11:12a".to_datetime.must_equal DateTime.parse("0007-07-11 10:11:12a")
+    Sequel.convert_two_digit_years = true
   end
 
   it "should raise InvalidValue for an invalid date" do
@@ -63,7 +57,6 @@ end
 describe "String#to_sequel_time" do
   after do
     Sequel.datetime_class = Time
-    Sequel.convert_two_digit_years = true
   end
 
   it "should convert the string into a Time object by default" do
@@ -82,10 +75,11 @@ describe "String#to_sequel_time" do
     "July 11, 07 10:11:12a".to_sequel_time.must_equal DateTime.parse("2007-07-11 10:11:12a")
   end
 
-  it "should not convert 2 digit years if set not to when using DateTime class" do
+  deprecated "should not convert 2 digit years if set not to when using DateTime class" do
     Sequel.datetime_class = DateTime
     Sequel.convert_two_digit_years = false
     "July 11, 07 10:11:12a".to_sequel_time.must_equal DateTime.parse("0007-07-11 10:11:12a")
+    Sequel.convert_two_digit_years = true
   end
 
   it "should raise InvalidValue for an invalid time" do

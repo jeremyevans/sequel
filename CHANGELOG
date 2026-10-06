@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Sequel.convert_two_digit_years= (jeremyevans)
+
 * Add create_table like method on PostgreSQL, allowing you to copy all columns from another table (jeremyevans)
 
 * Add alter_table detach_partition method on PostgreSQL 10+, for detaching a partition to a separate table (jeremyevans)
