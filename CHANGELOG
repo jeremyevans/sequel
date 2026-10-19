@@ -1,5 +1,7 @@
 === master
 
+* Replace aliasing of Kernel methods inside modules with define_method and Kernel.instance_method (jeremyevans)
+
 * Deprecate Sequel::SPLIT_SYMBOL_CACHE constant (jeremyevans)
 
 * Deprecate Sequel.split_symbols= (jeremyevans)

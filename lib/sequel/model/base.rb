@@ -1188,7 +1188,7 @@ END
       # By default it calls send with the argument to get the value.  This can
       # be overridden if you have columns that conflict with existing
       # method names.
-      alias get_column_value send
+      define_method(:get_column_value, Kernel.instance_method(:send))
 
       # Set the value of the column.  Takes two arguments.  The first is a
       # symbol or string argument for the column name, suffixed with =.  The
@@ -1196,7 +1196,7 @@ END
       # with the argument to set the value.  This can be overridden if you have
       # columns that conflict with existing method names (unlikely for setter
       # methods, but possible).
-      alias set_column_value send
+      define_method(:set_column_value, Kernel.instance_method(:send))
 
       # Creates new instance and passes the given values to set.
       # If a block is given, yield the instance to the block.
@@ -1293,7 +1293,7 @@ END
       # self.class.
       #
       #   Artist.new.model # => Artist
-      alias_method :model, :class
+      define_method(:model, Kernel.instance_method(:class))
 
       # The autoincrementing primary key for this model object. Should be
       # overridden if you have a composite primary key with one part of it

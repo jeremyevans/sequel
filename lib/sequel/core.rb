@@ -86,8 +86,8 @@ module Sequel
     #   Sequel.single_threaded = true
     attr_accessor :single_threaded
 
-    # # SEQUEL6: Remove
-    alias orig_require require
+    # SEQUEL6: Remove
+    define_method(:orig_require, Kernel.instance_method(:require))
     private :orig_require
 
     # Returns true if the passed object could be a specifier of conditions, false otherwise.
