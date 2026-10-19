@@ -181,7 +181,7 @@ module Sequel
           raise Error, "cannot use extension with ../ for security reasons"
         end
 
-        orig_require("sequel/extensions/#{e}")
+        Kernel.require("sequel/extensions/#{e}")
       end
     end
     
