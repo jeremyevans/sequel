@@ -48,7 +48,7 @@ DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
 Sequel::Model.plugin :pg_eager_any_typed_array if ENV['SEQUEL_PG_EAGER_ANY_TYPED_ARRAY']
 Sequel::Model.shape_friendly = true if ENV["SEQUEL_MODEL_SHAPE_FRIENDLY"]
 
-if DB.adapter_scheme == :ibmdb || (DB.adapter_scheme == :ado && DB.database_type == :access)
+if DB.adapter_scheme == :ibmdb
   def DB.drop_table(*tables)
     super
   rescue Sequel::DatabaseError

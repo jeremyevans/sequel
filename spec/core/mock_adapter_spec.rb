@@ -483,7 +483,7 @@ describe "Sequel Mock Adapter" do
   end
 
   it "should be able to load dialects based on the database name" do
-    Sequel.mock(:host=>'access').select(Date.new(2011, 12, 13)).sql.must_equal 'SELECT #2011-12-13#'
+    deprecated{Sequel.mock(:host=>'access').select(Date.new(2011, 12, 13)).sql.must_equal 'SELECT #2011-12-13#'}
     Sequel.mock(:host=>'db2').select(1).sql.must_equal 'SELECT 1 FROM "SYSIBM"."SYSDUMMY1"'
     Sequel.mock(:host=>'mssql')[:A].full_text_search(:B, 'C').with_quote_identifiers(false).sql.must_equal "SELECT * FROM A WHERE (CONTAINS (B, 'C'))"
     Sequel.mock(:host=>'mssql')[:A].full_text_search(:B, %w'C"\' D').with_quote_identifiers(false).sql.must_equal "SELECT * FROM A WHERE (CONTAINS (B, '\"C\"\"''\" OR \"D\"'))"

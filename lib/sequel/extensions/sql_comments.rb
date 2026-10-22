@@ -84,10 +84,6 @@
 #     # SELECT * FROM albums -- model:Album,action:all -- Some Comment
 #   end
 #
-# Note that Microsoft Access does not support inline comments,
-# and attempting to use comments on it will result in SQL syntax
-# errors.
-#
 # Related modules: Sequel::SQLComments, Sequel::Database::SQLComments
 
 #

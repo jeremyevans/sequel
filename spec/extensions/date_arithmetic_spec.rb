@@ -162,7 +162,7 @@ describe "date_arithmetic extension" do
     db.literal(Sequel.date_add(:a, @h0, :cast=>:datetime)).must_equal "CAST(a AS datetime)"
   end
 
-  it "should correctly literalize on access" do
+  deprecated "should correctly literalize on access" do
     db = dbf.call(:access).dataset.with_quote_identifiers(false)
     db.literal(Sequel.date_add(:a, @h0)).must_equal "CDate(a)"
     db.literal(Sequel.date_add(:a, @h1)).must_equal "DATEADD('d', 1, a)"

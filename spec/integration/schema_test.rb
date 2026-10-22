@@ -192,7 +192,7 @@ describe "Database schema parser" do
     end
   when :mssql, :h2, :hsqldb
     int_types.concat([:smallint, :tinyint])
-  when :derby, :access
+  when :derby
     int_types.concat([:smallint])
   when :sqlanywhere
     int_types.concat([:tinyint])

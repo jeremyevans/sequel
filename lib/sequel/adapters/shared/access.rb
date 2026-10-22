@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+Sequel::Deprecation.deprecate("Sequel's support for Microsoft Access", "Please consider maintaining it yourself as an external gem if you want to continue using it")
+
 require_relative '../utils/emulate_offset_with_reverse_and_count'
 require_relative '../utils/unmodified_identifiers'
 require_relative '../utils/columns_limit_1'
