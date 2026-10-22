@@ -1,5 +1,7 @@
 === master
 
+* Raise error if attempting to use a quoted identifier containing ] on Microsoft Access (jeremyevans)
+
 * Replace aliasing of Kernel methods inside modules with define_method and Kernel.instance_method (jeremyevans)
 
 * Deprecate Sequel::SPLIT_SYMBOL_CACHE constant (jeremyevans)

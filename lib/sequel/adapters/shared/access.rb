@@ -185,7 +185,9 @@ module Sequel
       # Access uses [] for quoting identifiers, and can't handle
       # ] inside identifiers.
       def quoted_identifier_append(sql, v)
-        sql << '[' << v.to_s << ']'
+        v = v.to_s
+        raise Error, "Access cannot quote an identifier containing ]" if v.include?("]")
+        sql << '[' << v << ']'
       end
 
       # Access does not support derived column lists.
