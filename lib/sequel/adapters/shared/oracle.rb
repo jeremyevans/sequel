@@ -401,7 +401,7 @@ module Sequel
       def quoted_identifier_append(sql, name)
         name = name.to_s
         raise Error, "Oracle cannot quote an identifier containing \"" if name.include?('"')
-        sql << '"' << name.gsub('"', '""') << '"'
+        sql << '"' << name << '"'
       end
 
       # Oracle requires SQL standard datetimes
