@@ -23,9 +23,9 @@ describe "pg_loose_count extension" do
   end
 
   it "should add loose_counts method getting fast counts for all tables in a schema" do
-    ["schema", :schema, Sequel.identifier(:schema)].each do
+    ["schema", :schema, Sequel.identifier(:schema)].each do |schema|
       @db.fetch = {relname: "t", v: 2}
-      @db.loose_counts(:schema).must_equal(t: 2)
+      @db.loose_counts(schema).must_equal(t: 2)
       @db.sqls.must_equal ["SELECT relname, CAST(reltuples AS integer) AS v FROM pg_class WHERE ((relnamespace = CAST(to_regnamespace('schema') AS oid)) AND (relkind IN ('r', 'm', 'p'))) ORDER BY relname"]
     end
   end
