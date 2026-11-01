@@ -1,5 +1,7 @@
 === master
 
+* Avoid duplicating table when adding/dropping CHECK or NOT NULL constraints on SQLite 3.53+ (jeremyevans)
+
 * Add Database#wait_for_lsn on PostgreSQL 19+ to support WAIT FOR LSN (jeremyevans)
 
 * Add virtual_row_core_refinements extension, enabling the core refinements inside virtual row blocks (jeremyevans)

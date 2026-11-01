@@ -207,7 +207,17 @@ module Sequel
           run "PRAGMA legacy_alter_table = 1" if sqlite_version >= 32600
         end
         transaction do 
-          if ops.length > 1 && ops.all?{|op| op[:op] == :add_constraint || op[:op] == :set_column_null}
+          combine_constraints = if ops.length > 1 && !ops.any?{|op| op[:op] != :add_constraint && op[:op] != :set_column_null}
+            if sqlite_version >= 35300
+              !ops.all?{|op| (op[:op] == :add_constraint && op[:type] == :check) || op[:op] == :set_column_null}
+            else
+              true
+            end
+          else
+            false
+          end
+
+          if combine_constraints
             null_ops, ops = ops.partition{|op| op[:op] == :set_column_null}
 
             # Apply NULL/NOT NULL ops first, since those should be purely independent of the constraints.
@@ -261,7 +271,11 @@ module Sequel
         when :set_column_default
           duplicate_table(table){|columns| columns.each{|s| s[:default] = op[:default] if s[:name].to_s == op[:name].to_s}}
         when :set_column_null
-          duplicate_table(table){|columns| columns.each{|s| s[:null] = op[:null] if s[:name].to_s == op[:name].to_s}}
+          if sqlite_version >= 35300
+            super
+          else
+            duplicate_table(table){|columns| columns.each{|s| s[:null] = op[:null] if s[:name].to_s == op[:name].to_s}}
+          end
         when :set_column_type
           duplicate_table(table){|columns| columns.each{|s| s.merge!(op) if s[:name].to_s == op[:name].to_s}}
         when :drop_constraint
@@ -282,10 +296,18 @@ module Sequel
           when :unique
             duplicate_table(table, :no_unique=>true)
           else
-            duplicate_table(table)
+            if sqlite_version >= 35300
+              super
+            else
+              duplicate_table(table)
+            end
           end
         when :add_constraint
-          duplicate_table(table, :constraints=>[op])
+          if op[:type] == :check
+            super
+          else
+            duplicate_table(table, :constraints=>[op])
+          end
         when :add_constraints
           duplicate_table(table, :constraints=>op[:ops])
         else
