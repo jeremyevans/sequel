@@ -46,6 +46,8 @@ Superclass:
 <ol>
 <li><a href="#method-i-add_exclusion_constraint">add_exclusion_constraint</a></li>
 <li><a href="#method-i-alter_constraint">alter_constraint</a></li>
+<li><a href="#method-i-attach_partition">attach_partition</a></li>
+<li><a href="#method-i-detach_partition">detach_partition</a></li>
 <li><a href="#method-i-rename_constraint">rename_constraint</a></li>
 <li><a href="#method-i-validate_constraint">validate_constraint</a></li>
 </ol>
@@ -71,9 +73,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-add_exclusion_constraint-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">142</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_exclusion_constraint</span>(<span class="ruby-identifier">elements</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">143</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:add_constraint</span>, <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:exclude</span>, <span class="ruby-value">:elements</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">elements</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
-<span class="line-num">144</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">153</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_exclusion_constraint</span>(<span class="ruby-identifier">elements</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">154</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:add_constraint</span>, <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:exclude</span>, <span class="ruby-value">:elements</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">elements</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">155</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-alter_constraint'>
@@ -106,9 +108,53 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-alter_constraint-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">153</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">alter_constraint</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">154</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:alter_constraint</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
-<span class="line-num">155</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">164</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">alter_constraint</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">165</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:alter_constraint</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">166</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-attach_partition'>
+<a name='method-i-attach_partition'></a>
+<div class='synopsis'>
+<span class='name'>attach_partition</span><span class='arguments'>(name, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Attach an existing table as a partition of the altered table. This is preferable to using create_table with :partition_of for a number of reasons. Accepts the same block that you would pass to create_table with the :partition_of option.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-attach_partition-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-attach_partition-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">172</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">attach_partition</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">173</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:attach_partition</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:generator</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">CreatePartitionOfTableGenerator</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
+<span class="line-num">174</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-detach_partition'>
+<a name='method-i-detach_partition'></a>
+<div class='synopsis'>
+<span class='name'>detach_partition</span><span class='arguments'>(name, concurrently: false, finalize: false)</span>
+
+</div>
+<div class='description'>
+
+<p>Detach a partition from a partitioned table. The detached partition becomes a separate table. Arguments: name: Name of partitioned table concurrently: Use CONCURRENTLY when detaching, which reduces the locking required. finalize: Use FINALIZE when detaching, to complete a case where CONCURRENTLY was</p>
+
+<pre>used but could not complete the detach.</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-detach_partition-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-detach_partition-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">182</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">detach_partition</span>(<span class="ruby-identifier">name</span>, <span class="ruby-value">concurrently:</span> <span class="ruby-keyword">false</span>, <span class="ruby-value">finalize:</span> <span class="ruby-keyword">false</span>)
+<span class="line-num">183</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:detach_partition</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:concurrently</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">concurrently</span>, <span class="ruby-value">:finalize</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">finalize</span>}
+<span class="line-num">184</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-rename_constraint'>
@@ -118,9 +164,8 @@ Superclass:
 
 </div>
 <div class='description'>
-<table class="rdoc-list note-list"><tbody><tr><td class='label'>:inherit </td><td>
-<p>Set true to use INHERIT, or false to use NO INHERIT (PostgreSQL 18+)</p>
-</td></tr></tbody></table>
+
+<p>Rename an constraint.</p>
 
 </div>
 <div class='source'>
@@ -128,9 +173,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-rename_constraint-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">158</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rename_constraint</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>)
-<span class="line-num">159</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:rename_constraint</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:new_name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">new_name</span>}
-<span class="line-num">160</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">187</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rename_constraint</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>)
+<span class="line-num">188</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:rename_constraint</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:new_name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">new_name</span>}
+<span class="line-num">189</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-validate_constraint'>
@@ -149,9 +194,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-validate_constraint-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">164</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate_constraint</span>(<span class="ruby-identifier">name</span>)
-<span class="line-num">165</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:validate_constraint</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>}
-<span class="line-num">166</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">193</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate_constraint</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">194</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:validate_constraint</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>}
+<span class="line-num">195</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

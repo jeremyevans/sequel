@@ -33,13 +33,11 @@ lib/sequel/extensions/named_timezones.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Allows the use of named timezones via TZInfo (requires tzinfo). Forces the use of DateTime as Sequel’s datetime_class, since historically, Ruby’s Time class doesn’t support timezones other than local and UTC. To continue using Ruby’s Time class when using the <a href="named_timezones_rb.html">named_timezones</a> extension:</p>
+<p>Allows the use of named timezones via TZInfo (requires tzinfo). Forces the use of DateTime as Sequel’s datetime_class by default, since historically, Ruby’s Time class doesn’t support timezones other than local and UTC. To continue using Ruby’s Time class when using the <a href="named_timezones_rb.html">named_timezones</a> extension, set the <code>SEQUEL_NAMED_TIMEZONES_USE_TIME</code> environment variable before loading the extension:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Load the extension</span>
+<span class="ruby-constant">ENV</span>[<span class="ruby-string">&#39;SEQUEL_NAMED_TIMEZONES_USE_TIME&#39;</span>] = <span class="ruby-string">&quot;1&quot;</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:named_timezones</span>
-
-<span class="ruby-comment"># Set Sequel.datetime_class back to Time</span>
-<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">datetime_class</span> = <span class="ruby-constant">Time</span>
 </pre>
 
 <p>This allows you to either pass strings or TZInfo::Timezone instance to Sequel.database_timezone=, application_timezone=, and typecast_timezone=.  If a string is passed, it is converted to a TZInfo::Timezone using TZInfo::Timezone.get.</p>

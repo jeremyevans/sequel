@@ -574,10 +574,13 @@ Superclass:
 </a>
 <pre id='method-i-to_datetime-source'>   <span class="ruby-comment"># File lib/sequel/extensions/string_date_time.rb</span>
 <span class="line-num">24</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_datetime</span>
-<span class="line-num">25</span>   <span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_two_digit_years</span>)
-<span class="line-num">26</span> <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
-<span class="line-num">27</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>)
-<span class="line-num">28</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">25</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;String#to_datetime is deprecated and will be removed in Sequel 6.&quot;</span>)
+<span class="line-num">26</span>   <span class="ruby-keyword">begin</span>
+<span class="line-num">27</span>     <span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_two_digit_years</span>)
+<span class="line-num">28</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+<span class="line-num">29</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>)
+<span class="line-num">30</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">31</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_sequel_blob'>
@@ -617,15 +620,15 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-to_sequel_time-source'>   <span class="ruby-comment"># File lib/sequel/extensions/string_date_time.rb</span>
-<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_time</span>
-<span class="line-num">33</span>   <span class="ruby-keyword">if</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">datetime_class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">DateTime</span>
-<span class="line-num">34</span>     <span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_two_digit_years</span>)
-<span class="line-num">35</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">36</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">datetime_class</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">37</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">38</span> <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
-<span class="line-num">39</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>)
-<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">35</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_time</span> <span class="ruby-comment"># SEQUEL6: Simplify making an alias to to_time</span>
+<span class="line-num">36</span>   <span class="ruby-keyword">if</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">datetime_class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">DateTime</span>
+<span class="line-num">37</span>     <span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_two_digit_years</span>)
+<span class="line-num">38</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">39</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">datetime_class</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">40</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">41</span> <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+<span class="line-num">42</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>)
+<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_time'>
@@ -644,11 +647,11 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-to_time-source'>   <span class="ruby-comment"># File lib/sequel/extensions/string_date_time.rb</span>
-<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_time</span>
-<span class="line-num">44</span>   <span class="ruby-constant">Time</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">45</span> <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
-<span class="line-num">46</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>)
-<span class="line-num">47</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">46</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_time</span>
+<span class="line-num">47</span>   <span class="ruby-constant">Time</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">48</span> <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+<span class="line-num">49</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>)
+<span class="line-num">50</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-underscore'>

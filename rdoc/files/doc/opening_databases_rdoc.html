@@ -177,10 +177,6 @@ doc/opening_databases.rdoc
 <pre class="ruby"><span class="ruby-comment"># SQL Server</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;ado:///sequel_test?host=server%5cdb_instance&#39;</span>)
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;ado://user:password@server/database?host=server%5cdb_instance&amp;provider=SQLNCLI10&#39;</span>)
-<span class="ruby-comment"># Access 2007</span>
-<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(<span class="ruby-value">conn_string:</span> <span class="ruby-string">&#39;Provider=Microsoft.ACE.OLEDB.12.0;Data Source=drive:\\path\\filename.accdb&#39;</span>)
-<span class="ruby-comment"># Access 2000</span>
-<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(<span class="ruby-value">conn_string:</span> <span class="ruby-string">&#39;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\\path\\filename.mdb&#39;</span>)
 <span class="ruby-comment"># Excel 2000 (for table names, use a dollar after the sheet name, e.g. Sheet1$)</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(<span class="ruby-value">conn_string:</span> <span class="ruby-string">&#39;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\\path\\filename.xls;Extended Properties=Excel 8.0;&#39;</span>)
 </pre>

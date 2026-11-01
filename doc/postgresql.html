@@ -188,7 +188,19 @@
 <span class="ruby-comment">#   USING (CAST(&#39;epoch&#39; AS timestamp) + (CAST(&#39;1 second&#39; AS interval) * &quot;unix_time&quot;))</span>
 </pre>
 
-<h3 id="label-Creating+Partitioned+Tables"><a href="#label-Creating+Partitioned+Tables">Creating Partitioned Tables</a></h3>
+<h3 id="label-CREATE+TABLE+LIKE"><a href="#label-CREATE+TABLE+LIKE">CREATE TABLE LIKE</a></h3>
+
+<p>You can use the <code>like</code> option in <code>create_table</code> for <code>CREATE TABLE LIKE</code>:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:a</span>){<span class="ruby-identifier">like</span> <span class="ruby-value">:b</span>, <span class="ruby-value">including:</span> <span class="ruby-value">:all</span>}
+<span class="ruby-comment"># CREATE TABLE &quot;a&quot; LIKE &quot;b&quot; INCLUDING ALL</span>
+</pre>
+
+<p><code>like</code> supports both an <code>including</code> and <code>excluding</code> argument, which can be passed symbols for all <code>INCLUDING</code> and <code>EXCLUDING</code> options that PostgreSQL supports.</p>
+
+<h3 id="label-Partitioned+Tables"><a href="#label-Partitioned+Tables">Partitioned Tables</a></h3>
+
+<h4 id="label-Creating"><a href="#label-Creating">Creating</a></h4>
 
 <p>PostgreSQL allows marking tables as partitioned tables, and adding partitions to such tables. <a href="..//rdoc/classes/Sequel.html"><code>Sequel</code></a> offers support for this.  You can create a partitioned table using the <code>:partition_by</code> option and <code>:partition_type</code> options (the default partition type is range partitioning):</p>
 
@@ -254,6 +266,19 @@
 </pre>
 
 <p>There is currently no support for using custom column or table constraints in partitions of other tables.  Support may be added in the future.</p>
+
+<h4 id="label-Attaching-2FDetaching+Partitions"><a href="#label-Attaching-2FDetaching+Partitions">Attaching/Detaching Partitions</a></h4>
+
+<p>You can use <code>attach_partition</code> and <code>detach_partition</code> in <code>alter_table</code> to attach or detach partitions. <code>attach_partition</code> takes the same block as <code>create_table</code> when using the :partition_of option. You can combine this with the <code>create_table</code> <code>like</code> method to make a copy of an existing table schema, and then attach it as a new partition. This is generally better than using the <code>create_table</code> <code>:partition_of</code> option if you need concurrent access to the tables.</p>
+
+<pre>DB.create_table(:table1a){like :table1, including :all}
+
+DB.alter_table(:table1) do
+  attach_partition(:table1) do
+    from minvalue
+    to 0
+  end
+end</pre>
 
 <h3 id="label-Creating+Unlogged+Tables"><a href="#label-Creating+Unlogged+Tables">Creating Unlogged Tables</a></h3>
 

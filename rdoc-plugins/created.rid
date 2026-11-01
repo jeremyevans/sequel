@@ -1,4 +1,4 @@
-Thu, 01 Oct 2026 10:25:17 -0700
+Sun, 01 Nov 2026 09:03:00 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 11 Oct 2022 13:37:12 -0700
 lib/sequel/extensions/_pretty_table.rb	Mon, 10 Aug 2026 21:10:16 -0700
@@ -17,7 +17,7 @@ lib/sequel/extensions/constant_sql_override.rb	Tue, 11 Sep 2018 10:35:39 -0700
 lib/sequel/extensions/constraint_validations.rb	Mon, 10 Aug 2026 21:10:16 -0700
 lib/sequel/extensions/core_extensions.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/core_refinements.rb	Sun, 06 Sep 2026 22:33:36 -0700
-lib/sequel/extensions/current_datetime_timestamp.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/extensions/current_datetime_timestamp.rb	Mon, 05 Oct 2026 22:58:48 -0700
 lib/sequel/extensions/dataset_run.rb	Tue, 03 Mar 2026 21:13:26 -0800
 lib/sequel/extensions/dataset_source_alias.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/date_arithmetic.rb	Mon, 10 Aug 2026 21:10:16 -0700
@@ -43,7 +43,7 @@ lib/sequel/extensions/lit_require_frozen.rb	Sun, 06 Sep 2026 09:38:13 -0700
 lib/sequel/extensions/looser_typecasting.rb	Fri, 26 Sep 2025 23:42:00 -0700
 lib/sequel/extensions/migration.rb	Fri, 28 Aug 2026 21:20:15 -0700
 lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Thu, 11 Feb 2016 15:50:14 -0800
-lib/sequel/extensions/named_timezones.rb	Sun, 06 Sep 2026 22:33:36 -0700
+lib/sequel/extensions/named_timezones.rb	Mon, 05 Oct 2026 22:58:48 -0700
 lib/sequel/extensions/no_auto_literal_strings.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/null_dataset.rb	Tue, 17 Dec 2024 16:27:06 -0800
 lib/sequel/extensions/pagination.rb	Tue, 21 Sep 2021 14:24:30 -0700
@@ -62,7 +62,7 @@ lib/sequel/extensions/pg_inet_ops.rb	Fri, 28 Aug 2026 21:20:15 -0700
 lib/sequel/extensions/pg_interval.rb	Fri, 28 Aug 2026 21:20:15 -0700
 lib/sequel/extensions/pg_json.rb	Fri, 28 Aug 2026 21:20:15 -0700
 lib/sequel/extensions/pg_json_ops.rb	Sun, 06 Sep 2026 09:38:13 -0700
-lib/sequel/extensions/pg_loose_count.rb	Mon, 24 May 2021 12:25:38 -0700
+lib/sequel/extensions/pg_loose_count.rb	Fri, 02 Oct 2026 16:00:51 -0700
 lib/sequel/extensions/pg_multirange.rb	Tue, 26 Aug 2025 15:04:09 -0700
 lib/sequel/extensions/pg_range.rb	Fri, 28 Aug 2026 21:20:15 -0700
 lib/sequel/extensions/pg_range_ops.rb	Fri, 28 Aug 2026 21:20:15 -0700
@@ -86,13 +86,13 @@ lib/sequel/extensions/server_block.rb	Mon, 12 Jun 2023 13:05:49 -0700
 lib/sequel/extensions/server_logging.rb	Thu, 12 May 2016 12:28:13 -0700
 lib/sequel/extensions/set_literalizer.rb	Sun, 23 Nov 2025 09:58:00 -0800
 lib/sequel/extensions/split_array_nil.rb	Sun, 23 Nov 2025 09:58:00 -0800
-lib/sequel/extensions/sql_comments.rb	Mon, 10 Aug 2026 21:10:16 -0700
+lib/sequel/extensions/sql_comments.rb	Wed, 21 Oct 2026 18:44:30 -0700
 lib/sequel/extensions/sql_expr.rb	Fri, 14 Oct 2016 13:06:50 -0700
 lib/sequel/extensions/sql_log_normalizer.rb	Mon, 10 Aug 2026 21:10:16 -0700
 lib/sequel/extensions/sqlite_json_ops.rb	Fri, 28 Aug 2026 21:20:15 -0700
 lib/sequel/extensions/stdio_logger.rb	Mon, 01 Jul 2024 16:32:10 -0700
 lib/sequel/extensions/string_agg.rb	Mon, 10 Aug 2026 21:10:16 -0700
-lib/sequel/extensions/string_date_time.rb	Fri, 17 Dec 2021 16:59:47 -0800
+lib/sequel/extensions/string_date_time.rb	Mon, 05 Oct 2026 22:58:48 -0700
 lib/sequel/extensions/symbol_aref.rb	Sun, 06 Sep 2026 22:33:36 -0700
 lib/sequel/extensions/symbol_aref_refinement.rb	Sun, 06 Sep 2026 22:33:36 -0700
 lib/sequel/extensions/symbol_as.rb	Sun, 06 Sep 2026 22:33:36 -0700
@@ -216,5 +216,6 @@ lib/sequel/plugins/xml_serializer.rb	Sat, 15 Aug 2026 16:05:21 -0700
 doc/advanced_associations.rdoc	Wed, 15 Apr 2026 20:16:19 -0700
 doc/association_basics.rdoc	Mon, 10 Aug 2026 21:10:16 -0700
 doc/core_extensions.rdoc	Sun, 06 Sep 2026 22:33:36 -0700
+doc/mass_assignment.rdoc	Sun, 06 Sep 2026 09:38:13 -0700
 doc/reflection.rdoc	Mon, 11 Nov 2024 14:55:11 -0800
 doc/schema_modification.rdoc	Sat, 08 Aug 2026 18:51:01 -0700

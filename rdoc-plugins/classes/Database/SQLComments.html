@@ -89,10 +89,10 @@ Database::SQLComments
 [show source]
 </a>
 <pre id='method-c-extended-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sql_comments.rb</span>
-<span class="line-num">143</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)
-<span class="line-num">144</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@comment_hashes</span>, {})
-<span class="line-num">145</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-constant">DatasetSQLComments</span>
-<span class="line-num">146</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">139</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)
+<span class="line-num">140</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@comment_hashes</span>, {})
+<span class="line-num">141</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-constant">DatasetSQLComments</span>
+<span class="line-num">142</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -112,22 +112,22 @@ Database::SQLComments
 [show source]
 </a>
 <pre id='method-i-with_comments-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sql_comments.rb</span>
-<span class="line-num">153</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_comments</span>(<span class="ruby-identifier">comment_hash</span>)
-<span class="line-num">154</span>   <span class="ruby-identifier">hashes</span> = <span class="ruby-ivar">@comment_hashes</span>
-<span class="line-num">155</span>   <span class="ruby-identifier">t</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">current</span>
-<span class="line-num">156</span>   <span class="ruby-identifier">new_hash</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">hash</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">hashes</span>[<span class="ruby-identifier">t</span>]}
-<span class="line-num">157</span>     <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">comment_hash</span>)
-<span class="line-num">158</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">159</span>     <span class="ruby-identifier">comment_hash</span>.<span class="ruby-identifier">dup</span>
-<span class="line-num">160</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">161</span>   <span class="ruby-keyword">yield</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">hashes</span>[<span class="ruby-identifier">t</span>] = <span class="ruby-identifier">new_hash</span>}
-<span class="line-num">162</span> <span class="ruby-keyword">ensure</span>
-<span class="line-num">163</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">hash</span>
-<span class="line-num">164</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">hashes</span>[<span class="ruby-identifier">t</span>] = <span class="ruby-identifier">hash</span>}
-<span class="line-num">165</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">166</span>     <span class="ruby-identifier">t</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">hashes</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">t</span>)}
-<span class="line-num">167</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">168</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">149</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_comments</span>(<span class="ruby-identifier">comment_hash</span>)
+<span class="line-num">150</span>   <span class="ruby-identifier">hashes</span> = <span class="ruby-ivar">@comment_hashes</span>
+<span class="line-num">151</span>   <span class="ruby-identifier">t</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">current</span>
+<span class="line-num">152</span>   <span class="ruby-identifier">new_hash</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">hash</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">hashes</span>[<span class="ruby-identifier">t</span>]}
+<span class="line-num">153</span>     <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">comment_hash</span>)
+<span class="line-num">154</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">155</span>     <span class="ruby-identifier">comment_hash</span>.<span class="ruby-identifier">dup</span>
+<span class="line-num">156</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">157</span>   <span class="ruby-keyword">yield</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">hashes</span>[<span class="ruby-identifier">t</span>] = <span class="ruby-identifier">new_hash</span>}
+<span class="line-num">158</span> <span class="ruby-keyword">ensure</span>
+<span class="line-num">159</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">hash</span>
+<span class="line-num">160</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">hashes</span>[<span class="ruby-identifier">t</span>] = <span class="ruby-identifier">hash</span>}
+<span class="line-num">161</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">162</span>     <span class="ruby-identifier">t</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">hashes</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">t</span>)}
+<span class="line-num">163</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">164</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

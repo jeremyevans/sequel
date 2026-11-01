@@ -43,7 +43,12 @@ lib/sequel/extensions/pg_loose_count.rb
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loose_count</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:schema</span>][<span class="ruby-value">:table</span>]) <span class="ruby-comment"># =&gt; 123456</span>
 </pre>
 
-<p>How accurate this count is depends on the number of rows added/deleted from the table since the last time it was analyzed. If the table has not been vacuumed or analyzed yet, this can return 0 or -1 depending on the PostgreSQL version in use.</p>
+<p>To get the loose count of all tables in a given schema:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loose_counts</span>(<span class="ruby-value">:schema</span>) <span class="ruby-comment"># =&gt; {table: 123456, ...}</span>
+</pre>
+
+<p>How accurate these counts are depends on the number of rows added/deleted from the table since the last time it was analyzed. If the table has not been vacuumed or analyzed yet, this can return 0 or -1 depending on the PostgreSQL version in use.</p>
 
 <p>To load the extension into the database:</p>
 

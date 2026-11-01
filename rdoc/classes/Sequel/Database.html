@@ -1037,18 +1037,18 @@ Superclass:
 </td></tr></tbody></table>
 
 <p>PostgreSQL specific options:</p>
-<table class="rdoc-list note-list"><tbody><tr><td class='label'>:on_commit </td><td>
-<p>Either :preserve_rows (default), :drop or :delete_rows. Should only be specified when creating a temporary table.</p>
-</td></tr><tr><td class='label'>:foreign </td><td>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:foreign </td><td>
 <p>Create a foreign table.  The value should be the name of the foreign server that was specified in CREATE SERVER.</p>
 </td></tr><tr><td class='label'>:inherits </td><td>
 <p>Inherit from a different table.  An array can be specified to inherit from multiple tables.</p>
-</td></tr><tr><td class='label'>:unlogged </td><td>
-<p>Create the table as an unlogged table.</p>
+</td></tr><tr><td class='label'>:on_commit </td><td>
+<p>Either :preserve_rows (default), :drop or :delete_rows. Should only be specified when creating a temporary table.</p>
 </td></tr><tr><td class='label'>:options </td><td>
 <p>The OPTIONS clause to use for foreign tables.  Should be a hash where keys are option names and values are option values.  Note that option names are unquoted, so you should not use untrusted keys.</p>
 </td></tr><tr><td class='label'>:tablespace </td><td>
 <p>The tablespace to use for the table.</p>
+</td></tr><tr><td class='label'>:unlogged </td><td>
+<p>Create the table as an unlogged table.</p>
 </td></tr></tbody></table>
 
 <p>SQLite specific options:</p>

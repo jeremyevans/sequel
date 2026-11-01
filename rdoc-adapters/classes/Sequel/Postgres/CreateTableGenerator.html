@@ -45,6 +45,7 @@ Superclass:
 <h3>Public Instance</h3>
 <ol>
 <li><a href="#method-i-exclude">exclude</a></li>
+<li><a href="#method-i-like">like</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -92,6 +93,32 @@ Superclass:
 <span class="line-num">134</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude</span>(<span class="ruby-identifier">elements</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
 <span class="line-num">135</span>   <span class="ruby-identifier">constraints</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:exclude</span>, <span class="ruby-value">:elements</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">elements</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
 <span class="line-num">136</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-like'>
+<a name='method-i-like'></a>
+<div class='synopsis'>
+<span class='name'>like</span><span class='arguments'>(table, excluding: nil, including: nil)</span>
+
+</div>
+<div class='description'>
+
+<p>Copies the column names, data types, and not null constraints from the specified table using LIKE. Arguments: table: Name of table to copy from excluding: LIKE options to exclude, can be a symbol or array of symbols</p>
+
+<pre>(options: :comments, :compression:, :constraints, :defaults,
+:generated, :identity, :indexes, :statistics, :storage, :all)</pre>
+
+<p>including: LIKE options to include (same values supported as excluding)</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-like-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-like-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">145</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">like</span>(<span class="ruby-identifier">table</span>, <span class="ruby-value">excluding:</span> <span class="ruby-keyword">nil</span>, <span class="ruby-value">including:</span> <span class="ruby-keyword">nil</span>)
+<span class="line-num">146</span>   <span class="ruby-identifier">columns</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">like_table:</span> <span class="ruby-identifier">table</span>, <span class="ruby-value">excluding:</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">excluding</span>), <span class="ruby-value">including:</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">including</span>)}
+<span class="line-num">147</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

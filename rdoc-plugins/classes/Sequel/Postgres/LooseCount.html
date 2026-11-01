@@ -41,6 +41,7 @@ Sequel::Postgres::LooseCount
 <h3>Public Instance</h3>
 <ol>
 <li><a href="#method-i-loose_count">loose_count</a></li>
+<li><a href="#method-i-loose_counts">loose_counts</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -64,9 +65,55 @@ Sequel::Postgres::LooseCount
 [show source]
 </a>
 <pre id='method-i-loose_count-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pg_loose_count.rb</span>
-<span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">loose_count</span>(<span class="ruby-identifier">table</span>)
-<span class="line-num">32</span>   <span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_class</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">:oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>)).<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-value">:reltuples</span>, <span class="ruby-constant">Integer</span>))
-<span class="line-num">33</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">35</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">loose_count</span>(<span class="ruby-identifier">table</span>)
+<span class="line-num">36</span>   <span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_class</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">:oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>)).<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-value">:reltuples</span>, <span class="ruby-constant">Integer</span>))
+<span class="line-num">37</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-loose_counts'>
+<a name='method-i-loose_counts'></a>
+<div class='synopsis'>
+<span class='name'>loose_counts</span><span class='arguments'>(schema)</span>
+
+</div>
+<div class='description'>
+
+<p>Look at the table statistics for the given schema and return a hash with table name keys and approximate counts. Results include normal tables, materialized views, and partitioned tables.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-loose_counts-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-loose_counts-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pg_loose_count.rb</span>
+<span class="line-num">42</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">loose_counts</span>(<span class="ruby-identifier">schema</span>)
+<span class="line-num">43</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">schema</span>
+<span class="line-num">44</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>
+<span class="line-num">45</span>     <span class="ruby-identifier">schema</span> = <span class="ruby-identifier">schema</span>.<span class="ruby-identifier">to_s</span>
+<span class="line-num">46</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>
+<span class="line-num">47</span>     <span class="ruby-keyword">nil</span>
+<span class="line-num">48</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>
+<span class="line-num">49</span>     <span class="ruby-identifier">schema</span> = <span class="ruby-identifier">schema</span>.<span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_s</span>
+<span class="line-num">50</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">51</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;unsupported argument type, should be symbol, string, or Sequel::SQL::Identifier, given #{schema.inspect}&quot;</span>
+<span class="line-num">52</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">53</span> 
+<span class="line-num">54</span>   <span class="ruby-identifier">namespace_oid</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>
+<span class="line-num">55</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:to_regnamespace</span>, <span class="ruby-identifier">schema</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:oid</span>)
+<span class="line-num">56</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">57</span>     <span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_namespace</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">nspname:</span> <span class="ruby-identifier">schema</span>).<span class="ruby-identifier">select</span>(<span class="ruby-value">:oid</span>)
+<span class="line-num">58</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">59</span> 
+<span class="line-num">60</span>   <span class="ruby-identifier">hash</span> = {}
+<span class="line-num">61</span>   <span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_class</span>).
+<span class="line-num">62</span>     <span class="ruby-identifier">where</span>(<span class="ruby-value">relnamespace:</span> <span class="ruby-identifier">namespace_oid</span>, <span class="ruby-value">relkind:</span> <span class="ruby-node">%w&quot;r m p&quot;</span>).
+<span class="line-num">63</span>     <span class="ruby-identifier">order</span>(<span class="ruby-value">:relname</span>).
+<span class="line-num">64</span>     <span class="ruby-identifier">select_map</span>([<span class="ruby-value">:relname</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-value">:reltuples</span>, <span class="ruby-constant">Integer</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:v</span>)]).
+<span class="line-num">65</span>     <span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+<span class="line-num">66</span>       <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_sym</span>] = <span class="ruby-identifier">v</span>
+<span class="line-num">67</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">68</span>   <span class="ruby-identifier">hash</span>
+<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

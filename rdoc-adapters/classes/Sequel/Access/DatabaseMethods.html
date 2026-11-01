@@ -89,9 +89,9 @@ Sequel::Access::DatabaseMethods
 [show source]
 </a>
 <pre id='method-i-database_type-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>
-<span class="line-num">14</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">database_type</span>
-<span class="line-num">15</span>   <span class="ruby-value">:access</span>
-<span class="line-num">16</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">16</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">database_type</span>
+<span class="line-num">17</span>   <span class="ruby-value">:access</span>
+<span class="line-num">18</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-rename_table'>
@@ -110,10 +110,10 @@ Sequel::Access::DatabaseMethods
 [show source]
 </a>
 <pre id='method-i-rename_table-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>
-<span class="line-num">25</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rename_table</span>(<span class="ruby-identifier">from_table</span>, <span class="ruby-identifier">to_table</span>)
-<span class="line-num">26</span>   <span class="ruby-identifier">create_table</span>(<span class="ruby-identifier">to_table</span>, <span class="ruby-value">:as</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">from</span>(<span class="ruby-identifier">from_table</span>))
-<span class="line-num">27</span>   <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">from_table</span>)
-<span class="line-num">28</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rename_table</span>(<span class="ruby-identifier">from_table</span>, <span class="ruby-identifier">to_table</span>)
+<span class="line-num">28</span>   <span class="ruby-identifier">create_table</span>(<span class="ruby-identifier">to_table</span>, <span class="ruby-value">:as</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">from</span>(<span class="ruby-identifier">from_table</span>))
+<span class="line-num">29</span>   <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">from_table</span>)
+<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-serial_primary_key_options'>
@@ -132,9 +132,9 @@ Sequel::Access::DatabaseMethods
 [show source]
 </a>
 <pre id='method-i-serial_primary_key_options-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>
-<span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">serial_primary_key_options</span>
-<span class="line-num">32</span>   {<span class="ruby-value">:primary_key</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Counter</span>}
-<span class="line-num">33</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">33</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">serial_primary_key_options</span>
+<span class="line-num">34</span>   {<span class="ruby-value">:primary_key</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Counter</span>}
+<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

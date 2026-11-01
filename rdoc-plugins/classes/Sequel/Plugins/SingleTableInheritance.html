@@ -40,7 +40,7 @@ Sequel::Plugins::SingleTableInheritance
 
 <p>By default, the plugin assumes that the <code>sti_key</code> column (the first argument to the plugin) holds the class name as a string.  However, you can override this by using the <code>:model_map</code> option and/or the <code>:key_map</code> option.</p>
 
-<p>The <code>sti_key</code> column can be set via mass assignment, just like any non-primary key column. Make sure to follow the recommendations in the mass assignment guide to ensure this column is not set with untrusted data.</p>
+<p>The <code>sti_key</code> column can be set via mass assignment, just like any non-primary key column. Make sure to follow the recommendations in the <a href="../../../files/doc/mass_assignment_rdoc.html">mass assignment guide</a> to ensure this column is not set with untrusted data.</p>
 
 <p>You should only load this plugin in the parent class, not in the subclasses.</p>
 

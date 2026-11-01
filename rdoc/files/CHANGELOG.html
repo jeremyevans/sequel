@@ -33,6 +33,37 @@ CHANGELOG
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.110.0+-282026-11-01-29"><a href="#label-5.110.0+-282026-11-01-29"><a href="doc/release_notes/5_110_0_txt.html">5.110.0</a> (2026-11-01)</a></h3>
+<ul><li>
+<p>Raise error if attempting to use a quoted identifier containing “ on Oracle (jeremyevans)</p>
+</li><li>
+<p>Deprecate Microsoft Access support (jeremyevans)</p>
+</li><li>
+<p>Raise error if attempting to use a quoted identifier containing ] on Microsoft Access (jeremyevans)</p>
+</li><li>
+<p>Replace aliasing of Kernel methods inside modules with define_method and Kernel.instance_method (jeremyevans)</p>
+</li><li>
+<p>Deprecate Sequel::SPLIT_SYMBOL_CACHE constant (jeremyevans)</p>
+</li><li>
+<p>Deprecate Sequel.split_symbols= (jeremyevans)</p>
+</li><li>
+<p>Deprecate String#to_datetime in the string_date_time extension (jeremyevans)</p>
+</li><li>
+<p>Support SEQUEL_NAMED_TIMEZONES_USE_TIME environment variable for not having named_timezones extension set datetime_class (jeremyevans)</p>
+</li><li>
+<p>Deprecate Sequel.datetime_class= (jeremyevans)</p>
+</li><li>
+<p>Deprecate Sequel.convert_two_digit_years= (jeremyevans)</p>
+</li><li>
+<p>Add create_table like method on PostgreSQL, allowing you to copy all columns from another table (jeremyevans)</p>
+</li><li>
+<p>Add alter_table detach_partition method on PostgreSQL 10+, for detaching a partition to a separate table (jeremyevans)</p>
+</li><li>
+<p>Add alter_table attach_partition method on PostgreSQL 10+, for attaching an existing table as a partition (jeremyevans)</p>
+</li><li>
+<p>Add Database#loose_counts to pg_loose_count extension, getting loose counts for all tables in a schema (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.109.0+-282026-10-01-29"><a href="#label-5.109.0+-282026-10-01-29"><a href="doc/release_notes/5_109_0_txt.html">5.109.0</a> (2026-10-01)</a></h3>
 <ul><li>
 <p>Make create_table with :temp and :as options create temporary table on Microsoft SQL Server and DB2 (jeremyevans) (#2393)</p>
