@@ -303,7 +303,7 @@ module Sequel
             end
           end
         when :add_constraint
-          if op[:type] == :check
+          if op[:type] == :check && sqlite_version >= 35300
             super
           else
             duplicate_table(table, :constraints=>[op])
