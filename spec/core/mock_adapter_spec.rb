@@ -768,6 +768,24 @@ describe "PostgreSQL support" do
     @db.sqls.must_equal ["INSERT INTO \"a\" DEFAULT VALUES RETURNING *"]
   end
 
+  it "should support WAIT FOR LSN" do
+    @db.wait_for_lsn('0/0306EE20')
+    @db.sqls.must_equal ["WAIT FOR LSN '0/0306EE20'"]
+    @db.wait_for_lsn('0/0306EE20', mode: :standby_write)
+    @db.sqls.must_equal ["WAIT FOR LSN '0/0306EE20' WITH (MODE 'standby_write')"]
+    @db.wait_for_lsn('0/0306EE20', no_throw: true)
+    @db.sqls.must_equal ["WAIT FOR LSN '0/0306EE20' WITH (NO_THROW)"]
+    @db.wait_for_lsn('0/0306EE20', timeout: "1ms")
+    @db.sqls.must_equal ["WAIT FOR LSN '0/0306EE20' WITH (TIMEOUT '1ms')"]
+    @db.wait_for_lsn('0/0306EE20', mode: :standby_replay, timeout: "1ms")
+    @db.sqls.must_equal ["WAIT FOR LSN '0/0306EE20' WITH (MODE 'standby_replay', TIMEOUT '1ms')"]
+    @db.wait_for_lsn('0/0306EE20', mode: :primary_flush, no_throw: true)
+    @db.sqls.must_equal ["WAIT FOR LSN '0/0306EE20' WITH (MODE 'primary_flush', NO_THROW)"]
+    @db.wait_for_lsn('0/0306EE20', timeout: "1ms", no_throw: true)
+    @db.sqls.must_equal ["WAIT FOR LSN '0/0306EE20' WITH (TIMEOUT '1ms', NO_THROW)"]
+    proc{@db.wait_for_lsn('0/0306EE20', mode: :invalid)}.must_raise Sequel::Error
+  end
+
   it "should support adding columns with COLLATE" do
     @db.alter_table(:t){add_column :x, String, :collate=>'s'}
     @db.sqls.must_equal ["ALTER TABLE \"t\" ADD COLUMN \"x\" text COLLATE s"]

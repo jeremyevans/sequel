@@ -183,6 +183,12 @@ describe 'A PostgreSQL database' do
       update(:id=>2).must_equal([{:x=>1, :y=>2}])
   end if DB.server_version >= 180000
 
+  it "should support WAIT FOR LSN" do
+    proc{@db.wait_for_lsn('0/0306EE20', timeout: "1ms")}.must_raise Sequel::DatabaseError
+    @db.wait_for_lsn('0/0306EE20', mode: :primary_flush, timeout: "1ms", no_throw: true).must_equal "success"
+    @db.wait_for_lsn('0/0306EE20', mode: :standby_flush, timeout: "1ms", no_throw: true, server: :default).must_equal "not in recovery"
+  end if DB.server_version >= 190000
+
   it "should provide a list of existing ordinary tables" do
     @db.create_table(:test){Integer :id}
     @db.tables.must_include :test

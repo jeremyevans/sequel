@@ -931,6 +931,52 @@ module Sequel
         pg_class_relname(relkind, opts)
       end
 
+      # Run the WAIT FOR LSN command with the given options. Returns either
+      # "success", "timeout", or "not in recovery".  Arguments:
+      # +mode+ :: The type of LSN processing to wait for. Can be +nil+, +:standby_replay+,
+      #           +:standby_write+, +:standby_flush+, or +primary_flush+
+      # +server+ :: The server on which to run the command.
+      # +timeout+ :: Timeout to wait for. +0+ means indefinitely.
+      # +no_throw+ :: Uses +NO_THROW+, which avoids throwing an error if there is a timeout
+      #               or when run on the primary.
+      def wait_for_lsn(lsn, mode: nil, timeout: nil, no_throw: nil, server: nil)
+        sql = String.new
+        sql << "WAIT FOR LSN ?"
+        args = [lsn]
+
+        if mode || timeout || no_throw
+          sql << " WITH ("
+          sep = ""
+
+          case mode
+          when nil
+            # nothing
+          when :standby_replay, :standby_write, :standby_flush, :primary_flush
+            sql << sep << "MODE ?"
+            sep = ", "
+            args << mode.to_s
+          else
+            raise Error, "invalid wait_for_lsn mode argument: #{mode.inspect}"
+          end
+
+          if timeout
+            sql << sep << "TIMEOUT ?"
+            sep = ", "
+            args << timeout
+          end
+
+          if no_throw
+            sql << sep << "NO_THROW"
+          end
+
+          sql << ")"
+        end
+
+        ds = dataset
+        ds = ds.server(server) if server
+        ds.with_sql(Sequel::SQL::PlaceholderLiteralString.new(sql, args)).single_value!
+      end
+
       # Attempt to acquire an exclusive advisory lock with the given lock_id (which should be
       # a 64-bit integer).  If successful, yield to the block, then release the advisory lock
       # when the block exits.  If unsuccessful, raise a Sequel::AdvisoryLockError.
