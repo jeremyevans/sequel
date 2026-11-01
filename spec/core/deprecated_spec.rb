@@ -68,4 +68,19 @@ describe "Sequel::Deprecated" do
     @output.first.must_equal 'foo'
     @output.count.must_equal 4
   end
+
+  it "check_keywords should issue deprecation method if positional argument is given" do
+    @d.check_keywords(:test, false, {a: 1}, {})
+    @output.must_equal ['A positional options hash is now deprecated for test. Support for this will be removed in Sequel 6. Switch to passing keywords arguments. Keys given in positional options hash: a.']
+  end
+
+  it "check_keywords should issue deprecation method if extra keyword arguments are given" do
+    @d.check_keywords(:test, true, {}, {a: 1})
+    @output.must_equal ['Unrecognized keywords given to test: a. Backwards compatibility for this will be removed in Sequel 6.']
+  end
+
+  it "check_keywords should not issue deprecation method if positional argument not given and no extra keywords given" do
+    @d.check_keywords(:test, true, {}, {})
+    @output.must_equal []
+  end
 end

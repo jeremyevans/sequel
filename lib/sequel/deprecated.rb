@@ -57,6 +57,19 @@ module Sequel
       nil
     end
 
+    # Handle positional argument to keyword argument conversion warnings in plugins.
+    def self.check_keywords(method, no_positional_opts, opts, kw)
+      unless no_positional_opts
+        deprecate("A positional options hash is now deprecated for #{method}. Support for this will be removed in Sequel 6. Switch to passing keywords arguments. Keys given in positional options hash: #{opts.keys.join(", ")}.")
+      end
+
+      unless kw.empty?
+        deprecate("Unrecognized keywords given to #{method}: #{kw.keys.join(", ")}. Backwards compatibility for this will be removed in Sequel 6.")
+      end
+
+      nil
+    end
+
     # If using ruby 2.3+, use Module#deprecate_constant to deprecate the constant,
     # otherwise do nothing as the ruby implementation does not support constant deprecation.
     def self.deprecate_constant(mod, constant)
