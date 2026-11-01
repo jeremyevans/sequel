@@ -228,8 +228,64 @@ describe "Model#save" do
     proc{@m.save(:raise_on_failure => true)}.must_raise(Sequel::ValidationFailed)
   end
 
-  it "should return nil if validations fail and raise_on_save_faiure is false" do
+  it "should return nil if validations fail and raise_on_save_failure is false" do
     @m.raise_on_save_failure = false
     @m.save.must_be_nil
+  end
+end
+
+describe "Model#validate!" do
+  before do
+    @c = Class.new(Sequel::Model(:people)) do
+      columns :id, :x
+
+      def validate
+        errors.add(:id, 'blah') unless x == 7
+      end
+    end
+    @m = @c.load(:id => 4, :x=>6)
+    DB.reset
+  end
+
+  it "should skip validations if validate is false" do
+    @m.validate!(:validate=>false).must_equal true
+  end
+
+  it "should skip validations if the skip_validation_on_save! method is used" do
+    @m.skip_validation_on_next_save!
+    @m.validate!.must_equal true
+  end
+
+  it "should not skip future validations if the skip_validation_on_save! method is used" do
+    @m.raise_on_save_failure = false
+    @m.skip_validation_on_next_save!
+    @m.validate!.must_equal true
+    @m.validate!.must_equal false
+  end
+
+  it "should skip validations if the skip_validation_on_save! method is used and validate is true" do
+    @m.skip_validation_on_next_save!
+    @m.validate!(:validate=>true).must_equal true
+  end
+
+  it "should raise error if validations fail and raise_on_save_failure is true" do
+    begin
+      @m.validate!
+    rescue Sequel::ValidationFailed => e
+      e.model.must_be_same_as(@m)
+      e.errors.must_be_same_as(@m.errors)
+    else
+      raise
+    end
+  end
+
+  it "should raise error if validations fail and raise_on_failure is true" do
+    @m.raise_on_save_failure = false
+    proc{@m.validate!(:raise_on_failure => true)}.must_raise(Sequel::ValidationFailed)
+  end
+
+  it "should return false if validations fail and raise_on_save_failure is false" do
+    @m.raise_on_save_failure = false
+    @m.validate!.must_equal false
   end
 end

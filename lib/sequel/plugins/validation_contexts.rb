@@ -4,7 +4,7 @@ module Sequel
   module Plugins
     # The validation_contexts plugin adds support for a validation_context method inside a validate
     # method.  You pass in the validation context to use via the :validation_context option to
-    # Sequel::Model#save && Sequel::Model#valid?:
+    # Sequel::Model#save, #validate!, and #valid?:
     #
     #   class Album < Sequel::Model
     #     plugin :validation_contexts
@@ -38,14 +38,29 @@ module Sequel
         # Set via the :validation_context option passed to save/valid?.
         attr_reader :validation_context
 
-        private
-
-        # Set validation context before running validations
-        def _valid?(opts)
+        def save(opts=OPTS)
+          validation_context = @validation_context
           @validation_context = opts[:validation_context] if opts[:validation_context]
           super
         ensure
-          @validation_context = nil if @validation_context
+          @validation_context = validation_context if @validation_context
+        end
+
+        def validate!(validation_context: nil, validate: nil, raise_on_failure: nil)
+          valid_context = @validation_context
+          @validation_context = validation_context unless validation_context.nil?
+          super(validate: validate, raise_on_failure: raise_on_failure)
+        ensure
+          @validation_context = valid_context if @validation_context
+        end
+
+        # Set validation context before running validations
+        def valid?(opts=OPTS)
+          validation_context = @validation_context
+          @validation_context = opts[:validation_context] if opts[:validation_context]
+          super
+        ensure
+          @validation_context = validation_context if @validation_context
         end
       end
     end

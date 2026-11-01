@@ -56,11 +56,12 @@ module Sequel
         end
 
         # Catch any thrown HookFailed exceptions if not raising on failure.
-        def checked_save_failure(opts)
-          if raise_on_failure?(opts)
-            super
+        def checked_save_failure(opts=(no_positional_opts = true; OPTS), raise_on_failure: opts[:raise_on_failure], **kw)
+          Sequel::Deprecation.check_keywords(__callee__, no_positional_opts, opts, kw)
+          if raise_on_failure?(raise_on_failure: raise_on_failure)
+            super(raise_on_failure: raise_on_failure)
           else
-            catch_hook_failures{super}
+            catch_hook_failures{super(raise_on_failure: raise_on_failure)}
           end
         end
 

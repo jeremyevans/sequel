@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require_relative "spec_helper"
 
-describe "Sequel::Plugins::ValidationHelpers" do
+describe "validation_contexts plugin" do
   before do
     @c = Class.new(Sequel::Model(:foo))
     @c.class_eval do
@@ -23,6 +23,11 @@ describe "Sequel::Plugins::ValidationHelpers" do
   it "should support :validation_context option to save?" do
     @c.new(:c=>3).save
     proc{@c.new(:c=>3).save(:validation_context=>:foo)}.must_raise Sequel::ValidationFailed
+  end
+
+  it "should support :validation_context option to validate!" do
+    @c.new(:c=>3).validate!
+    proc{@c.new(:c=>3).validate!(validation_context: :foo)}.must_raise Sequel::ValidationFailed
   end
 
   it "should raise error if using a validation context on a frozen model instance" do

@@ -1340,7 +1340,7 @@ END
       #   # => #<Artist {:id=>1, ...}>
       def destroy(opts = OPTS)
         raise Sequel::Error, "can't destroy frozen object" if frozen?
-        checked_save_failure(opts){checked_transaction(opts){_destroy(opts)}}
+        checked_save_failure(raise_on_failure: opts[:raise_on_failure]){checked_transaction(opts){_destroy(opts)}}
       end
 
       # Iterates through all of the current values using each.
@@ -1629,11 +1629,9 @@ END
       def save(opts=OPTS)
         raise Sequel::Error, "can't save frozen object" if frozen?
         set_server(opts[:server]) if opts[:server] 
-        unless _save_valid?(opts)
-          raise(validation_failed_error) if raise_on_failure?(opts)
-          return
-        end
-        checked_save_failure(opts){checked_transaction(opts){_save(opts)}}
+        raise_on_failure = opts[:raise_on_failure]
+        return unless validate!(validate: opts[:validate], raise_on_failure: raise_on_failure)
+        checked_save_failure(raise_on_failure: raise_on_failure){checked_transaction(opts){_save(opts)}}
       end
 
       # Saves only changed columns if the object has been modified.
@@ -1770,6 +1768,21 @@ END
       # user code, call <tt>valid?</tt> instead to check if an object
       # is valid.
       def validate
+      end
+
+      # Performs the same validation that #save performs internally, running validation hooks.
+      # Returns true if the object is valid. On failure, raises by default, but can return false
+      # if +raise_on_failure+ is true. Arguments:
+      # +validate+ :: Whether or not perform validation (if false, only runs the validation hooks)
+      # +raise_on_failure+ :: Whether to raise if validation or a validation hook fails (defaults
+      #                       to +raise_on_save_failure+ setting)
+      def validate!(validate: nil, raise_on_failure: nil)
+        if _save_valid?(validate: validate)
+          true
+        else
+          raise(validation_failed_error) if raise_on_failure?(raise_on_failure: raise_on_failure)
+          false
+        end
       end
 
       # Validates the object and returns true if no errors are reported.
@@ -2021,7 +2034,7 @@ END
           return true
         end
 
-        checked_save_failure(opts){_valid?(opts)}
+        checked_save_failure(raise_on_failure: opts[:raise_on_failure]){_valid?(opts)}
       end
 
       # Call _update with the given columns, if any are present.
@@ -2079,8 +2092,9 @@ END
 
       # If not raising on failure, check for HookFailed
       # being raised by yielding and swallow it.
-      def checked_save_failure(opts)
-        if raise_on_failure?(opts)
+      def checked_save_failure(opts=(no_positional_opts = true; OPTS), raise_on_failure: opts[:raise_on_failure], **kw)
+        Sequel::Deprecation.check_keywords(__callee__, no_positional_opts, opts, kw)
+        if raise_on_failure?(raise_on_failure: raise_on_failure)
           yield
         else
           begin
@@ -2152,8 +2166,14 @@ END
       # :raise_on_failure option is present in the hash, use that, otherwise,
       # fallback to the object's raise_on_save_failure (if set), or
       # class's default (if not).
-      def raise_on_failure?(opts)
-        opts.fetch(:raise_on_failure, raise_on_save_failure)
+      def raise_on_failure?(opts=(no_positional_opts = true; OPTS), raise_on_failure: opts[:raise_on_failure], **kw)
+        Sequel::Deprecation.check_keywords(__callee__, no_positional_opts, opts, kw)
+        case raise_on_failure
+        when true, false
+          raise_on_failure
+        else
+          raise_on_save_failure
+        end
       end
 
       # Raise an error appropriate to the hook type. May be swallowed by
