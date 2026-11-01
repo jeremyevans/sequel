@@ -150,6 +150,7 @@ spec_task.call("Run model specs", :spec_model, 'spec/model_spec.rb', false, fals
 spec_task.call("Run plugin/extension specs", :spec_plugin, 'spec/plugin_spec.rb', "plugin-extension", true)
 spec_task.call("Run bin/sequel specs", :spec_bin, 'spec/bin_spec.rb', 'bin', false)
 spec_task.call("Run core extensions specs", :spec_core_ext, 'spec/core_extensions_spec.rb', 'core-ext', true)
+spec_task.call("Run virtual row core refinements specs", :spec_vr_core_refinements, 'spec/virtual_row_core_refinements_spec.rb', 'vr-core-refinements', true) if RUBY_VERSION >= "4.1"
 spec_task.call("Run integration tests", :spec_integration, 'spec/adapter_spec.rb none', '1', true)
 
 %w'postgres sqlite mysql oracle mssql db2 sqlanywhere'.each do |adapter|
@@ -171,6 +172,7 @@ task :spec_cov do
   Rake::Task['spec_core_model_cov'].invoke
   Rake::Task['spec_plugin_cov'].invoke
   Rake::Task['spec_core_ext_cov'].invoke
+  Rake::Task['spec_vr_core_refinements_cov'].invoke if RUBY_VERSION >= "4.1"
   ENV['NO_SEQUEL_PG'] = '1'
   Rake::Task['spec_postgres_cov'].invoke
 end

@@ -1,5 +1,7 @@
 === master
 
+* Add virtual_row_core_refinements extension, enabling the core refinements inside virtual row blocks (jeremyevans)
+
 * Add Model#validate! for performing the same validation performed by #save (jeremyevans)
 
 * Change Model#checked_save_failure and #raise_on_failure? private methods to accept keyword arguments (jeremyevans)

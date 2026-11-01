@@ -56,6 +56,14 @@ Then for each file where you want to use the refinements:
 
   using Sequel::CoreRefinements
 
+=== In Virtual Row Blocks
+
+To enable the extensions in Sequel virtual row blocks, you can use the virtual_row_core_refinements extension:
+
+  Sequel.extension :virtual_row_core_refinements
+
+This support requires Proc#refined, so it only works in Ruby 4.1+.
+
 == Core Extension Methods
 
 This section will briefly describe all of the methods added to the core classes, and what the alternative method is that doesn't require the core extensions.
