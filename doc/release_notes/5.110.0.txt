@@ -1,0 +1,89 @@
+= New Features
+
+* The pg_loose_count extension now adds Database#loose_counts, which
+  takes a schema name, and returns a hash of loose counts for all
+  tables in the schema:
+
+    DB.loose_counts(:schema) # => {table: 123456, ...}
+
+* Database#create_table on PostgreSQL now supports a like method to
+  copy schema information from another table. It supports including
+  and excluding keyword arguments for the related clauses supported
+  by PostgreSQL:
+
+    DB.create_table(:table) do
+      like :other_table, including: :all
+    end
+
+* Database#alter_table on PostgreSQL 10+ now supports attach_partition
+  and detach_partition methods, for attaching and detaching
+  partitions.
+
+  attach_partition requires a block that uses the table partitioning
+  DSL (the same DSL used for create_table with the :partition_of
+  option):
+
+    DB.alter_table(:table) do
+      attach_partition(:part) do
+        from 3
+        to 4
+      end
+    end
+
+  detach_partition supports a concurrently keyword argument:
+
+    DB.alter_table(:table) do
+      detach_partition(:part, concurrently: true)
+    end
+
+  If you were previously using create_table with :partition_of, you
+  may want to consider combining create_table like with alter_table
+  attach_partition, as it reduces the amount of locking required to
+  add a partition to a table.
+
+* The SEQUEL_NAMED_TIMEZONES_USE_TIME environment variable is now
+  respected by the named_timezones extension. If set, the
+  named_timezones will not set datetime_class to DateTime. Starting
+  in Sequel 6, this will be the default behavior.
+
+= Other Improvements
+
+* Sequel no longer uses alias inside a module to alias methods
+  defined in Object. Instead, it uses define_method with
+  Kernel.instance_method. This prevents warnings in verbose mode
+  when running on Ruby 4.1.
+
+= Deprecations
+
+Support for these features will be removed in Sequel 6.
+
+* Sequel.split_symbols= is now deprecated. Sequel disabled
+  splitting symbols by default in Sequel 5. If your application still
+  relies on symbol splitting, you can use
+  https://github.com/jeremyevans/sequel-unsplit to handle the
+  majority of the conversion. Related to this, the
+  Sequel::SPLIT_SYMBOL_CACHE constant is now also deprecated
+
+* Sequel.datetime_class= is now deprecated. Sequel defaults to Time,
+  and only supported setting this to DateTime. DateTime has been
+  deprecated since Ruby 3.0. Most of the reasons to use
+  DateTime went away in Ruby 1.9, and the last reason (timezone
+  support) went away in Ruby 2.6.
+
+* Sequel.convert_two_digit_years= is now deprecated. Sequel has
+  defaulted to converting two digit years in dates and timestamps
+  since version 2.5.0 (over 18 years ago).
+
+* String#to_datetime in the string_date_time extension is now
+  deprecated.
+
+* Sequel's Microsoft Access support is now deprecated. The support
+  never worked well enough to pass Sequel's integration test suite.
+
+= Backwards Compatibility
+
+* Sequel now raises if attempting to quote an identifier containing
+  ] on Microsoft access, and when attempting to quote an identifier
+  containing " on Oracle. The documentation already warned against
+  using such identifiers, but since using them can result in SQL
+  injections, it is better to raise instead.

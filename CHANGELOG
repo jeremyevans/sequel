@@ -1,4 +1,4 @@
-=== master
+=== 5.110.0 (2026-11-01)
 
 * Raise error if attempting to use a quoted identifier containing " on Oracle (jeremyevans)
 
