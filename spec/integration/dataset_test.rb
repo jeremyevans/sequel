@@ -132,9 +132,9 @@ describe "Simple Dataset operations" do
   end
 
   it "should iterate over records as they come in" do
-    called = false
-    wait{@ds.each{|row| called = true; _(row).must_equal(:id=>1, :number=>10)}}
-    called.must_equal true
+    rows = []
+    wait{@ds.each{|row| rows << row}}
+    rows.must_equal [{:id=>1, :number=>10}]
   end
 
   it "should support iterating over large numbers of records with paged_each" do
