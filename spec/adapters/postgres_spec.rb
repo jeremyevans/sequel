@@ -1934,14 +1934,14 @@ describe "A PostgreSQL dataset with a timestamp field" do
 
   it "should handle parsing dates and timestamps in with 1, 2, and 3 digit years" do
     [1, 10, 100, -2, -20, -200].each do |year|
-      d = Date.new(year, 2, 3)
+      d = Date.new(year, 2, 3, Date::GREGORIAN)
       @db.get(Sequel.cast(d, Date)).must_equal d
       begin
         Sequel.default_timezone = :utc
         d = Time.utc(year, 2, 3, 10, 11, 12)
         @db.get(Sequel.cast(d, Time)).must_equal d
         with_datetime_class_datetime do
-          d = DateTime.new(year, 2, 3, 10, 11, 12)
+          d = DateTime.new(year, 2, 3, 10, 11, 12, 'Z', Date::GREGORIAN)
           @db.get(Sequel.cast(d, Time)).must_equal d
         end
       ensure
@@ -1964,7 +1964,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
   end
 
   it "should handle BC times and dates" do
-    d = Date.new(-1234, 2, 3)
+    d = Date.new(-1234, 2, 3, Date::GREGORIAN)
     @db.get(Sequel.cast(d, Date)).must_equal d
 
     Sequel.default_timezone = :utc
@@ -1973,14 +1973,14 @@ describe "A PostgreSQL dataset with a timestamp field" do
     @db.dataset.extension(:pg_timestamptz).get(Sequel.cast(t, :timestamptz)).must_equal t
 
     with_datetime_class_datetime do
-      dt = DateTime.new(-1234, 2, 3, 10, 20, Rational(30, 20))
+      dt = DateTime.new(-1234, 2, 3, 10, 20, Rational(30, 20), 'Z', Date::GREGORIAN)
       @db.get(Sequel.cast(dt, DateTime)).must_equal dt
       @db.dataset.extension(:pg_timestamptz).get(Sequel.cast(dt, :timestamptz)).must_equal dt
     end
   end
 
   it "should handle BC times and dates in bound variables" do
-    d = Date.new(-1234, 2, 3)
+    d = Date.new(-1234, 2, 3, Date::GREGORIAN)
     @db.select(Sequel.cast(:$d, Date)).call(:single_value, :d=>d).must_equal d
 
     Sequel.default_timezone = :utc
@@ -1989,7 +1989,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
     @db.select(Sequel.cast(:$t, :timestamptz)).call(:single_value, :t=>t).must_equal t
 
     with_datetime_class_datetime do
-      dt = DateTime.new(-1234, 2, 3, 10, 20, Rational(30, 20))
+      dt = DateTime.new(-1234, 2, 3, 10, 20, Rational(30, 20), 'Z', Date::GREGORIAN)
       @db.select(Sequel.cast(:$dt, DateTime)).call(:single_value, :dt=>dt).must_equal dt
       @db.select(Sequel.cast(:$dt, :timestamptz)).call(:single_value, :dt=>dt).must_equal dt
     end
@@ -5295,7 +5295,7 @@ describe 'PostgreSQL range types' do
     @db = DB
     @ds = @db[:items]
     @map = {:i4=>'int4range', :i8=>'int8range', :n=>'numrange', :d=>'daterange', :t=>'tsrange', :tz=>'tstzrange'}
-    @r = {:i4=>1...2, :i8=>2...3, :n=>BigDecimal('1.0')..BigDecimal('2.0'), :d=>Date.today...(Date.today+1), :t=>Time.local(2011, 1)..Time.local(2011, 2), :tz=>Time.local(2011, 1)..Time.local(2011, 2)}
+    @r = {:i4=>1...2, :i8=>2...3, :n=>BigDecimal('1.0')..BigDecimal('2.0'), :d=>Date.today.gregorian...(Date.today.gregorian+1), :t=>Time.local(2011, 1)..Time.local(2011, 2), :tz=>Time.local(2011, 1)..Time.local(2011, 2)}
     @ra = {}
     @pgr = {}
     @pgra = {}
@@ -5512,7 +5512,7 @@ describe 'PostgreSQL multirange types' do
       :i4=>[1...2, 4...5],
       :i8=>[2...3, 5...6],
       :n=>[BigDecimal('1.0')..BigDecimal('2.0'), BigDecimal('4.0')..BigDecimal('5.0')],
-      :d=>[Date.today...(Date.today+1), (Date.today+3)...(Date.today+4)],
+      :d=>[Date.today.gregorian...(Date.today.gregorian+1), (Date.today.gregorian+3)...(Date.today.gregorian+4)],
       :t=>[Time.local(2011, 1)..Time.local(2011, 2), Time.local(2011, 4)..Time.local(2011, 5)],
       :tz=>[Time.local(2011, 1)..Time.local(2011, 2), Time.local(2011, 4)..Time.local(2011, 5)],
     }

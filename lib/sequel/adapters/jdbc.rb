@@ -85,7 +85,7 @@ module Sequel
       x = convertors[:RubyDate] = Object.new
       def x.call(r, i)
         if v = r.getDate(i)
-          Date.civil(v.getYear + 1900, v.getMonth + 1, v.getDate)
+          Date.civil(v.getYear + 1900, v.getMonth + 1, v.getDate, Date::GREGORIAN)
         end
       end
       x = convertors[:RubyTimestamp] = Object.new

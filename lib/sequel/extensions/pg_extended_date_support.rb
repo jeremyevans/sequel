@@ -111,12 +111,12 @@ module Sequel
           end
           if m[2]
             dt = if Sequel.datetime_class == DateTime
-              DateTime.parse(value)
+              DateTime.parse(value, true, Date::GREGORIAN)
             elsif TIME_CAN_PARSE_BC
               Time.parse(value)
             # simplecov:disable
             else
-              DateTime.parse(value).to_time
+              DateTime.parse(value, true, Date::GREGORIAN).to_time
             # simplecov:enable
             end
 
@@ -236,7 +236,7 @@ module Sequel
           # Work around JRuby bug #4822 in Time#to_datetime for times before date of calendar reform
           def literal_time(time)
             if time < TIME_YEAR_1
-              literal_datetime(DateTime.parse(super))
+              literal_datetime(DateTime.parse(super, true, Date::GREGORIAN))
             else
               super
             end

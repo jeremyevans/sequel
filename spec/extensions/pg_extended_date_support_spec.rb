@@ -77,7 +77,7 @@ describe "pg_extended_date_support extension" do
   end
 
   it "should handle parsing BC dates" do
-    @db.conversion_procs[1082].call("1092-10-20 BC").must_equal Date.new(-1091, 10, 20)
+    @db.conversion_procs[1082].call("1092-10-20 BC").must_equal Date.new(-1091, 10, 20, Date::GREGORIAN)
   end
 
   it "should handle parsing BC timestamps as Time values" do
@@ -89,16 +89,16 @@ describe "pg_extended_date_support extension" do
   end
 
   with_datetime_class_datetime "should handle parsing BC timestamps as DateTime values" do
-    @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00 BC").must_equal DateTime.new(-1199, 2, 15, 14, 13, 20)
-    @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00:00 BC").must_equal DateTime.new(-1199, 2, 15, 14, 13, 20)
+    @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00 BC").must_equal DateTime.new(-1199, 2, 15, 14, 13, 20, 'Z', Date::GREGORIAN)
+    @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00:00 BC").must_equal DateTime.new(-1199, 2, 15, 14, 13, 20, 'Z', Date::GREGORIAN)
     Sequel.default_timezone = :utc
-    @db.conversion_procs[1114].call("1200-02-15 14:13:20 BC").must_equal DateTime.new(-1199, 2, 15, 14, 13, 20)
+    @db.conversion_procs[1114].call("1200-02-15 14:13:20 BC").must_equal DateTime.new(-1199, 2, 15, 14, 13, 20, 'Z', Date::GREGORIAN)
   end
 
   it "should handle parsing AD timestamps with offset seconds" do
     @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00:00").must_equal Time.utc(1200, 2, 15, 14, 13, 20)
     with_datetime_class_datetime do
-      @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00:00").must_equal DateTime.new(1200, 2, 15, 14, 13, 20)
+      @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00:00").must_equal DateTime.new(1200, 2, 15, 14, 13, 20, 'Z', Date::GREGORIAN)
     end
   end
 

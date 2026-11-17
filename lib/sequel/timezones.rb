@@ -85,7 +85,7 @@ module Sequel
       if v.is_a?(Date) && !v.is_a?(DateTime)
         # Dates handled specially as they are assumed to already be in the application_timezone
         if datetime_class == DateTime
-          DateTime.civil(v.year, v.month, v.day, 0, 0, 0, application_timezone == :local ? Rational(Time.local(v.year, v.month, v.day).utc_offset, 86400) : 0)
+          DateTime.civil(v.year, v.month, v.day, 0, 0, 0, application_timezone == :local ? Rational(Time.local(v.year, v.month, v.day).utc_offset, 86400) : 0, v.start)
         else
           Time.public_send(application_timezone == :utc ? :utc : :local, v.year, v.month, v.day)
         end
@@ -178,9 +178,9 @@ module Sequel
         if datetime_class == DateTime
           s += Rational(ns, 1000000000) if ns
           if off
-            DateTime.civil(y, mo, d, h, mi, s, off)
+            DateTime.civil(y, mo, d, h, mi, s, off, Date::GREGORIAN)
           else
-            convert_input_datetime_no_offset(DateTime.civil(y, mo, d, h, mi, s), input_timezone)
+            convert_input_datetime_no_offset(DateTime.civil(y, mo, d, h, mi, s, 0, Date::GREGORIAN), input_timezone)
           end
         elsif off
           s += Rational(ns, 1000000000) if ns

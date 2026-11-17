@@ -352,8 +352,11 @@ module Sequel
     # Converts the given +string+ into a +Date+ object.
     #
     #   Sequel.string_to_date('2010-09-10') # Date.civil(2010, 09, 10)
+    #
+    # This assumes the proleptic gregorian calendar, since that is what
+    # is commonly used by databases.
     def string_to_date(string)
-      Date.parse(string, Sequel.convert_two_digit_years)
+      Date.parse(string, Sequel.convert_two_digit_years, Date::GREGORIAN)
     rescue => e
       raise convert_exception_class(e, InvalidValue)
     end
@@ -366,7 +369,7 @@ module Sequel
     # This method is deprecated and will be removed in Sequel 6.1.
     def string_to_datetime(string) # SEQUEL6.1: Remove
       if datetime_class == DateTime
-        DateTime.parse(string, convert_two_digit_years)
+        DateTime.parse(string, convert_two_digit_years, Date::GREGORIAN)
       else
         datetime_class.parse(string)
       end

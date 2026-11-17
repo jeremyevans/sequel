@@ -44,7 +44,7 @@ module Sequel
       end
     end
     date = Object.new
-    def date.call(s) ::Date.new(*s.split('-').map(&:to_i)) end
+    def date.call(s) ::Date.new(*s.split('-').map(&:to_i), Date::GREGORIAN) end
     TYPE_TRANSLATOR_DATE = date.freeze
     bytea = Object.new
     def bytea.call(str)
@@ -2008,7 +2008,7 @@ module Sequel
         :multirange
       end
 
-      MIN_DATE = Date.new(-4713, 11, 24)
+      MIN_DATE = Date.new(-4713, 11, 24, Date::GREGORIAN)
       MAX_DATE = Date.new(5874897, 12, 31)
       MIN_TIMESTAMP = Time.utc(-4713, 11, 24).freeze
       MAX_TIMESTAMP = (Time.utc(294277) - Rational(1, 1000000)).freeze
