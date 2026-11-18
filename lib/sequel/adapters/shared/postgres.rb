@@ -940,41 +940,8 @@ module Sequel
       # +no_throw+ :: Uses +NO_THROW+, which avoids throwing an error if there is a timeout
       #               or when run on the primary.
       def wait_for_lsn(lsn, mode: nil, timeout: nil, no_throw: nil, server: nil)
-        sql = String.new
-        sql << "WAIT FOR LSN ?"
-        args = [lsn]
-
-        if mode || timeout || no_throw
-          sql << " WITH ("
-          sep = ""
-
-          case mode
-          when nil
-            # nothing
-          when :standby_replay, :standby_write, :standby_flush, :primary_flush
-            sql << sep << "MODE ?"
-            sep = ", "
-            args << mode.to_s
-          else
-            raise Error, "invalid wait_for_lsn mode argument: #{mode.inspect}"
-          end
-
-          if timeout
-            sql << sep << "TIMEOUT ?"
-            sep = ", "
-            args << timeout
-          end
-
-          if no_throw
-            sql << sep << "NO_THROW"
-          end
-
-          sql << ")"
-        end
-
-        ds = dataset
-        ds = ds.server(server) if server
-        ds.with_sql(Sequel::SQL::PlaceholderLiteralString.new(sql, args)).single_value!
+        wait_for_lsn_dataset(lsn, mode: mode, timeout: timeout, no_throw: no_throw, server: server).
+          single_value!
       end
 
       # Attempt to acquire an exclusive advisory lock with the given lock_id (which should be
@@ -2141,6 +2108,45 @@ module Sequel
         # simplecov:disable
         :local if server_version >= 90400
         # simplecov:enable
+      end
+
+      # Internals of wait_for_lsn
+      def wait_for_lsn_dataset(lsn, mode: nil, timeout: nil, no_throw: nil, server: nil)
+        sql = String.new
+        sql << "WAIT FOR LSN ?"
+        args = [lsn]
+
+        if mode || timeout || no_throw
+          sql << " WITH ("
+          sep = ""
+
+          case mode
+          when nil
+            # nothing
+          when :standby_replay, :standby_write, :standby_flush, :primary_flush
+            sql << sep << "MODE ?"
+            sep = ", "
+            args << mode.to_s
+          else
+            raise Error, "invalid wait_for_lsn mode argument: #{mode.inspect}"
+          end
+
+          if timeout
+            sql << sep << "TIMEOUT ?"
+            sep = ", "
+            args << timeout
+          end
+
+          if no_throw
+            sql << sep << "NO_THROW"
+          end
+
+          sql << ")"
+        end
+
+        ds = dataset
+        ds = ds.server(server) if server
+        ds.with_sql(Sequel::SQL::PlaceholderLiteralString.new(sql.freeze, args))
       end
     end
 

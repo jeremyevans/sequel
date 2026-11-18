@@ -233,6 +233,11 @@ module Sequel
           super
         end
 
+        # Disable auto_parameterization during WAIT FOR LSN.
+        def wait_for_lsn_dataset(lsn, mode: nil, timeout: nil, no_throw: nil, server: nil)
+          _no_auto_parameterize(super)
+        end
+
         # Disable automatic parameterization for the given table if supported.
         def _no_auto_parameterize(table)
           if table.is_a?(DatasetMethods)
