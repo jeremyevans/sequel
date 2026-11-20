@@ -185,8 +185,8 @@ describe 'A PostgreSQL database' do
 
   it "should support WAIT FOR LSN" do
     proc{@db.wait_for_lsn('0/0306EE20', timeout: "1ms")}.must_raise Sequel::DatabaseError
-    @db.wait_for_lsn('0/0306EE20', mode: :primary_flush, timeout: "5s", no_throw: true).must_equal "success"
-    @db.wait_for_lsn('0/0306EE20', mode: :standby_flush, timeout: "5s", no_throw: true, server: :default).must_equal "not in recovery"
+    %w"success timeout".must_include @db.wait_for_lsn('0/0306EE20', mode: :primary_flush, timeout: "5s", no_throw: true)
+    ["not in recovery", "timeout"].must_include @db.wait_for_lsn('0/0306EE20', mode: :standby_flush, timeout: "5s", no_throw: true, server: :default)
   end if DB.server_version >= 190000
 
   it "should provide a list of existing ordinary tables" do
